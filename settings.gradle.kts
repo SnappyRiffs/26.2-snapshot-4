@@ -11,6 +11,15 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("com.diffplug.spotless") version "8.10.4"
 }
+configure<SpotlessExtension> {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.17.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
 
 rootProject.name = "minecraft"
 include("app")
