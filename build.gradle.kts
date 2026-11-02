@@ -8,7 +8,7 @@ repositories {
 
 spotless {
     java {
-        target("decompiled/**/*.java")
+        target("decompiled-26.2 snapshot 4/**/*.java")
 
         googleJavaFormat("1.30.0")
         removeUnusedImports()
