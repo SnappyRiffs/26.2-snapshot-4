@@ -10,7 +10,7 @@ spotless {
     java {
         target("decompiled/**/*.java")
 
-        googleJavaFormat("1.17.0")
+        googleJavaFormat("1.30.0")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
