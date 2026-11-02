@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  org.slf4j.Logger
@@ -183,4 +183,3 @@ SpriteGetter {
         }
     }
 }
-

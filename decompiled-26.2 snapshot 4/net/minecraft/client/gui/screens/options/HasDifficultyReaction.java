@@ -4,6 +4,5 @@
 package net.minecraft.client.gui.screens.options;
 
 public interface HasDifficultyReaction {
-    public void onDifficultyChanged();
+  public void onDifficultyChanged();
 }
-

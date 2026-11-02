@@ -4,6 +4,5 @@
 package net.minecraft.world;
 
 public interface Clearable {
-    public void clearContent();
+  public void clearContent();
 }
-

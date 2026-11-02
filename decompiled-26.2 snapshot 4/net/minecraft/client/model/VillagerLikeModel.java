@@ -7,6 +7,5 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public interface VillagerLikeModel<T extends EntityRenderState> {
-    public void translateToArms(T var1, PoseStack var2);
+  public void translateToArms(T var1, PoseStack var2);
 }
-

@@ -5,28 +5,24 @@ package net.minecraft.server.packs.linkfs;
 
 import java.nio.file.Path;
 import java.util.Map;
-import net.minecraft.server.packs.linkfs.LinkFSPath;
 
 interface PathContents {
-    public static final PathContents MISSING = new PathContents(){
+  public static final PathContents MISSING =
+      new PathContents() {
 
         public String toString() {
-            return "empty";
+          return "empty";
         }
-    };
-    public static final PathContents RELATIVE = new PathContents(){
+      };
+  public static final PathContents RELATIVE =
+      new PathContents() {
 
         public String toString() {
-            return "relative";
+          return "relative";
         }
-    };
+      };
 
-    public record DirectoryContents(Map<String, LinkFSPath> children) implements PathContents
-    {
-    }
+  public record DirectoryContents(Map<String, LinkFSPath> children) implements PathContents {}
 
-    public record FileContents(Path contents) implements PathContents
-    {
-    }
+  public record FileContents(Path contents) implements PathContents {}
 }
-

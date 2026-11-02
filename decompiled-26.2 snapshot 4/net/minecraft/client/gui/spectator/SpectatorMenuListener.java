@@ -3,9 +3,6 @@
  */
 package net.minecraft.client.gui.spectator;
 
-import net.minecraft.client.gui.spectator.SpectatorMenu;
-
 public interface SpectatorMenuListener {
-    public void onSpectatorMenuClosed(SpectatorMenu var1);
+  public void onSpectatorMenuClosed(SpectatorMenu var1);
 }
-

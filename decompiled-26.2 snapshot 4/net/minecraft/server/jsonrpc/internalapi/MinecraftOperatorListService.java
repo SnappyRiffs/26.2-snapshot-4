@@ -11,14 +11,14 @@ import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.ServerOpListEntry;
 
 public interface MinecraftOperatorListService {
-    public Collection<ServerOpListEntry> getEntries();
+  public Collection<ServerOpListEntry> getEntries();
 
-    public void op(NameAndId var1, Optional<PermissionLevel> var2, Optional<Boolean> var3, ClientInfo var4);
+  public void op(
+      NameAndId var1, Optional<PermissionLevel> var2, Optional<Boolean> var3, ClientInfo var4);
 
-    public void op(NameAndId var1, ClientInfo var2);
+  public void op(NameAndId var1, ClientInfo var2);
 
-    public void deop(NameAndId var1, ClientInfo var2);
+  public void deop(NameAndId var1, ClientInfo var2);
 
-    public void clear(ClientInfo var1);
+  public void clear(ClientInfo var1);
 }
-

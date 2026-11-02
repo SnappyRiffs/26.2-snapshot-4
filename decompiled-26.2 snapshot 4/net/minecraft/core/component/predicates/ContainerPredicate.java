@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -22,18 +22,25 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.component.ItemContainerContents;
 
-public record ContainerPredicate(Optional<CollectionPredicate<ItemInstance, ItemPredicate>> items) implements SingleComponentItemPredicate<ItemContainerContents>
-{
-    public static final Codec<ContainerPredicate> CODEC = RecordCodecBuilder.create(i -> i.group((App)CollectionPredicate.codec(ItemPredicate.CODEC).optionalFieldOf("items").forGetter(ContainerPredicate::items)).apply((Applicative)i, ContainerPredicate::new));
+public record ContainerPredicate(Optional<CollectionPredicate<ItemInstance, ItemPredicate>> items)
+    implements SingleComponentItemPredicate<ItemContainerContents> {
+  public static final Codec<ContainerPredicate> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          CollectionPredicate.codec(ItemPredicate.CODEC)
+                              .optionalFieldOf("items")
+                              .forGetter(ContainerPredicate::items))
+                  .apply((Applicative) i, ContainerPredicate::new));
 
-    @Override
-    public DataComponentType<ItemContainerContents> componentType() {
-        return DataComponents.CONTAINER;
-    }
+  @Override
+  public DataComponentType<ItemContainerContents> componentType() {
+    return DataComponents.CONTAINER;
+  }
 
-    @Override
-    public boolean matches(ItemContainerContents value) {
-        return !this.items.isPresent() || this.items.get().test(value.nonEmptyItems());
-    }
+  @Override
+  public boolean matches(ItemContainerContents value) {
+    return !this.items.isPresent() || this.items.get().test(value.nonEmptyItems());
+  }
 }
-

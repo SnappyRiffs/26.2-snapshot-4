@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.MapCodec
@@ -17,8 +17,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.RegistryFixedCodec;
 
 public record WorldClock() {
-    public static final Codec<Holder<WorldClock>> CODEC = RegistryFixedCodec.create(Registries.WORLD_CLOCK);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<WorldClock>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.WORLD_CLOCK);
-    public static final Codec<WorldClock> DIRECT_CODEC = MapCodec.unitCodec(WorldClock::new);
+  public static final Codec<Holder<WorldClock>> CODEC =
+      RegistryFixedCodec.create(Registries.WORLD_CLOCK);
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<WorldClock>> STREAM_CODEC =
+      ByteBufCodecs.holderRegistry(Registries.WORLD_CLOCK);
+  public static final Codec<WorldClock> DIRECT_CODEC = MapCodec.unitCodec(WorldClock::new);
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -23,28 +23,36 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.slf4j.Logger;
 
-public record SingleFile(Identifier resourceId, Optional<Identifier> spriteId) implements SpriteSource
-{
-    private static final Logger LOGGER = LogUtils.getLogger();
-    public static final MapCodec<SingleFile> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Identifier.CODEC.fieldOf("resource").forGetter(SingleFile::resourceId), (App)Identifier.CODEC.optionalFieldOf("sprite").forGetter(SingleFile::spriteId)).apply((Applicative)i, SingleFile::new));
+public record SingleFile(Identifier resourceId, Optional<Identifier> spriteId)
+    implements SpriteSource {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  public static final MapCodec<SingleFile> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App) Identifier.CODEC.fieldOf("resource").forGetter(SingleFile::resourceId),
+                      (App)
+                          Identifier.CODEC
+                              .optionalFieldOf("sprite")
+                              .forGetter(SingleFile::spriteId))
+                  .apply((Applicative) i, SingleFile::new));
 
-    public SingleFile(Identifier resourceId) {
-        this(resourceId, Optional.empty());
-    }
+  public SingleFile(Identifier resourceId) {
+    this(resourceId, Optional.empty());
+  }
 
-    @Override
-    public void run(ResourceManager resourceManager, SpriteSource.Output output) {
-        Identifier fullResourceId = TEXTURE_ID_CONVERTER.idToFile(this.resourceId);
-        Optional<Resource> resource = resourceManager.getResource(fullResourceId);
-        if (resource.isPresent()) {
-            output.add(this.spriteId.orElse(this.resourceId), resource.get());
-        } else {
-            LOGGER.warn("Missing sprite: {}", (Object)fullResourceId);
-        }
+  @Override
+  public void run(ResourceManager resourceManager, SpriteSource.Output output) {
+    Identifier fullResourceId = TEXTURE_ID_CONVERTER.idToFile(this.resourceId);
+    Optional<Resource> resource = resourceManager.getResource(fullResourceId);
+    if (resource.isPresent()) {
+      output.add(this.spriteId.orElse(this.resourceId), resource.get());
+    } else {
+      LOGGER.warn("Missing sprite: {}", (Object) fullResourceId);
     }
+  }
 
-    public MapCodec<SingleFile> codec() {
-        return MAP_CODEC;
-    }
+  public MapCodec<SingleFile> codec() {
+    return MAP_CODEC;
+  }
 }
-

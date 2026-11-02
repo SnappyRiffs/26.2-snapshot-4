@@ -3,9 +3,4 @@
  */
 package net.minecraft.world.ticks;
 
-import net.minecraft.world.ticks.TickAccess;
-
-public interface TickContainerAccess<T>
-extends TickAccess<T> {
-}
-
+public interface TickContainerAccess<T> extends TickAccess<T> {}

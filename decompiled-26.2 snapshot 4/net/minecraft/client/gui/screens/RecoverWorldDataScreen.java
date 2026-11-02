@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  it.unimi.dsi.fastutil.booleans.BooleanConsumer
@@ -162,4 +162,3 @@ extends Screen {
         this.attemptRestore(minecraft);
     }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  *  org.jspecify.annotations.Nullable
@@ -14,9 +14,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -26,46 +23,56 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.jspecify.annotations.Nullable;
 
-public class WaterloggedTransparentBlock
-extends TransparentBlock
-implements SimpleWaterloggedBlock {
-    public static final MapCodec<WaterloggedTransparentBlock> CODEC = WaterloggedTransparentBlock.simpleCodec(WaterloggedTransparentBlock::new);
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+public class WaterloggedTransparentBlock extends TransparentBlock
+    implements SimpleWaterloggedBlock {
+  public static final MapCodec<WaterloggedTransparentBlock> CODEC =
+      WaterloggedTransparentBlock.simpleCodec(WaterloggedTransparentBlock::new);
+  public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-    protected MapCodec<? extends WaterloggedTransparentBlock> codec() {
-        return CODEC;
-    }
+  protected MapCodec<? extends WaterloggedTransparentBlock> codec() {
+    return CODEC;
+  }
 
-    protected WaterloggedTransparentBlock(BlockBehaviour.Properties properties) {
-        super(properties);
-        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(WATERLOGGED, false));
-    }
+  protected WaterloggedTransparentBlock(BlockBehaviour.Properties properties) {
+    super(properties);
+    this.registerDefaultState((BlockState) this.defaultBlockState().setValue(WATERLOGGED, false));
+  }
 
-    @Override
-    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
-        FluidState replacedFluidState = context.getLevel().getFluidState(context.getClickedPos());
-        return (BlockState)super.getStateForPlacement(context).setValue(WATERLOGGED, replacedFluidState.is(Fluids.WATER));
-    }
+  @Override
+  public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+    FluidState replacedFluidState = context.getLevel().getFluidState(context.getClickedPos());
+    return (BlockState)
+        super.getStateForPlacement(context)
+            .setValue(WATERLOGGED, replacedFluidState.is(Fluids.WATER));
+  }
 
-    @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
-        if (state.getValue(WATERLOGGED).booleanValue()) {
-            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        }
-        return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+  @Override
+  protected BlockState updateShape(
+      BlockState state,
+      LevelReader level,
+      ScheduledTickAccess ticks,
+      BlockPos pos,
+      Direction directionToNeighbour,
+      BlockPos neighbourPos,
+      BlockState neighbourState,
+      RandomSource random) {
+    if (state.getValue(WATERLOGGED).booleanValue()) {
+      ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
     }
+    return super.updateShape(
+        state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+  }
 
-    @Override
-    protected FluidState getFluidState(BlockState state) {
-        if (state.getValue(WATERLOGGED).booleanValue()) {
-            return Fluids.WATER.getSource(true);
-        }
-        return super.getFluidState(state);
+  @Override
+  protected FluidState getFluidState(BlockState state) {
+    if (state.getValue(WATERLOGGED).booleanValue()) {
+      return Fluids.WATER.getSource(true);
     }
+    return super.getFluidState(state);
+  }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(WATERLOGGED);
-    }
+  @Override
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    builder.add(WATERLOGGED);
+  }
 }
-

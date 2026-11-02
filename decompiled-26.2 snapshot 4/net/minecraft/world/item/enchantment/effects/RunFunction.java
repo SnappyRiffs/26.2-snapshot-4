@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -26,30 +26,46 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.enchantment.EnchantedItemInUse;
-import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
 import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
-public record RunFunction(Identifier function) implements EnchantmentEntityEffect
-{
-    private static final Logger LOGGER = LogUtils.getLogger();
-    public static final MapCodec<RunFunction> CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Identifier.CODEC.fieldOf("function").forGetter(RunFunction::function)).apply((Applicative)i, RunFunction::new));
+public record RunFunction(Identifier function) implements EnchantmentEntityEffect {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  public static final MapCodec<RunFunction> CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group((App) Identifier.CODEC.fieldOf("function").forGetter(RunFunction::function))
+                  .apply((Applicative) i, RunFunction::new));
 
-    @Override
-    public void apply(ServerLevel serverLevel, int enchantmentLevel, EnchantedItemInUse item, Entity entity, Vec3 position) {
-        MinecraftServer server = serverLevel.getServer();
-        ServerFunctionManager functions = server.getFunctions();
-        Optional<CommandFunction<CommandSourceStack>> function = functions.get(this.function);
-        if (function.isPresent()) {
-            CommandSourceStack source = server.createCommandSourceStack().withPermission(LevelBasedPermissionSet.GAMEMASTER).withSuppressedOutput().withEntity(entity).withLevel(serverLevel).withPosition(position).withRotation(entity.getRotationVector());
-            functions.execute(function.get(), source);
-        } else {
-            LOGGER.error("Enchantment run_function effect failed for non-existent function {}", (Object)this.function);
-        }
+  @Override
+  public void apply(
+      ServerLevel serverLevel,
+      int enchantmentLevel,
+      EnchantedItemInUse item,
+      Entity entity,
+      Vec3 position) {
+    MinecraftServer server = serverLevel.getServer();
+    ServerFunctionManager functions = server.getFunctions();
+    Optional<CommandFunction<CommandSourceStack>> function = functions.get(this.function);
+    if (function.isPresent()) {
+      CommandSourceStack source =
+          server
+              .createCommandSourceStack()
+              .withPermission(LevelBasedPermissionSet.GAMEMASTER)
+              .withSuppressedOutput()
+              .withEntity(entity)
+              .withLevel(serverLevel)
+              .withPosition(position)
+              .withRotation(entity.getRotationVector());
+      functions.execute(function.get(), source);
+    } else {
+      LOGGER.error(
+          "Enchantment run_function effect failed for non-existent function {}",
+          (Object) this.function);
     }
+  }
 
-    public MapCodec<RunFunction> codec() {
-        return CODEC;
-    }
+  public MapCodec<RunFunction> codec() {
+    return CODEC;
+  }
 }
-

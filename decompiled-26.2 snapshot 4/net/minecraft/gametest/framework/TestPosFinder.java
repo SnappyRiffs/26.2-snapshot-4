@@ -8,6 +8,5 @@ import net.minecraft.core.BlockPos;
 
 @FunctionalInterface
 public interface TestPosFinder {
-    public Stream<BlockPos> findTestPos();
+  public Stream<BlockPos> findTestPos();
 }
-

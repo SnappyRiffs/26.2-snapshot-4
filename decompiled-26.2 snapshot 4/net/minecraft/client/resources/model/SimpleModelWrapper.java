@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.HashMultimap
  *  com.mojang.logging.LogUtils
@@ -16,8 +16,6 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
@@ -27,40 +25,44 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public record SimpleModelWrapper(QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial) implements BlockStateModelPart
-{
-    private static final Logger LOGGER = LogUtils.getLogger();
+public record SimpleModelWrapper(
+    QuadCollection quads, boolean useAmbientOcclusion, Material.Baked particleMaterial)
+    implements BlockStateModelPart {
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static BlockStateModelPart bake(ModelBaker modelBakery, Identifier location, ModelState state) {
-        ResolvedModel model = modelBakery.getModel(location);
-        TextureSlots textureSlots = model.getTopTextureSlots();
-        boolean hasAmbientOcclusion = model.getTopAmbientOcclusion();
-        Material.Baked particleMaterial = model.resolveParticleMaterial(textureSlots, modelBakery);
-        QuadCollection geometry = model.bakeTopGeometry(textureSlots, modelBakery, state);
-        HashMultimap forbiddenSprites = null;
-        for (BakedQuad bakedQuad : geometry.getAll()) {
-            TextureAtlasSprite sprite = bakedQuad.materialInfo().sprite();
-            if (sprite.atlasLocation().equals(TextureAtlas.LOCATION_BLOCKS)) continue;
-            if (forbiddenSprites == null) {
-                forbiddenSprites = HashMultimap.create();
-            }
-            forbiddenSprites.put((Object)sprite.atlasLocation(), (Object)sprite.contents().name());
-        }
-        if (forbiddenSprites != null) {
-            LOGGER.warn("Rejecting block model {}, since it contains sprites from outside of supported atlas: {}", (Object)location, forbiddenSprites);
-            return modelBakery.missingBlockModelPart();
-        }
-        return new SimpleModelWrapper(geometry, hasAmbientOcclusion, particleMaterial);
+  public static BlockStateModelPart bake(
+      ModelBaker modelBakery, Identifier location, ModelState state) {
+    ResolvedModel model = modelBakery.getModel(location);
+    TextureSlots textureSlots = model.getTopTextureSlots();
+    boolean hasAmbientOcclusion = model.getTopAmbientOcclusion();
+    Material.Baked particleMaterial = model.resolveParticleMaterial(textureSlots, modelBakery);
+    QuadCollection geometry = model.bakeTopGeometry(textureSlots, modelBakery, state);
+    HashMultimap forbiddenSprites = null;
+    for (BakedQuad bakedQuad : geometry.getAll()) {
+      TextureAtlasSprite sprite = bakedQuad.materialInfo().sprite();
+      if (sprite.atlasLocation().equals(TextureAtlas.LOCATION_BLOCKS)) continue;
+      if (forbiddenSprites == null) {
+        forbiddenSprites = HashMultimap.create();
+      }
+      forbiddenSprites.put((Object) sprite.atlasLocation(), (Object) sprite.contents().name());
     }
+    if (forbiddenSprites != null) {
+      LOGGER.warn(
+          "Rejecting block model {}, since it contains sprites from outside of supported atlas: {}",
+          (Object) location,
+          forbiddenSprites);
+      return modelBakery.missingBlockModelPart();
+    }
+    return new SimpleModelWrapper(geometry, hasAmbientOcclusion, particleMaterial);
+  }
 
-    @Override
-    public List<BakedQuad> getQuads(@Nullable Direction direction) {
-        return this.quads.getQuads(direction);
-    }
+  @Override
+  public List<BakedQuad> getQuads(@Nullable Direction direction) {
+    return this.quads.getQuads(direction);
+  }
 
-    @Override
-    public int materialFlags() {
-        return this.quads.materialFlags();
-    }
+  @Override
+  public int materialFlags() {
+    return this.quads.materialFlags();
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -10,17 +10,14 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.renderer.state.gui.ScreenArea;
 import org.jspecify.annotations.Nullable;
 
-public interface GuiElementRenderState
-extends ScreenArea {
-    public void buildVertices(VertexConsumer var1);
+public interface GuiElementRenderState extends ScreenArea {
+  public void buildVertices(VertexConsumer var1);
 
-    public RenderPipeline pipeline();
+  public RenderPipeline pipeline();
 
-    public TextureSetup textureSetup();
+  public TextureSetup textureSetup();
 
-    public @Nullable ScreenRectangle scissorArea();
+  public @Nullable ScreenRectangle scissorArea();
 }
-

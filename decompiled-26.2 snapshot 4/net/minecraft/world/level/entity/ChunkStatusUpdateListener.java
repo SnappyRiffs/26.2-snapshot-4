@@ -8,6 +8,5 @@ import net.minecraft.world.level.ChunkPos;
 
 @FunctionalInterface
 public interface ChunkStatusUpdateListener {
-    public void onChunkStatusChange(ChunkPos var1, FullChunkStatus var2);
+  public void onChunkStatusChange(ChunkPos var1, FullChunkStatus var2);
 }
-

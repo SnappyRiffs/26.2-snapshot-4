@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  */
@@ -12,28 +12,35 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
-import net.minecraft.world.level.levelgen.structure.structures.SwampHutPiece;
 
-public class SwampHutStructure
-extends Structure {
-    public static final MapCodec<SwampHutStructure> CODEC = SwampHutStructure.simpleCodec(SwampHutStructure::new);
+public class SwampHutStructure extends Structure {
+  public static final MapCodec<SwampHutStructure> CODEC =
+      SwampHutStructure.simpleCodec(SwampHutStructure::new);
 
-    public SwampHutStructure(Structure.StructureSettings settings) {
-        super(settings);
-    }
+  public SwampHutStructure(Structure.StructureSettings settings) {
+    super(settings);
+  }
 
-    @Override
-    public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
-        return SwampHutStructure.onTopOfChunkCenter(context, Heightmap.Types.WORLD_SURFACE_WG, builder -> SwampHutStructure.generatePieces(builder, context));
-    }
+  @Override
+  public Optional<Structure.GenerationStub> findGenerationPoint(
+      Structure.GenerationContext context) {
+    return SwampHutStructure.onTopOfChunkCenter(
+        context,
+        Heightmap.Types.WORLD_SURFACE_WG,
+        builder -> SwampHutStructure.generatePieces(builder, context));
+  }
 
-    private static void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context) {
-        builder.addPiece(new SwampHutPiece(context.random(), context.chunkPos().getMinBlockX(), context.chunkPos().getMinBlockZ()));
-    }
+  private static void generatePieces(
+      StructurePiecesBuilder builder, Structure.GenerationContext context) {
+    builder.addPiece(
+        new SwampHutPiece(
+            context.random(),
+            context.chunkPos().getMinBlockX(),
+            context.chunkPos().getMinBlockZ()));
+  }
 
-    @Override
-    public StructureType<?> type() {
-        return StructureType.SWAMP_HUT;
-    }
+  @Override
+  public StructureType<?> type() {
+    return StructureType.SWAMP_HUT;
+  }
 }
-

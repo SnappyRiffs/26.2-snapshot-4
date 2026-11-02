@@ -8,6 +8,5 @@ import java.nio.file.Path;
 import net.minecraft.util.worldupdate.UpgradeProgress;
 
 public interface FileFixOperation {
-    public void fix(Path var1, UpgradeProgress var2) throws IOException;
+  public void fix(Path var1, UpgradeProgress var2) throws IOException;
 }
-

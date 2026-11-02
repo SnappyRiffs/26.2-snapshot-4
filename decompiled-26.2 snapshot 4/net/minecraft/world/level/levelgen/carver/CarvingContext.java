@@ -18,33 +18,43 @@ import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
 
-public class CarvingContext
-extends WorldGenerationContext {
-    private final RegistryAccess registryAccess;
-    private final NoiseChunk noiseChunk;
-    private final RandomState randomState;
-    private final SurfaceRules.RuleSource surfaceRule;
+public class CarvingContext extends WorldGenerationContext {
+  private final RegistryAccess registryAccess;
+  private final NoiseChunk noiseChunk;
+  private final RandomState randomState;
+  private final SurfaceRules.RuleSource surfaceRule;
 
-    public CarvingContext(NoiseBasedChunkGenerator generator, RegistryAccess registryAccess, LevelHeightAccessor heightAccessor, NoiseChunk noiseChunk, RandomState randomState, SurfaceRules.RuleSource surfaceRule) {
-        super(generator, heightAccessor);
-        this.registryAccess = registryAccess;
-        this.noiseChunk = noiseChunk;
-        this.randomState = randomState;
-        this.surfaceRule = surfaceRule;
-    }
+  public CarvingContext(
+      NoiseBasedChunkGenerator generator,
+      RegistryAccess registryAccess,
+      LevelHeightAccessor heightAccessor,
+      NoiseChunk noiseChunk,
+      RandomState randomState,
+      SurfaceRules.RuleSource surfaceRule) {
+    super(generator, heightAccessor);
+    this.registryAccess = registryAccess;
+    this.noiseChunk = noiseChunk;
+    this.randomState = randomState;
+    this.surfaceRule = surfaceRule;
+  }
 
-    @Deprecated
-    public Optional<BlockState> topMaterial(Function<BlockPos, Holder<Biome>> biomeGetter, ChunkAccess chunk, BlockPos pos, boolean underFluid) {
-        return this.randomState.surfaceSystem().topMaterial(this.surfaceRule, this, biomeGetter, chunk, this.noiseChunk, pos, underFluid);
-    }
+  @Deprecated
+  public Optional<BlockState> topMaterial(
+      Function<BlockPos, Holder<Biome>> biomeGetter,
+      ChunkAccess chunk,
+      BlockPos pos,
+      boolean underFluid) {
+    return this.randomState
+        .surfaceSystem()
+        .topMaterial(this.surfaceRule, this, biomeGetter, chunk, this.noiseChunk, pos, underFluid);
+  }
 
-    @Deprecated
-    public RegistryAccess registryAccess() {
-        return this.registryAccess;
-    }
+  @Deprecated
+  public RegistryAccess registryAccess() {
+    return this.registryAccess;
+  }
 
-    public RandomState randomState() {
-        return this.randomState;
-    }
+  public RandomState randomState() {
+    return this.randomState;
+  }
 }
-

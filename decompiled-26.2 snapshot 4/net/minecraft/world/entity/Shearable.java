@@ -8,8 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 
 public interface Shearable {
-    public void shear(ServerLevel var1, SoundSource var2, ItemStack var3);
+  public void shear(ServerLevel var1, SoundSource var2, ItemStack var3);
 
-    public boolean readyForShearing();
+  public boolean readyForShearing();
 }
-

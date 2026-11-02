@@ -3,11 +3,9 @@
  */
 package com.mojang.blaze3d.buffers;
 
-public interface GpuFence
-extends AutoCloseable {
-    @Override
-    public void close();
+public interface GpuFence extends AutoCloseable {
+  @Override
+  public void close();
 
-    public boolean awaitCompletion(long var1);
+  public boolean awaitCompletion(long var1);
 }
-

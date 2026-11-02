@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -56,4 +56,3 @@ public record ClampedInt(IntProvider source, int minInclusive, int maxInclusive)
         return MAP_CODEC;
     }
 }
-

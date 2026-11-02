@@ -16,70 +16,82 @@ import net.minecraft.server.permissions.Permissions;
 import net.minecraft.util.CommonLinks;
 
 public enum ChatRestriction {
-    CHAT_AND_COMMANDS_DISABLED_BY_OPTIONS((Component)Component.translatable("chat_restriction.chat_and_commands_disabled_by_options"), (Optional)Optional.of(Action.GO_TO_CHAT_SETTINGS)){
+  CHAT_AND_COMMANDS_DISABLED_BY_OPTIONS(
+      (Component) Component.translatable("chat_restriction.chat_and_commands_disabled_by_options"),
+      (Optional) Optional.of(Action.GO_TO_CHAT_SETTINGS)) {
 
-        @Override
-        public void modifyPermissions(Set<Permission> permissionSet) {
-            ChatRestriction.disableCommands(permissionSet);
-            ChatRestriction.disablePlayerMessages(permissionSet);
-        }
+    @Override
+    public void modifyPermissions(Set<Permission> permissionSet) {
+      ChatRestriction.disableCommands(permissionSet);
+      ChatRestriction.disablePlayerMessages(permissionSet);
     }
-    ,
-    CHAT_DISABLED_BY_OPTIONS((Component)Component.translatable("chat_restriction.chat_disabled_by_options"), (Optional)Optional.of(Action.GO_TO_CHAT_SETTINGS)){
+  },
+  CHAT_DISABLED_BY_OPTIONS(
+      (Component) Component.translatable("chat_restriction.chat_disabled_by_options"),
+      (Optional) Optional.of(Action.GO_TO_CHAT_SETTINGS)) {
 
-        @Override
-        public void modifyPermissions(Set<Permission> permissionSet) {
-            ChatRestriction.disablePlayerMessages(permissionSet);
-        }
+    @Override
+    public void modifyPermissions(Set<Permission> permissionSet) {
+      ChatRestriction.disablePlayerMessages(permissionSet);
     }
-    ,
-    DISABLED_BY_LAUNCHER((Component)Component.translatable("chat_restriction.disabled_by_launcher"), Optional.empty()){
+  },
+  DISABLED_BY_LAUNCHER(
+      (Component) Component.translatable("chat_restriction.disabled_by_launcher"),
+      Optional.empty()) {
 
-        @Override
-        public void modifyPermissions(Set<Permission> permissionSet) {
-            ChatRestriction.disablePlayerMessages(permissionSet);
-        }
+    @Override
+    public void modifyPermissions(Set<Permission> permissionSet) {
+      ChatRestriction.disablePlayerMessages(permissionSet);
     }
-    ,
-    DISABLED_BY_PROFILE((Component)Component.translatable("chat_restriction.disabled_by_profile"), (Optional)Optional.of(Action.GO_TO_ACCOUNT)){
+  },
+  DISABLED_BY_PROFILE(
+      (Component) Component.translatable("chat_restriction.disabled_by_profile"),
+      (Optional) Optional.of(Action.GO_TO_ACCOUNT)) {
 
-        @Override
-        public void modifyPermissions(Set<Permission> permissionSet) {
-            ChatRestriction.disablePlayerMessages(permissionSet);
-        }
-    };
-
-    private final Component display;
-    private final Optional<Action> action;
-
-    private ChatRestriction(Component display, Optional<Action> action) {
-        this.display = display;
-        this.action = action;
+    @Override
+    public void modifyPermissions(Set<Permission> permissionSet) {
+      ChatRestriction.disablePlayerMessages(permissionSet);
     }
+  };
 
-    public Component display() {
-        return this.display;
-    }
+  private final Component display;
+  private final Optional<Action> action;
 
-    public Optional<Action> action() {
-        return this.action;
-    }
+  private ChatRestriction(Component display, Optional<Action> action) {
+    this.display = display;
+    this.action = action;
+  }
 
-    private static void disablePlayerMessages(Set<Permission> permissionSet) {
-        permissionSet.remove(Permissions.CHAT_SEND_MESSAGES);
-        permissionSet.remove(Permissions.CHAT_RECEIVE_PLAYER_MESSAGES);
-    }
+  public Component display() {
+    return this.display;
+  }
 
-    private static void disableCommands(Set<Permission> permissionSet) {
-        permissionSet.remove(Permissions.CHAT_SEND_COMMANDS);
-        permissionSet.remove(Permissions.CHAT_RECEIVE_SYSTEM_MESSAGES);
-    }
+  public Optional<Action> action() {
+    return this.action;
+  }
 
-    public abstract void modifyPermissions(Set<Permission> var1);
+  private static void disablePlayerMessages(Set<Permission> permissionSet) {
+    permissionSet.remove(Permissions.CHAT_SEND_MESSAGES);
+    permissionSet.remove(Permissions.CHAT_RECEIVE_PLAYER_MESSAGES);
+  }
 
-    public record Action(Component title, BiConsumer<Minecraft, Screen> runnable) {
-        public static final Action GO_TO_ACCOUNT = new Action(Component.translatable("chat_restriction.disabled_by_profile.action"), (minecraft, screen) -> ConfirmLinkScreen.confirmLinkNow(screen, CommonLinks.ACCOUNT_SETTINGS, true));
-        public static final Action GO_TO_CHAT_SETTINGS = new Action(Component.translatable("chat_restriction.chat_disabled_by_options.action"), (minecraft, screen) -> minecraft.gui.setScreen(new ChatOptionsScreen((Screen)screen, minecraft.options)));
-    }
+  private static void disableCommands(Set<Permission> permissionSet) {
+    permissionSet.remove(Permissions.CHAT_SEND_COMMANDS);
+    permissionSet.remove(Permissions.CHAT_RECEIVE_SYSTEM_MESSAGES);
+  }
+
+  public abstract void modifyPermissions(Set<Permission> var1);
+
+  public record Action(Component title, BiConsumer<Minecraft, Screen> runnable) {
+    public static final Action GO_TO_ACCOUNT =
+        new Action(
+            Component.translatable("chat_restriction.disabled_by_profile.action"),
+            (minecraft, screen) ->
+                ConfirmLinkScreen.confirmLinkNow(screen, CommonLinks.ACCOUNT_SETTINGS, true));
+    public static final Action GO_TO_CHAT_SETTINGS =
+        new Action(
+            Component.translatable("chat_restriction.chat_disabled_by_options.action"),
+            (minecraft, screen) ->
+                minecraft.gui.setScreen(new ChatOptionsScreen((Screen) screen, minecraft.options)));
+  }
 }
-

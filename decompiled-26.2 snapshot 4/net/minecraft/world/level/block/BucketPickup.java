@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public interface BucketPickup {
-    public ItemStack pickupBlock(@Nullable LivingEntity var1, LevelAccessor var2, BlockPos var3, BlockState var4);
+  public ItemStack pickupBlock(
+      @Nullable LivingEntity var1, LevelAccessor var2, BlockPos var3, BlockState var4);
 
-    public Optional<SoundEvent> getPickupSound();
+  public Optional<SoundEvent> getPickupSound();
 }
-

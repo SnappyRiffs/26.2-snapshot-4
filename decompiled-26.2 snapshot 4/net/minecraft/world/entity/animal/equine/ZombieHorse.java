@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -32,7 +32,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,164 +41,188 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-public class ZombieHorse
-extends AbstractHorse {
-    private static final float SPEED_FACTOR = 42.16f;
-    private static final double BASE_JUMP_STRENGTH = 0.5;
-    private static final double PER_RANDOM_JUMP_STRENGTH = 0.06666666666666667;
-    private static final double BASE_SPEED = 9.0;
-    private static final double PER_RANDOM_SPEED = 1.0;
-    private static final EntityDimensions BABY_DIMENSIONS = EntityTypes.ZOMBIE_HORSE.getDimensions().withAttachments(EntityAttachments.builder().attach(EntityAttachment.PASSENGER, 0.0f, EntityTypes.ZOMBIE_HORSE.getHeight() - 0.25f, 0.0f)).scale(0.7f);
+public class ZombieHorse extends AbstractHorse {
+  private static final float SPEED_FACTOR = 42.16f;
+  private static final double BASE_JUMP_STRENGTH = 0.5;
+  private static final double PER_RANDOM_JUMP_STRENGTH = 0.06666666666666667;
+  private static final double BASE_SPEED = 9.0;
+  private static final double PER_RANDOM_SPEED = 1.0;
+  private static final EntityDimensions BABY_DIMENSIONS =
+      EntityTypes.ZOMBIE_HORSE
+          .getDimensions()
+          .withAttachments(
+              EntityAttachments.builder()
+                  .attach(
+                      EntityAttachment.PASSENGER,
+                      0.0f,
+                      EntityTypes.ZOMBIE_HORSE.getHeight() - 0.25f,
+                      0.0f))
+          .scale(0.7f);
 
-    public ZombieHorse(EntityType<? extends ZombieHorse> type, Level level) {
-        super((EntityType<? extends AbstractHorse>)type, level);
-    }
+  public ZombieHorse(EntityType<? extends ZombieHorse> type, Level level) {
+    super((EntityType<? extends AbstractHorse>) type, level);
+  }
 
-    public static AttributeSupplier.Builder createAttributes() {
-        return ZombieHorse.createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 25.0);
-    }
+  public static AttributeSupplier.Builder createAttributes() {
+    return ZombieHorse.createBaseHorseAttributes().add(Attributes.MAX_HEALTH, 25.0);
+  }
 
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
-        this.setPersistenceRequired();
-        return super.interact(player, hand, location);
-    }
+  @Override
+  public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
+    this.setPersistenceRequired();
+    return super.interact(player, hand, location);
+  }
 
-    @Override
-    public boolean removeWhenFarAway(double distSqr) {
-        return true;
-    }
+  @Override
+  public boolean removeWhenFarAway(double distSqr) {
+    return true;
+  }
 
-    @Override
-    public boolean isMobControlled() {
-        return this.getFirstPassenger() instanceof Mob;
-    }
+  @Override
+  public boolean isMobControlled() {
+    return this.getFirstPassenger() instanceof Mob;
+  }
 
-    @Override
-    protected void randomizeAttributes(RandomSource random) {
-        this.getAttribute(Attributes.JUMP_STRENGTH).setBaseValue(ZombieHorse.generateZombieHorseJumpStrength(random::nextDouble));
-        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(ZombieHorse.generateZombieHorseSpeed(random::nextDouble));
-    }
+  @Override
+  protected void randomizeAttributes(RandomSource random) {
+    this.getAttribute(Attributes.JUMP_STRENGTH)
+        .setBaseValue(ZombieHorse.generateZombieHorseJumpStrength(random::nextDouble));
+    this.getAttribute(Attributes.MOVEMENT_SPEED)
+        .setBaseValue(ZombieHorse.generateZombieHorseSpeed(random::nextDouble));
+  }
 
-    private static double generateZombieHorseJumpStrength(DoubleSupplier probabilityProvider) {
-        return 0.5 + probabilityProvider.getAsDouble() * 0.06666666666666667 + probabilityProvider.getAsDouble() * 0.06666666666666667 + probabilityProvider.getAsDouble() * 0.06666666666666667;
-    }
+  private static double generateZombieHorseJumpStrength(DoubleSupplier probabilityProvider) {
+    return 0.5
+        + probabilityProvider.getAsDouble() * 0.06666666666666667
+        + probabilityProvider.getAsDouble() * 0.06666666666666667
+        + probabilityProvider.getAsDouble() * 0.06666666666666667;
+  }
 
-    private static double generateZombieHorseSpeed(DoubleSupplier probabilityProvider) {
-        return (9.0 + probabilityProvider.getAsDouble() * 1.0 + probabilityProvider.getAsDouble() * 1.0 + probabilityProvider.getAsDouble() * 1.0) / (double)42.16f;
-    }
+  private static double generateZombieHorseSpeed(DoubleSupplier probabilityProvider) {
+    return (9.0
+            + probabilityProvider.getAsDouble() * 1.0
+            + probabilityProvider.getAsDouble() * 1.0
+            + probabilityProvider.getAsDouble() * 1.0)
+        / (double) 42.16f;
+  }
 
-    @Override
-    protected SoundEvent getAmbientSound() {
-        return SoundEvents.ZOMBIE_HORSE_AMBIENT;
-    }
+  @Override
+  protected SoundEvent getAmbientSound() {
+    return SoundEvents.ZOMBIE_HORSE_AMBIENT;
+  }
 
-    @Override
-    protected SoundEvent getDeathSound() {
-        return SoundEvents.ZOMBIE_HORSE_DEATH;
-    }
+  @Override
+  protected SoundEvent getDeathSound() {
+    return SoundEvents.ZOMBIE_HORSE_DEATH;
+  }
 
-    @Override
-    protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ZOMBIE_HORSE_HURT;
-    }
+  @Override
+  protected SoundEvent getHurtSound(DamageSource source) {
+    return SoundEvents.ZOMBIE_HORSE_HURT;
+  }
 
-    @Override
-    protected SoundEvent getAngrySound() {
-        return SoundEvents.ZOMBIE_HORSE_ANGRY;
-    }
+  @Override
+  protected SoundEvent getAngrySound() {
+    return SoundEvents.ZOMBIE_HORSE_ANGRY;
+  }
 
-    @Override
-    protected SoundEvent getEatingSound() {
-        return SoundEvents.ZOMBIE_HORSE_EAT;
-    }
+  @Override
+  protected SoundEvent getEatingSound() {
+    return SoundEvents.ZOMBIE_HORSE_EAT;
+  }
 
-    @Override
-    public @Nullable AgeableMob getBreedOffspring(ServerLevel level, AgeableMob partner) {
-        return EntityTypes.ZOMBIE_HORSE.create(level, EntitySpawnReason.BREEDING);
-    }
+  @Override
+  public @Nullable AgeableMob getBreedOffspring(ServerLevel level, AgeableMob partner) {
+    return EntityTypes.ZOMBIE_HORSE.create(level, EntitySpawnReason.BREEDING);
+  }
 
-    @Override
-    public boolean canFallInLove() {
-        return false;
-    }
+  @Override
+  public boolean canFallInLove() {
+    return false;
+  }
 
-    @Override
-    protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, i -> i.is(ItemTags.ZOMBIE_HORSE_FOOD), false));
-    }
+  @Override
+  protected void addBehaviourGoals() {
+    this.goalSelector.addGoal(0, new FloatGoal(this));
+    this.goalSelector.addGoal(
+        3, new TemptGoal(this, 1.25, i -> i.is(ItemTags.ZOMBIE_HORSE_FOOD), false));
+  }
 
-    @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
-        Zombie zombie;
-        if (spawnReason == EntitySpawnReason.NATURAL && (zombie = EntityTypes.ZOMBIE.create(this.level(), EntitySpawnReason.JOCKEY)) != null) {
-            zombie.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f);
-            zombie.finalizeSpawn(level, difficulty, spawnReason, null);
-            zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SPEAR));
-            zombie.startRiding(this, false, false);
-        }
-        return super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+  @Override
+  public @Nullable SpawnGroupData finalizeSpawn(
+      ServerLevelAccessor level,
+      DifficultyInstance difficulty,
+      EntitySpawnReason spawnReason,
+      @Nullable SpawnGroupData groupData) {
+    Zombie zombie;
+    if (spawnReason == EntitySpawnReason.NATURAL
+        && (zombie = EntityTypes.ZOMBIE.create(this.level(), EntitySpawnReason.JOCKEY)) != null) {
+      zombie.snapTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0f);
+      zombie.finalizeSpawn(level, difficulty, spawnReason, null);
+      zombie.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SPEAR));
+      zombie.startRiding(this, false, false);
     }
+    return super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+  }
 
-    @Override
-    public InteractionResult mobInteract(Player player, InteractionHand hand) {
-        boolean shouldOpenInventory;
-        boolean bl = shouldOpenInventory = !this.isBaby() && this.isTamed() && player.isSecondaryUseActive();
-        if (this.isVehicle() || shouldOpenInventory) {
-            return super.mobInteract(player, hand);
-        }
-        ItemStack itemStack = player.getItemInHand(hand);
-        if (!itemStack.isEmpty()) {
-            if (this.isFood(itemStack)) {
-                return this.fedFood(player, itemStack);
-            }
-            if (!this.isTamed()) {
-                this.makeMad();
-                return InteractionResult.SUCCESS;
-            }
-        }
-        return super.mobInteract(player, hand);
+  @Override
+  public InteractionResult mobInteract(Player player, InteractionHand hand) {
+    boolean shouldOpenInventory;
+    boolean bl =
+        shouldOpenInventory = !this.isBaby() && this.isTamed() && player.isSecondaryUseActive();
+    if (this.isVehicle() || shouldOpenInventory) {
+      return super.mobInteract(player, hand);
     }
+    ItemStack itemStack = player.getItemInHand(hand);
+    if (!itemStack.isEmpty()) {
+      if (this.isFood(itemStack)) {
+        return this.fedFood(player, itemStack);
+      }
+      if (!this.isTamed()) {
+        this.makeMad();
+        return InteractionResult.SUCCESS;
+      }
+    }
+    return super.mobInteract(player, hand);
+  }
 
-    @Override
-    public boolean canUseSlot(EquipmentSlot slot) {
-        return true;
-    }
+  @Override
+  public boolean canUseSlot(EquipmentSlot slot) {
+    return true;
+  }
 
-    @Override
-    public boolean canBeLeashed() {
-        return this.isTamed() || !this.isMobControlled();
-    }
+  @Override
+  public boolean canBeLeashed() {
+    return this.isTamed() || !this.isMobControlled();
+  }
 
-    @Override
-    public boolean isFood(ItemStack itemStack) {
-        return itemStack.is(ItemTags.ZOMBIE_HORSE_FOOD);
-    }
+  @Override
+  public boolean isFood(ItemStack itemStack) {
+    return itemStack.is(ItemTags.ZOMBIE_HORSE_FOOD);
+  }
 
-    @Override
-    protected EquipmentSlot sunProtectionSlot() {
-        return EquipmentSlot.BODY;
-    }
+  @Override
+  protected EquipmentSlot sunProtectionSlot() {
+    return EquipmentSlot.BODY;
+  }
 
-    @Override
-    public Vec3[] getQuadLeashOffsets() {
-        return Leashable.createQuadLeashOffsets(this, 0.04, 0.41, 0.18, 0.73);
-    }
+  @Override
+  public Vec3[] getQuadLeashOffsets() {
+    return Leashable.createQuadLeashOffsets(this, 0.04, 0.41, 0.18, 0.73);
+  }
 
-    @Override
-    public EntityDimensions getDefaultDimensions(Pose pose) {
-        return this.isBaby() ? BABY_DIMENSIONS : super.getDefaultDimensions(pose);
-    }
+  @Override
+  public EntityDimensions getDefaultDimensions(Pose pose) {
+    return this.isBaby() ? BABY_DIMENSIONS : super.getDefaultDimensions(pose);
+  }
 
-    @Override
-    public float chargeSpeedModifier() {
-        return 1.4f;
-    }
+  @Override
+  public float chargeSpeedModifier() {
+    return 1.4f;
+  }
 
-    @Override
-    public boolean canAgeUp() {
-        return false;
-    }
+  @Override
+  public boolean canAgeUp() {
+    return false;
+  }
 }
-

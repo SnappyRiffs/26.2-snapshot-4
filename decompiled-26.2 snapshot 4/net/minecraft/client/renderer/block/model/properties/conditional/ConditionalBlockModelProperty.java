@@ -6,6 +6,5 @@ package net.minecraft.client.renderer.block.model.properties.conditional;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface ConditionalBlockModelProperty {
-    public boolean get(BlockState var1);
+  public boolean get(BlockState var1);
 }
-

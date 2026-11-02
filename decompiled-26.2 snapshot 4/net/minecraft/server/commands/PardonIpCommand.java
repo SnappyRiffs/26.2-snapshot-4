@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.net.InetAddresses
  *  com.mojang.brigadier.CommandDispatcher
@@ -28,24 +28,46 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.players.IpBanList;
 
 public class PardonIpCommand {
-    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType((Message)Component.translatable("commands.pardonip.invalid"));
-    private static final SimpleCommandExceptionType ERROR_NOT_BANNED = new SimpleCommandExceptionType((Message)Component.translatable("commands.pardonip.failed"));
+  private static final SimpleCommandExceptionType ERROR_INVALID =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.pardonip.invalid"));
+  private static final SimpleCommandExceptionType ERROR_NOT_BANNED =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.pardonip.failed"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("pardon-ip").requires(Commands.hasPermission(Commands.LEVEL_ADMINS))).then(Commands.argument("target", StringArgumentType.word()).suggests((c, p) -> SharedSuggestionProvider.suggest(((CommandSourceStack)c.getSource()).getServer().getPlayerList().getIpBans().getUserList(), p)).executes(c -> PardonIpCommand.unban((CommandSourceStack)c.getSource(), StringArgumentType.getString((CommandContext)c, (String)"target")))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("pardon-ip")
+                        .requires(Commands.hasPermission(Commands.LEVEL_ADMINS)))
+                .then(
+                    Commands.argument("target", StringArgumentType.word())
+                        .suggests(
+                            (c, p) ->
+                                SharedSuggestionProvider.suggest(
+                                    ((CommandSourceStack) c.getSource())
+                                        .getServer()
+                                        .getPlayerList()
+                                        .getIpBans()
+                                        .getUserList(),
+                                    p))
+                        .executes(
+                            c ->
+                                PardonIpCommand.unban(
+                                    (CommandSourceStack) c.getSource(),
+                                    StringArgumentType.getString(
+                                        (CommandContext) c, (String) "target")))));
+  }
 
-    private static int unban(CommandSourceStack source, String ip) throws CommandSyntaxException {
-        if (!InetAddresses.isInetAddress((String)ip)) {
-            throw ERROR_INVALID.create();
-        }
-        IpBanList bans = source.getServer().getPlayerList().getIpBans();
-        if (!bans.isBanned(ip)) {
-            throw ERROR_NOT_BANNED.create();
-        }
-        bans.remove(ip);
-        source.sendSuccess(() -> Component.translatable("commands.pardonip.success", ip), true);
-        return 1;
+  private static int unban(CommandSourceStack source, String ip) throws CommandSyntaxException {
+    if (!InetAddresses.isInetAddress((String) ip)) {
+      throw ERROR_INVALID.create();
     }
+    IpBanList bans = source.getServer().getPlayerList().getIpBans();
+    if (!bans.isBanned(ip)) {
+      throw ERROR_NOT_BANNED.create();
+    }
+    bans.remove(ip);
+    source.sendSuccess(() -> Component.translatable("commands.pardonip.success", ip), true);
+    return 1;
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -14,91 +14,94 @@ import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 
 public abstract class NeedleDirectionHelper {
-    private final boolean wobble;
+  private final boolean wobble;
 
-    protected NeedleDirectionHelper(boolean wobble) {
-        this.wobble = wobble;
+  protected NeedleDirectionHelper(boolean wobble) {
+    this.wobble = wobble;
+  }
+
+  public float get(
+      ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable ItemOwner owner, int seed) {
+    Level level;
+    if (owner == null) {
+      return 0.0f;
     }
-
-    public float get(ItemStack itemStack, @Nullable ClientLevel clientLevel, @Nullable ItemOwner owner, int seed) {
-        Level level;
-        if (owner == null) {
-            return 0.0f;
-        }
-        if (clientLevel == null && (level = owner.level()) instanceof ClientLevel) {
-            ClientLevel level2;
-            clientLevel = level2 = (ClientLevel)level;
-        }
-        if (clientLevel == null) {
-            return 0.0f;
-        }
-        return this.calculate(itemStack, clientLevel, seed, owner);
+    if (clientLevel == null && (level = owner.level()) instanceof ClientLevel) {
+      ClientLevel level2;
+      clientLevel = level2 = (ClientLevel) level;
     }
-
-    protected abstract float calculate(ItemStack var1, ClientLevel var2, int var3, ItemOwner var4);
-
-    protected boolean wobble() {
-        return this.wobble;
+    if (clientLevel == null) {
+      return 0.0f;
     }
+    return this.calculate(itemStack, clientLevel, seed, owner);
+  }
 
-    protected Wobbler newWobbler(float factor) {
-        return this.wobble ? NeedleDirectionHelper.standardWobbler(factor) : NeedleDirectionHelper.nonWobbler();
-    }
+  protected abstract float calculate(ItemStack var1, ClientLevel var2, int var3, ItemOwner var4);
 
-    public static Wobbler standardWobbler(final float factor) {
-        return new Wobbler(){
-            private float rotation;
-            private float deltaRotation;
-            private long lastUpdateTick;
+  protected boolean wobble() {
+    return this.wobble;
+  }
 
-            @Override
-            public float rotation() {
-                return this.rotation;
-            }
+  protected Wobbler newWobbler(float factor) {
+    return this.wobble
+        ? NeedleDirectionHelper.standardWobbler(factor)
+        : NeedleDirectionHelper.nonWobbler();
+  }
 
-            @Override
-            public boolean shouldUpdate(long tick) {
-                return this.lastUpdateTick != tick;
-            }
+  public static Wobbler standardWobbler(final float factor) {
+    return new Wobbler() {
+      private float rotation;
+      private float deltaRotation;
+      private long lastUpdateTick;
 
-            @Override
-            public void update(long tick, float targetRotation) {
-                this.lastUpdateTick = tick;
-                float tempDeltaRotation = Mth.positiveModulo(targetRotation - this.rotation + 0.5f, 1.0f) - 0.5f;
-                this.deltaRotation += tempDeltaRotation * 0.1f;
-                this.deltaRotation *= factor;
-                this.rotation = Mth.positiveModulo(this.rotation + this.deltaRotation, 1.0f);
-            }
-        };
-    }
+      @Override
+      public float rotation() {
+        return this.rotation;
+      }
 
-    public static Wobbler nonWobbler() {
-        return new Wobbler(){
-            private float targetValue;
+      @Override
+      public boolean shouldUpdate(long tick) {
+        return this.lastUpdateTick != tick;
+      }
 
-            @Override
-            public float rotation() {
-                return this.targetValue;
-            }
+      @Override
+      public void update(long tick, float targetRotation) {
+        this.lastUpdateTick = tick;
+        float tempDeltaRotation =
+            Mth.positiveModulo(targetRotation - this.rotation + 0.5f, 1.0f) - 0.5f;
+        this.deltaRotation += tempDeltaRotation * 0.1f;
+        this.deltaRotation *= factor;
+        this.rotation = Mth.positiveModulo(this.rotation + this.deltaRotation, 1.0f);
+      }
+    };
+  }
 
-            @Override
-            public boolean shouldUpdate(long tick) {
-                return true;
-            }
+  public static Wobbler nonWobbler() {
+    return new Wobbler() {
+      private float targetValue;
 
-            @Override
-            public void update(long tick, float targetRotation) {
-                this.targetValue = targetRotation;
-            }
-        };
-    }
+      @Override
+      public float rotation() {
+        return this.targetValue;
+      }
 
-    public static interface Wobbler {
-        public float rotation();
+      @Override
+      public boolean shouldUpdate(long tick) {
+        return true;
+      }
 
-        public boolean shouldUpdate(long var1);
+      @Override
+      public void update(long tick, float targetRotation) {
+        this.targetValue = targetRotation;
+      }
+    };
+  }
 
-        public void update(long var1, float var3);
-    }
+  public static interface Wobbler {
+    public float rotation();
+
+    public boolean shouldUpdate(long var1);
+
+    public void update(long var1, float var3);
+  }
 }
-

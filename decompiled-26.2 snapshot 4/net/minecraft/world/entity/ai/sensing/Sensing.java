@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.ints.IntOpenHashSet
  *  it.unimi.dsi.fastutil.ints.IntSet
@@ -15,37 +15,36 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 
 public class Sensing {
-    private final Mob mob;
-    private final IntSet seen = new IntOpenHashSet();
-    private final IntSet unseen = new IntOpenHashSet();
+  private final Mob mob;
+  private final IntSet seen = new IntOpenHashSet();
+  private final IntSet unseen = new IntOpenHashSet();
 
-    public Sensing(Mob mob) {
-        this.mob = mob;
-    }
+  public Sensing(Mob mob) {
+    this.mob = mob;
+  }
 
-    public void tick() {
-        this.seen.clear();
-        this.unseen.clear();
-    }
+  public void tick() {
+    this.seen.clear();
+    this.unseen.clear();
+  }
 
-    public boolean hasLineOfSight(Entity target) {
-        int targetId = target.getId();
-        if (this.seen.contains(targetId)) {
-            return true;
-        }
-        if (this.unseen.contains(targetId)) {
-            return false;
-        }
-        ProfilerFiller profiler = Profiler.get();
-        profiler.push("hasLineOfSight");
-        boolean hasLineOfSight = this.mob.hasLineOfSight(target);
-        profiler.pop();
-        if (hasLineOfSight) {
-            this.seen.add(targetId);
-        } else {
-            this.unseen.add(targetId);
-        }
-        return hasLineOfSight;
+  public boolean hasLineOfSight(Entity target) {
+    int targetId = target.getId();
+    if (this.seen.contains(targetId)) {
+      return true;
     }
+    if (this.unseen.contains(targetId)) {
+      return false;
+    }
+    ProfilerFiller profiler = Profiler.get();
+    profiler.push("hasLineOfSight");
+    boolean hasLineOfSight = this.mob.hasLineOfSight(target);
+    profiler.pop();
+    if (hasLineOfSight) {
+      this.seen.add(targetId);
+    } else {
+      this.unseen.add(targetId);
+    }
+    return hasLineOfSight;
+  }
 }
-

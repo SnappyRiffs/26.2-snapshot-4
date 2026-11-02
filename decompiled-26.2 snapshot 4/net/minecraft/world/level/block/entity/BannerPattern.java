@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -22,9 +22,25 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryFileCodec;
 
 public record BannerPattern(Identifier assetId, String translationKey) {
-    public static final Codec<BannerPattern> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group((App)Identifier.CODEC.fieldOf("asset_id").forGetter(BannerPattern::assetId), (App)Codec.STRING.fieldOf("translation_key").forGetter(BannerPattern::translationKey)).apply((Applicative)i, BannerPattern::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, BannerPattern> DIRECT_STREAM_CODEC = StreamCodec.composite(Identifier.STREAM_CODEC, BannerPattern::assetId, ByteBufCodecs.STRING_UTF8, BannerPattern::translationKey, BannerPattern::new);
-    public static final Codec<Holder<BannerPattern>> CODEC = RegistryFileCodec.create(Registries.BANNER_PATTERN, DIRECT_CODEC);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<BannerPattern>> STREAM_CODEC = ByteBufCodecs.holder(Registries.BANNER_PATTERN, DIRECT_STREAM_CODEC);
+  public static final Codec<BannerPattern> DIRECT_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App) Identifier.CODEC.fieldOf("asset_id").forGetter(BannerPattern::assetId),
+                      (App)
+                          Codec.STRING
+                              .fieldOf("translation_key")
+                              .forGetter(BannerPattern::translationKey))
+                  .apply((Applicative) i, BannerPattern::new));
+  public static final StreamCodec<RegistryFriendlyByteBuf, BannerPattern> DIRECT_STREAM_CODEC =
+      StreamCodec.composite(
+          Identifier.STREAM_CODEC,
+          BannerPattern::assetId,
+          ByteBufCodecs.STRING_UTF8,
+          BannerPattern::translationKey,
+          BannerPattern::new);
+  public static final Codec<Holder<BannerPattern>> CODEC =
+      RegistryFileCodec.create(Registries.BANNER_PATTERN, DIRECT_CODEC);
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<BannerPattern>> STREAM_CODEC =
+      ByteBufCodecs.holder(Registries.BANNER_PATTERN, DIRECT_STREAM_CODEC);
 }
-

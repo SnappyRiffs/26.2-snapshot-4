@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  org.jspecify.annotations.Nullable
@@ -27,90 +27,92 @@ import net.minecraft.realms.RepeatedNarrator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public class RealmsLongRunningMcoTaskScreen
-extends RealmsScreen {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final RepeatedNarrator REPEATED_NARRATOR = new RepeatedNarrator(Duration.ofSeconds(5L));
-    private final List<LongRunningTask> queuedTasks;
-    private final Screen lastScreen;
-    protected final LinearLayout layout = LinearLayout.vertical();
-    private volatile Component title;
-    private @Nullable LoadingDotsWidget loadingDotsWidget;
+public class RealmsLongRunningMcoTaskScreen extends RealmsScreen {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private static final RepeatedNarrator REPEATED_NARRATOR =
+      new RepeatedNarrator(Duration.ofSeconds(5L));
+  private final List<LongRunningTask> queuedTasks;
+  private final Screen lastScreen;
+  protected final LinearLayout layout = LinearLayout.vertical();
+  private volatile Component title;
+  private @Nullable LoadingDotsWidget loadingDotsWidget;
 
-    public RealmsLongRunningMcoTaskScreen(Screen lastScreen, LongRunningTask ... tasks) {
-        super(GameNarrator.NO_TITLE);
-        this.lastScreen = lastScreen;
-        this.queuedTasks = List.of(tasks);
-        if (this.queuedTasks.isEmpty()) {
-            throw new IllegalArgumentException("No tasks added");
-        }
-        this.title = this.queuedTasks.get(0).getTitle();
-        Runnable runnable = () -> {
-            for (LongRunningTask task : tasks) {
-                this.setTitle(task.getTitle());
-                if (task.aborted()) break;
-                task.run();
-                if (!task.aborted()) continue;
-                return;
-            }
+  public RealmsLongRunningMcoTaskScreen(Screen lastScreen, LongRunningTask... tasks) {
+    super(GameNarrator.NO_TITLE);
+    this.lastScreen = lastScreen;
+    this.queuedTasks = List.of(tasks);
+    if (this.queuedTasks.isEmpty()) {
+      throw new IllegalArgumentException("No tasks added");
+    }
+    this.title = this.queuedTasks.get(0).getTitle();
+    Runnable runnable =
+        () -> {
+          for (LongRunningTask task : tasks) {
+            this.setTitle(task.getTitle());
+            if (task.aborted()) break;
+            task.run();
+            if (!task.aborted()) continue;
+            return;
+          }
         };
-        Thread thread = new Thread(runnable, "Realms-long-running-task");
-        thread.setUncaughtExceptionHandler(new RealmsDefaultUncaughtExceptionHandler(LOGGER));
-        thread.start();
-    }
+    Thread thread = new Thread(runnable, "Realms-long-running-task");
+    thread.setUncaughtExceptionHandler(new RealmsDefaultUncaughtExceptionHandler(LOGGER));
+    thread.start();
+  }
 
-    @Override
-    public boolean canInterruptWithAnotherScreen() {
-        return false;
-    }
+  @Override
+  public boolean canInterruptWithAnotherScreen() {
+    return false;
+  }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (this.loadingDotsWidget != null) {
-            REPEATED_NARRATOR.narrate(this.minecraft.getNarrator(), this.loadingDotsWidget.getMessage());
-        }
+  @Override
+  public void tick() {
+    super.tick();
+    if (this.loadingDotsWidget != null) {
+      REPEATED_NARRATOR.narrate(this.minecraft.getNarrator(), this.loadingDotsWidget.getMessage());
     }
+  }
 
-    @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.isEscape()) {
-            this.cancel();
-            return true;
-        }
-        return super.keyPressed(event);
+  @Override
+  public boolean keyPressed(KeyEvent event) {
+    if (event.isEscape()) {
+      this.cancel();
+      return true;
     }
+    return super.keyPressed(event);
+  }
 
-    @Override
-    public void init() {
-        this.layout.defaultCellSetting().alignHorizontallyCenter();
-        this.layout.addChild(RealmsLongRunningMcoTaskScreen.realmsLogo());
-        this.loadingDotsWidget = new LoadingDotsWidget(this.font, this.title);
-        this.layout.addChild(this.loadingDotsWidget, layoutSettings -> layoutSettings.paddingTop(10).paddingBottom(30));
-        this.layout.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.cancel()).build());
-        RealmsLongRunningMcoTaskScreen realmsLongRunningMcoTaskScreen = this;
-        this.layout.visitWidgets(x$0 -> realmsLongRunningMcoTaskScreen.addRenderableWidget(x$0));
-        this.repositionElements();
-    }
+  @Override
+  public void init() {
+    this.layout.defaultCellSetting().alignHorizontallyCenter();
+    this.layout.addChild(RealmsLongRunningMcoTaskScreen.realmsLogo());
+    this.loadingDotsWidget = new LoadingDotsWidget(this.font, this.title);
+    this.layout.addChild(
+        this.loadingDotsWidget, layoutSettings -> layoutSettings.paddingTop(10).paddingBottom(30));
+    this.layout.addChild(
+        Button.builder(CommonComponents.GUI_CANCEL, button -> this.cancel()).build());
+    RealmsLongRunningMcoTaskScreen realmsLongRunningMcoTaskScreen = this;
+    this.layout.visitWidgets(x$0 -> realmsLongRunningMcoTaskScreen.addRenderableWidget(x$0));
+    this.repositionElements();
+  }
 
-    @Override
-    protected void repositionElements() {
-        this.layout.arrangeElements();
-        FrameLayout.centerInRectangle(this.layout, this.getRectangle());
-    }
+  @Override
+  protected void repositionElements() {
+    this.layout.arrangeElements();
+    FrameLayout.centerInRectangle(this.layout, this.getRectangle());
+  }
 
-    protected void cancel() {
-        for (LongRunningTask queuedTask : this.queuedTasks) {
-            queuedTask.abortTask();
-        }
-        this.minecraft.gui.setScreen(this.lastScreen);
+  protected void cancel() {
+    for (LongRunningTask queuedTask : this.queuedTasks) {
+      queuedTask.abortTask();
     }
+    this.minecraft.gui.setScreen(this.lastScreen);
+  }
 
-    public void setTitle(Component title) {
-        if (this.loadingDotsWidget != null) {
-            this.loadingDotsWidget.setMessage(title);
-        }
-        this.title = title;
+  public void setTitle(Component title) {
+    if (this.loadingDotsWidget != null) {
+      this.loadingDotsWidget.setMessage(title);
     }
+    this.title = title;
+  }
 }
-

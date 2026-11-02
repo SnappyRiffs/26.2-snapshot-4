@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  org.jspecify.annotations.Nullable
@@ -29,107 +29,124 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public class VillageSiege
-implements CustomSpawner {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private boolean hasSetupSiege;
-    private State siegeState = State.SIEGE_DONE;
-    private int zombiesToSpawn;
-    private int nextSpawnTime;
-    private int spawnX;
-    private int spawnY;
-    private int spawnZ;
+public class VillageSiege implements CustomSpawner {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private boolean hasSetupSiege;
+  private State siegeState = State.SIEGE_DONE;
+  private int zombiesToSpawn;
+  private int nextSpawnTime;
+  private int spawnX;
+  private int spawnY;
+  private int spawnZ;
 
-    @Override
-    public void tick(ServerLevel level, boolean spawnEnemies) {
-        if (level.isBrightOutside() || !spawnEnemies) {
-            this.siegeState = State.SIEGE_DONE;
-            this.hasSetupSiege = false;
-            return;
-        }
-        Optional<Holder<WorldClock>> defaultClock = level.dimensionType().defaultClock();
-        if (defaultClock.isPresent() && level.clockManager().isAtTimeMarker(defaultClock.get(), ClockTimeMarkers.ROLL_VILLAGE_SIEGE)) {
-            State state = this.siegeState = level.getRandom().nextInt(10) == 0 ? State.SIEGE_TONIGHT : State.SIEGE_DONE;
-        }
-        if (this.siegeState == State.SIEGE_DONE) {
-            return;
-        }
-        if (!this.hasSetupSiege) {
-            if (this.tryToSetupSiege(level)) {
-                this.hasSetupSiege = true;
-            } else {
-                return;
-            }
-        }
-        if (this.nextSpawnTime > 0) {
-            --this.nextSpawnTime;
-            return;
-        }
-        this.nextSpawnTime = 2;
-        if (this.zombiesToSpawn > 0) {
-            this.trySpawn(level);
-            --this.zombiesToSpawn;
-        } else {
-            this.siegeState = State.SIEGE_DONE;
-        }
+  @Override
+  public void tick(ServerLevel level, boolean spawnEnemies) {
+    if (level.isBrightOutside() || !spawnEnemies) {
+      this.siegeState = State.SIEGE_DONE;
+      this.hasSetupSiege = false;
+      return;
     }
-
-    private boolean tryToSetupSiege(ServerLevel level) {
-        RandomSource random = level.getRandom();
-        for (Player player : level.players()) {
-            BlockPos center;
-            if (player.isSpectator() || !level.isVillage(center = player.blockPosition()) || level.getBiome(center).is(BiomeTags.WITHOUT_ZOMBIE_SIEGES)) continue;
-            for (int i = 0; i < 10; ++i) {
-                float angle = random.nextFloat() * ((float)Math.PI * 2);
-                this.spawnX = center.getX() + Mth.floor(Mth.cos(angle) * 32.0f);
-                this.spawnY = center.getY();
-                this.spawnZ = center.getZ() + Mth.floor(Mth.sin(angle) * 32.0f);
-                if (this.findRandomSpawnPos(level, new BlockPos(this.spawnX, this.spawnY, this.spawnZ)) == null) continue;
-                this.nextSpawnTime = 0;
-                this.zombiesToSpawn = 20;
-                break;
-            }
-            return true;
-        }
-        return false;
+    Optional<Holder<WorldClock>> defaultClock = level.dimensionType().defaultClock();
+    if (defaultClock.isPresent()
+        && level
+            .clockManager()
+            .isAtTimeMarker(defaultClock.get(), ClockTimeMarkers.ROLL_VILLAGE_SIEGE)) {
+      State state =
+          this.siegeState =
+              level.getRandom().nextInt(10) == 0 ? State.SIEGE_TONIGHT : State.SIEGE_DONE;
     }
-
-    private void trySpawn(ServerLevel level) {
-        Zombie zombie;
-        Vec3 spawnPos = this.findRandomSpawnPos(level, new BlockPos(this.spawnX, this.spawnY, this.spawnZ));
-        if (spawnPos == null) {
-            return;
-        }
-        try {
-            zombie = new Zombie(level);
-            zombie.finalizeSpawn(level, level.getCurrentDifficultyAt(zombie.blockPosition()), EntitySpawnReason.EVENT, null);
-        }
-        catch (Exception e) {
-            LOGGER.warn("Failed to create zombie for village siege at {}", (Object)spawnPos, (Object)e);
-            return;
-        }
-        zombie.snapTo(spawnPos.x, spawnPos.y, spawnPos.z, level.getRandom().nextFloat() * 360.0f, 0.0f);
-        level.addFreshEntityWithPassengers(zombie);
+    if (this.siegeState == State.SIEGE_DONE) {
+      return;
     }
-
-    private @Nullable Vec3 findRandomSpawnPos(ServerLevel level, BlockPos pos) {
-        RandomSource random = level.getRandom();
-        for (int i = 0; i < 10; ++i) {
-            int z;
-            int y;
-            int x = pos.getX() + random.nextInt(16) - 8;
-            BlockPos offset = new BlockPos(x, y = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z = pos.getZ() + random.nextInt(16) - 8), z);
-            if (!level.isVillage(offset) || !Monster.checkMonsterSpawnRules(EntityTypes.ZOMBIE, level, EntitySpawnReason.EVENT, offset, random)) continue;
-            return Vec3.atBottomCenterOf(offset);
-        }
-        return null;
+    if (!this.hasSetupSiege) {
+      if (this.tryToSetupSiege(level)) {
+        this.hasSetupSiege = true;
+      } else {
+        return;
+      }
     }
-
-    private static enum State {
-        SIEGE_CAN_ACTIVATE,
-        SIEGE_TONIGHT,
-        SIEGE_DONE;
-
+    if (this.nextSpawnTime > 0) {
+      --this.nextSpawnTime;
+      return;
     }
+    this.nextSpawnTime = 2;
+    if (this.zombiesToSpawn > 0) {
+      this.trySpawn(level);
+      --this.zombiesToSpawn;
+    } else {
+      this.siegeState = State.SIEGE_DONE;
+    }
+  }
+
+  private boolean tryToSetupSiege(ServerLevel level) {
+    RandomSource random = level.getRandom();
+    for (Player player : level.players()) {
+      BlockPos center;
+      if (player.isSpectator()
+          || !level.isVillage(center = player.blockPosition())
+          || level.getBiome(center).is(BiomeTags.WITHOUT_ZOMBIE_SIEGES)) continue;
+      for (int i = 0; i < 10; ++i) {
+        float angle = random.nextFloat() * ((float) Math.PI * 2);
+        this.spawnX = center.getX() + Mth.floor(Mth.cos(angle) * 32.0f);
+        this.spawnY = center.getY();
+        this.spawnZ = center.getZ() + Mth.floor(Mth.sin(angle) * 32.0f);
+        if (this.findRandomSpawnPos(level, new BlockPos(this.spawnX, this.spawnY, this.spawnZ))
+            == null) continue;
+        this.nextSpawnTime = 0;
+        this.zombiesToSpawn = 20;
+        break;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private void trySpawn(ServerLevel level) {
+    Zombie zombie;
+    Vec3 spawnPos =
+        this.findRandomSpawnPos(level, new BlockPos(this.spawnX, this.spawnY, this.spawnZ));
+    if (spawnPos == null) {
+      return;
+    }
+    try {
+      zombie = new Zombie(level);
+      zombie.finalizeSpawn(
+          level,
+          level.getCurrentDifficultyAt(zombie.blockPosition()),
+          EntitySpawnReason.EVENT,
+          null);
+    } catch (Exception e) {
+      LOGGER.warn("Failed to create zombie for village siege at {}", (Object) spawnPos, (Object) e);
+      return;
+    }
+    zombie.snapTo(spawnPos.x, spawnPos.y, spawnPos.z, level.getRandom().nextFloat() * 360.0f, 0.0f);
+    level.addFreshEntityWithPassengers(zombie);
+  }
+
+  private @Nullable Vec3 findRandomSpawnPos(ServerLevel level, BlockPos pos) {
+    RandomSource random = level.getRandom();
+    for (int i = 0; i < 10; ++i) {
+      int z;
+      int y;
+      int x = pos.getX() + random.nextInt(16) - 8;
+      BlockPos offset =
+          new BlockPos(
+              x,
+              y =
+                  level.getHeight(
+                      Heightmap.Types.WORLD_SURFACE, x, z = pos.getZ() + random.nextInt(16) - 8),
+              z);
+      if (!level.isVillage(offset)
+          || !Monster.checkMonsterSpawnRules(
+              EntityTypes.ZOMBIE, level, EntitySpawnReason.EVENT, offset, random)) continue;
+      return Vec3.atBottomCenterOf(offset);
+    }
+    return null;
+  }
+
+  private static enum State {
+    SIEGE_CAN_ACTIVATE,
+    SIEGE_TONIGHT,
+    SIEGE_DONE;
+  }
 }
-

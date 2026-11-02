@@ -11,48 +11,48 @@ import net.minecraft.world.clock.ClockManager;
 import net.minecraft.world.clock.ClockNetworkState;
 import net.minecraft.world.clock.WorldClock;
 
-public class ClientClockManager
-implements ClockManager {
-    private final Map<Holder<WorldClock>, ClockInstance> clocks = new HashMap<Holder<WorldClock>, ClockInstance>();
-    private long lastTickGameTime;
+public class ClientClockManager implements ClockManager {
+  private final Map<Holder<WorldClock>, ClockInstance> clocks =
+      new HashMap<Holder<WorldClock>, ClockInstance>();
+  private long lastTickGameTime;
 
-    private ClockInstance getInstance(Holder<WorldClock> definition) {
-        return this.clocks.computeIfAbsent(definition, holder -> new ClockInstance());
+  private ClockInstance getInstance(Holder<WorldClock> definition) {
+    return this.clocks.computeIfAbsent(definition, holder -> new ClockInstance());
+  }
+
+  public void tick(long gameTime) {
+    long gameTimeDelta = gameTime - this.lastTickGameTime;
+    this.lastTickGameTime = gameTime;
+    for (ClockInstance instance : this.clocks.values()) {
+      double newPartialTicks =
+          (double) instance.partialTick + (double) gameTimeDelta * (double) instance.rate;
+      long fullTicks = Mth.floor(newPartialTicks);
+      instance.partialTick = (float) (newPartialTicks - (double) fullTicks);
+      instance.totalTicks += fullTicks;
     }
+  }
 
-    public void tick(long gameTime) {
-        long gameTimeDelta = gameTime - this.lastTickGameTime;
-        this.lastTickGameTime = gameTime;
-        for (ClockInstance instance : this.clocks.values()) {
-            double newPartialTicks = (double)instance.partialTick + (double)gameTimeDelta * (double)instance.rate;
-            long fullTicks = Mth.floor(newPartialTicks);
-            instance.partialTick = (float)(newPartialTicks - (double)fullTicks);
-            instance.totalTicks += fullTicks;
-        }
-    }
-
-    public void handleUpdates(long gameTime, Map<Holder<WorldClock>, ClockNetworkState> updates) {
-        this.tick(gameTime);
-        updates.forEach((definition, state) -> {
-            ClockInstance clock = this.getInstance((Holder<WorldClock>)definition);
-            clock.totalTicks = state.totalTicks();
-            clock.partialTick = state.partialTick();
-            clock.rate = state.rate();
+  public void handleUpdates(long gameTime, Map<Holder<WorldClock>, ClockNetworkState> updates) {
+    this.tick(gameTime);
+    updates.forEach(
+        (definition, state) -> {
+          ClockInstance clock = this.getInstance((Holder<WorldClock>) definition);
+          clock.totalTicks = state.totalTicks();
+          clock.partialTick = state.partialTick();
+          clock.rate = state.rate();
         });
-    }
+  }
 
-    @Override
-    public long getTotalTicks(Holder<WorldClock> definition) {
-        return this.getInstance(definition).totalTicks;
-    }
+  @Override
+  public long getTotalTicks(Holder<WorldClock> definition) {
+    return this.getInstance(definition).totalTicks;
+  }
 
-    private static class ClockInstance {
-        private long totalTicks;
-        private float partialTick;
-        private float rate = 1.0f;
+  private static class ClockInstance {
+    private long totalTicks;
+    private float partialTick;
+    private float rate = 1.0f;
 
-        private ClockInstance() {
-        }
-    }
+    private ClockInstance() {}
+  }
 }
-

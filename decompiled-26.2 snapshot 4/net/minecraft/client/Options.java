@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.base.MoreObjects
  *  com.google.common.base.Splitter
@@ -1536,4 +1536,3 @@ public class Options {
         public <T> T process(String var1, T var2, Function<String, T> var3, Function<T, String> var4);
     }
 }
-

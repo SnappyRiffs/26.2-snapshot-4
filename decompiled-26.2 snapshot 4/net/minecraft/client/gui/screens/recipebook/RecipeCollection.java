@@ -14,67 +14,67 @@ import net.minecraft.world.item.crafting.display.RecipeDisplayEntry;
 import net.minecraft.world.item.crafting.display.RecipeDisplayId;
 
 public class RecipeCollection {
-    public static final RecipeCollection EMPTY = new RecipeCollection(List.of());
-    private final List<RecipeDisplayEntry> entries;
-    private final Set<RecipeDisplayId> craftable = new HashSet<RecipeDisplayId>();
-    private final Set<RecipeDisplayId> selected = new HashSet<RecipeDisplayId>();
+  public static final RecipeCollection EMPTY = new RecipeCollection(List.of());
+  private final List<RecipeDisplayEntry> entries;
+  private final Set<RecipeDisplayId> craftable = new HashSet<RecipeDisplayId>();
+  private final Set<RecipeDisplayId> selected = new HashSet<RecipeDisplayId>();
 
-    public RecipeCollection(List<RecipeDisplayEntry> recipes) {
-        this.entries = recipes;
+  public RecipeCollection(List<RecipeDisplayEntry> recipes) {
+    this.entries = recipes;
+  }
+
+  public void selectRecipes(
+      StackedItemContents stackedContents, Predicate<RecipeDisplay> selector) {
+    for (RecipeDisplayEntry entry : this.entries) {
+      boolean isSelected = selector.test(entry.display());
+      if (isSelected) {
+        this.selected.add(entry.id());
+      } else {
+        this.selected.remove(entry.id());
+      }
+      if (isSelected && entry.canCraft(stackedContents)) {
+        this.craftable.add(entry.id());
+        continue;
+      }
+      this.craftable.remove(entry.id());
     }
+  }
 
-    public void selectRecipes(StackedItemContents stackedContents, Predicate<RecipeDisplay> selector) {
-        for (RecipeDisplayEntry entry : this.entries) {
-            boolean isSelected = selector.test(entry.display());
-            if (isSelected) {
-                this.selected.add(entry.id());
-            } else {
-                this.selected.remove(entry.id());
-            }
-            if (isSelected && entry.canCraft(stackedContents)) {
-                this.craftable.add(entry.id());
-                continue;
-            }
-            this.craftable.remove(entry.id());
-        }
-    }
+  public boolean isCraftable(RecipeDisplayId recipe) {
+    return this.craftable.contains(recipe);
+  }
 
-    public boolean isCraftable(RecipeDisplayId recipe) {
-        return this.craftable.contains(recipe);
-    }
+  public boolean hasCraftable() {
+    return !this.craftable.isEmpty();
+  }
 
-    public boolean hasCraftable() {
-        return !this.craftable.isEmpty();
-    }
+  public boolean hasAnySelected() {
+    return !this.selected.isEmpty();
+  }
 
-    public boolean hasAnySelected() {
-        return !this.selected.isEmpty();
-    }
+  public List<RecipeDisplayEntry> getRecipes() {
+    return this.entries;
+  }
 
-    public List<RecipeDisplayEntry> getRecipes() {
-        return this.entries;
-    }
-
-    public List<RecipeDisplayEntry> getSelectedRecipes(CraftableStatus selector) {
-        Predicate<RecipeDisplayId> predicate = switch (selector.ordinal()) {
-            default -> throw new MatchException(null, null);
-            case 0 -> this.selected::contains;
-            case 1 -> this.craftable::contains;
-            case 2 -> recipe -> this.selected.contains(recipe) && !this.craftable.contains(recipe);
+  public List<RecipeDisplayEntry> getSelectedRecipes(CraftableStatus selector) {
+    Predicate<RecipeDisplayId> predicate =
+        switch (selector.ordinal()) {
+          default -> throw new MatchException(null, null);
+          case 0 -> this.selected::contains;
+          case 1 -> this.craftable::contains;
+          case 2 -> recipe -> this.selected.contains(recipe) && !this.craftable.contains(recipe);
         };
-        ArrayList<RecipeDisplayEntry> result = new ArrayList<RecipeDisplayEntry>();
-        for (RecipeDisplayEntry entries : this.entries) {
-            if (!predicate.test(entries.id())) continue;
-            result.add(entries);
-        }
-        return result;
+    ArrayList<RecipeDisplayEntry> result = new ArrayList<RecipeDisplayEntry>();
+    for (RecipeDisplayEntry entries : this.entries) {
+      if (!predicate.test(entries.id())) continue;
+      result.add(entries);
     }
+    return result;
+  }
 
-    public static enum CraftableStatus {
-        ANY,
-        CRAFTABLE,
-        NOT_CRAFTABLE;
-
-    }
+  public static enum CraftableStatus {
+    ANY,
+    CRAFTABLE,
+    NOT_CRAFTABLE;
+  }
 }
-

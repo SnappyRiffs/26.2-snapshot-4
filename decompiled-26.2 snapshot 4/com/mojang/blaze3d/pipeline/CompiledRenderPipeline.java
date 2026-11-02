@@ -4,6 +4,5 @@
 package com.mojang.blaze3d.pipeline;
 
 public interface CompiledRenderPipeline {
-    public boolean isValid();
+  public boolean isValid();
 }
-

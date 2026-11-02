@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -19,87 +19,85 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.Spawner;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
-public class SpawnerBlockEntity
-extends BlockEntity
-implements Spawner {
-    private final BaseSpawner spawner = new BaseSpawner(this){
+public class SpawnerBlockEntity extends BlockEntity implements Spawner {
+  private final BaseSpawner spawner =
+      new BaseSpawner(this) {
         {
-            Objects.requireNonNull(this$0);
+          Objects.requireNonNull(this$0);
         }
 
         @Override
         public void broadcastEvent(Level level, BlockPos pos, int id) {
-            level.blockEvent(pos, Blocks.SPAWNER, id, 0);
+          level.blockEvent(pos, Blocks.SPAWNER, id, 0);
         }
 
         @Override
         public void setNextSpawnData(@Nullable Level level, BlockPos pos, SpawnData nextSpawnData) {
-            super.setNextSpawnData(level, pos, nextSpawnData);
-            if (level != null) {
-                BlockState state = level.getBlockState(pos);
-                level.sendBlockUpdated(pos, state, state, 260);
-            }
+          super.setNextSpawnData(level, pos, nextSpawnData);
+          if (level != null) {
+            BlockState state = level.getBlockState(pos);
+            level.sendBlockUpdated(pos, state, state, 260);
+          }
         }
-    };
+      };
 
-    public SpawnerBlockEntity(BlockPos worldPosition, BlockState blockState) {
-        super(BlockEntityTypes.MOB_SPAWNER, worldPosition, blockState);
-    }
+  public SpawnerBlockEntity(BlockPos worldPosition, BlockState blockState) {
+    super(BlockEntityTypes.MOB_SPAWNER, worldPosition, blockState);
+  }
 
-    @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        this.spawner.load(this.level, this.worldPosition, input);
-    }
+  @Override
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    this.spawner.load(this.level, this.worldPosition, input);
+  }
 
-    @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        this.spawner.save(output);
-    }
+  @Override
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    this.spawner.save(output);
+  }
 
-    public static void clientTick(Level level, BlockPos pos, BlockState state, SpawnerBlockEntity entity) {
-        entity.spawner.clientTick(level, pos);
-    }
+  public static void clientTick(
+      Level level, BlockPos pos, BlockState state, SpawnerBlockEntity entity) {
+    entity.spawner.clientTick(level, pos);
+  }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, SpawnerBlockEntity entity) {
-        entity.spawner.serverTick((ServerLevel)level, pos);
-    }
+  public static void serverTick(
+      Level level, BlockPos pos, BlockState state, SpawnerBlockEntity entity) {
+    entity.spawner.serverTick((ServerLevel) level, pos);
+  }
 
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+  public ClientboundBlockEntityDataPacket getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = this.saveCustomOnly(registries);
-        tag.remove("SpawnPotentials");
-        return tag;
-    }
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    CompoundTag tag = this.saveCustomOnly(registries);
+    tag.remove("SpawnPotentials");
+    return tag;
+  }
 
-    @Override
-    public boolean triggerEvent(int b0, int b1) {
-        if (this.spawner.onEventTriggered(this.level, b0)) {
-            return true;
-        }
-        return super.triggerEvent(b0, b1);
+  @Override
+  public boolean triggerEvent(int b0, int b1) {
+    if (this.spawner.onEventTriggered(this.level, b0)) {
+      return true;
     }
+    return super.triggerEvent(b0, b1);
+  }
 
-    @Override
-    public void setEntityId(EntityType<?> type, RandomSource random) {
-        this.spawner.setEntityId(type, this.level, random, this.worldPosition);
-        this.setChanged();
-    }
+  @Override
+  public void setEntityId(EntityType<?> type, RandomSource random) {
+    this.spawner.setEntityId(type, this.level, random, this.worldPosition);
+    this.setChanged();
+  }
 
-    public BaseSpawner getSpawner() {
-        return this.spawner;
-    }
+  public BaseSpawner getSpawner() {
+    return this.spawner;
+  }
 }
-

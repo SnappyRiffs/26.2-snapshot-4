@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
  */
@@ -18,30 +18,46 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.player.Player;
 
-public class PlayerSensor
-extends Sensor<LivingEntity> {
-    @Override
-    public Set<MemoryModuleType<?>> requires() {
-        return ImmutableSet.of(MemoryModuleType.NEAREST_PLAYERS, MemoryModuleType.NEAREST_VISIBLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYERS);
-    }
+public class PlayerSensor extends Sensor<LivingEntity> {
+  @Override
+  public Set<MemoryModuleType<?>> requires() {
+    return ImmutableSet.of(
+        MemoryModuleType.NEAREST_PLAYERS,
+        MemoryModuleType.NEAREST_VISIBLE_PLAYER,
+        MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER,
+        MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYERS);
+  }
 
-    @Override
-    protected void doTick(ServerLevel level, LivingEntity body) {
-        List players = level.players().stream().filter(EntitySelector.NO_SPECTATORS).filter(player -> body.closerThan((Entity)player, this.getFollowDistance(body))).sorted(Comparator.comparingDouble(body::distanceToSqr)).collect(Collectors.toList());
-        Brain<? extends LivingEntity> brain = body.getBrain();
-        brain.setMemory(MemoryModuleType.NEAREST_PLAYERS, players);
-        List visiblePlayers = players.stream().filter(livingEntity -> PlayerSensor.isEntityTargetable(level, body, livingEntity)).collect(Collectors.toList());
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER, visiblePlayers.isEmpty() ? null : (Player)visiblePlayers.get(0));
-        List<Player> visibleAttackablePlayers = visiblePlayers.stream().filter(livingEntity -> PlayerSensor.isEntityAttackable(level, body, livingEntity)).toList();
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYERS, visibleAttackablePlayers);
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER, visibleAttackablePlayers.isEmpty() ? null : visibleAttackablePlayers.get(0));
-    }
+  @Override
+  protected void doTick(ServerLevel level, LivingEntity body) {
+    List players =
+        level.players().stream()
+            .filter(EntitySelector.NO_SPECTATORS)
+            .filter(player -> body.closerThan((Entity) player, this.getFollowDistance(body)))
+            .sorted(Comparator.comparingDouble(body::distanceToSqr))
+            .collect(Collectors.toList());
+    Brain<? extends LivingEntity> brain = body.getBrain();
+    brain.setMemory(MemoryModuleType.NEAREST_PLAYERS, players);
+    List visiblePlayers =
+        players.stream()
+            .filter(livingEntity -> PlayerSensor.isEntityTargetable(level, body, livingEntity))
+            .collect(Collectors.toList());
+    brain.setMemory(
+        MemoryModuleType.NEAREST_VISIBLE_PLAYER,
+        visiblePlayers.isEmpty() ? null : (Player) visiblePlayers.get(0));
+    List<Player> visibleAttackablePlayers =
+        visiblePlayers.stream()
+            .filter(livingEntity -> PlayerSensor.isEntityAttackable(level, body, livingEntity))
+            .toList();
+    brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYERS, visibleAttackablePlayers);
+    brain.setMemory(
+        MemoryModuleType.NEAREST_VISIBLE_ATTACKABLE_PLAYER,
+        visibleAttackablePlayers.isEmpty() ? null : visibleAttackablePlayers.get(0));
+  }
 
-    protected double getFollowDistance(LivingEntity body) {
-        return body.getAttributeValue(Attributes.FOLLOW_RANGE);
-    }
+  protected double getFollowDistance(LivingEntity body) {
+    return body.getAttributeValue(Attributes.FOLLOW_RANGE);
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -21,40 +21,46 @@ import net.minecraft.world.item.component.OminousBottleAmplifier;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.Validatable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 
-public class SetOminousBottleAmplifierFunction
-extends LootItemConditionalFunction {
-    static final MapCodec<SetOminousBottleAmplifierFunction> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> SetOminousBottleAmplifierFunction.commonFields(i).and((App)NumberProviders.CODEC.fieldOf("amplifier").forGetter(f -> f.amplifier)).apply((Applicative)i, SetOminousBottleAmplifierFunction::new));
-    private final NumberProvider amplifier;
+public class SetOminousBottleAmplifierFunction extends LootItemConditionalFunction {
+  static final MapCodec<SetOminousBottleAmplifierFunction> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              SetOminousBottleAmplifierFunction.commonFields(i)
+                  .and((App) NumberProviders.CODEC.fieldOf("amplifier").forGetter(f -> f.amplifier))
+                  .apply((Applicative) i, SetOminousBottleAmplifierFunction::new));
+  private final NumberProvider amplifier;
 
-    private SetOminousBottleAmplifierFunction(List<LootItemCondition> predicates, NumberProvider amplifier) {
-        super(predicates);
-        this.amplifier = amplifier;
-    }
+  private SetOminousBottleAmplifierFunction(
+      List<LootItemCondition> predicates, NumberProvider amplifier) {
+    super(predicates);
+    this.amplifier = amplifier;
+  }
 
-    @Override
-    public void validate(ValidationContext context) {
-        super.validate(context);
-        Validatable.validate(context, "amplifier", this.amplifier);
-    }
+  @Override
+  public void validate(ValidationContext context) {
+    super.validate(context);
+    Validatable.validate(context, "amplifier", this.amplifier);
+  }
 
-    public MapCodec<SetOminousBottleAmplifierFunction> codec() {
-        return MAP_CODEC;
-    }
+  public MapCodec<SetOminousBottleAmplifierFunction> codec() {
+    return MAP_CODEC;
+  }
 
-    @Override
-    public ItemStack run(ItemStack itemStack, LootContext context) {
-        int amplifierValue = Mth.clamp(this.amplifier.getInt(context), 0, 4);
-        itemStack.set(DataComponents.OMINOUS_BOTTLE_AMPLIFIER, new OminousBottleAmplifier(amplifierValue));
-        return itemStack;
-    }
+  @Override
+  public ItemStack run(ItemStack itemStack, LootContext context) {
+    int amplifierValue = Mth.clamp(this.amplifier.getInt(context), 0, 4);
+    itemStack.set(
+        DataComponents.OMINOUS_BOTTLE_AMPLIFIER, new OminousBottleAmplifier(amplifierValue));
+    return itemStack;
+  }
 
-    public static LootItemConditionalFunction.Builder<?> setAmplifier(NumberProvider amplifier) {
-        return SetOminousBottleAmplifierFunction.simpleBuilder(conditions -> new SetOminousBottleAmplifierFunction((List<LootItemCondition>)conditions, amplifier));
-    }
+  public static LootItemConditionalFunction.Builder<?> setAmplifier(NumberProvider amplifier) {
+    return SetOminousBottleAmplifierFunction.simpleBuilder(
+        conditions ->
+            new SetOminousBottleAmplifierFunction((List<LootItemCondition>) conditions, amplifier));
+  }
 }
-

@@ -4,32 +4,24 @@
 package com.mojang.blaze3d.opengl;
 
 import com.mojang.blaze3d.GpuFormat;
-import com.mojang.blaze3d.opengl.GlStateManager;
 
-public sealed interface Uniform
-extends AutoCloseable {
+public sealed interface Uniform extends AutoCloseable {
+  @Override
+  public default void close() {}
+
+  public record Sampler(int location, int samplerIndex) implements Uniform {}
+
+  public record Utb(int location, int samplerIndex, GpuFormat format, int texture)
+      implements Uniform {
+    public Utb(int location, int samplerIndex, GpuFormat format) {
+      this(location, samplerIndex, format, GlStateManager._genTexture());
+    }
+
     @Override
-    default public void close() {
+    public void close() {
+      GlStateManager._deleteTexture(this.texture);
     }
+  }
 
-    public record Sampler(int location, int samplerIndex) implements Uniform
-    {
-    }
-
-    public record Utb(int location, int samplerIndex, GpuFormat format, int texture) implements Uniform
-    {
-        public Utb(int location, int samplerIndex, GpuFormat format) {
-            this(location, samplerIndex, format, GlStateManager._genTexture());
-        }
-
-        @Override
-        public void close() {
-            GlStateManager._deleteTexture(this.texture);
-        }
-    }
-
-    public record Ubo(int blockBinding) implements Uniform
-    {
-    }
+  public record Ubo(int blockBinding) implements Uniform {}
 }
-

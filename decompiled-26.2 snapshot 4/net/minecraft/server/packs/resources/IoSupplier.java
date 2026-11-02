@@ -13,14 +13,13 @@ import java.util.zip.ZipFile;
 
 @FunctionalInterface
 public interface IoSupplier<T> {
-    public static IoSupplier<InputStream> create(Path path) {
-        return () -> Files.newInputStream(path, new OpenOption[0]);
-    }
+  public static IoSupplier<InputStream> create(Path path) {
+    return () -> Files.newInputStream(path, new OpenOption[0]);
+  }
 
-    public static IoSupplier<InputStream> create(ZipFile zipFile, ZipEntry entry) {
-        return () -> zipFile.getInputStream(entry);
-    }
+  public static IoSupplier<InputStream> create(ZipFile zipFile, ZipEntry entry) {
+    return () -> zipFile.getInputStream(entry);
+  }
 
-    public T get() throws IOException;
+  public T get() throws IOException;
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -11,22 +11,22 @@ import net.minecraft.network.chat.PlayerChatMessage;
 import org.jspecify.annotations.Nullable;
 
 public interface CommandSigningContext {
-    public static final CommandSigningContext ANONYMOUS = new CommandSigningContext(){
+  public static final CommandSigningContext ANONYMOUS =
+      new CommandSigningContext() {
 
         @Override
         public @Nullable PlayerChatMessage getArgument(String name) {
-            return null;
+          return null;
         }
-    };
+      };
 
-    public @Nullable PlayerChatMessage getArgument(String var1);
+  public @Nullable PlayerChatMessage getArgument(String var1);
 
-    public record SignedArguments(Map<String, PlayerChatMessage> arguments) implements CommandSigningContext
-    {
-        @Override
-        public @Nullable PlayerChatMessage getArgument(String name) {
-            return this.arguments.get(name);
-        }
+  public record SignedArguments(Map<String, PlayerChatMessage> arguments)
+      implements CommandSigningContext {
+    @Override
+    public @Nullable PlayerChatMessage getArgument(String name) {
+      return this.arguments.get(name);
     }
+  }
 }
-

@@ -3,12 +3,8 @@
  */
 package net.minecraft.client.renderer.entity.state;
 
-import net.minecraft.client.renderer.entity.state.HoldingEntityRenderState;
-
-public class WitchRenderState
-extends HoldingEntityRenderState {
-    public int entityId;
-    public boolean isHoldingItem;
-    public boolean isHoldingPotion;
+public class WitchRenderState extends HoldingEntityRenderState {
+  public int entityId;
+  public boolean isHoldingItem;
+  public boolean isHoldingPotion;
 }
-

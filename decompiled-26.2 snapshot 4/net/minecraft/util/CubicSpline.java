@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.annotations.VisibleForTesting
  *  com.google.common.collect.ImmutableList
@@ -124,7 +124,7 @@ public sealed interface CubicSpline<I> {
                     either = Either.left((Object)Float.valueOf(value));
                     return either;
                 }
-                case 1: 
+                case 1:
             }
             Multipoint multipoint = (Multipoint)selector1$temp;
             either = Either.right((Object)multipoint);
@@ -431,4 +431,3 @@ public sealed interface CubicSpline<I> {
         }
     }
 }
-

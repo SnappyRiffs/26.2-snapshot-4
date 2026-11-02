@@ -13,42 +13,48 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 public interface SelectableSlotContainer {
-    public int getRows();
+  public int getRows();
 
-    public int getColumns();
+  public int getColumns();
 
-    default public OptionalInt getHitSlot(BlockHitResult hitResult, Direction blockFacing) {
-        return SelectableSlotContainer.getRelativeHitCoordinatesForBlockFace(hitResult, blockFacing).map(hitCoords -> {
-            int row = SelectableSlotContainer.getSection(1.0f - hitCoords.y, this.getRows());
-            int column = SelectableSlotContainer.getSection(hitCoords.x, this.getColumns());
-            return OptionalInt.of(column + row * this.getColumns());
-        }).orElseGet(OptionalInt::empty);
+  public default OptionalInt getHitSlot(BlockHitResult hitResult, Direction blockFacing) {
+    return SelectableSlotContainer.getRelativeHitCoordinatesForBlockFace(hitResult, blockFacing)
+        .map(
+            hitCoords -> {
+              int row = SelectableSlotContainer.getSection(1.0f - hitCoords.y, this.getRows());
+              int column = SelectableSlotContainer.getSection(hitCoords.x, this.getColumns());
+              return OptionalInt.of(column + row * this.getColumns());
+            })
+        .orElseGet(OptionalInt::empty);
+  }
+
+  private static Optional<Vec2> getRelativeHitCoordinatesForBlockFace(
+      BlockHitResult hitResult, Direction blockFacing) {
+    Direction hitDirection = hitResult.getDirection();
+    if (blockFacing != hitDirection) {
+      return Optional.empty();
     }
+    BlockPos hitBlockPos = hitResult.getBlockPos().relative(hitDirection);
+    Vec3 relativeHit =
+        hitResult
+            .getLocation()
+            .subtract(hitBlockPos.getX(), hitBlockPos.getY(), hitBlockPos.getZ());
+    double relativeX = relativeHit.x();
+    double relativeY = relativeHit.y();
+    double relativeZ = relativeHit.z();
+    return switch (hitDirection) {
+      default -> throw new MatchException(null, null);
+      case Direction.NORTH -> Optional.of(new Vec2((float) (1.0 - relativeX), (float) relativeY));
+      case Direction.SOUTH -> Optional.of(new Vec2((float) relativeX, (float) relativeY));
+      case Direction.WEST -> Optional.of(new Vec2((float) relativeZ, (float) relativeY));
+      case Direction.EAST -> Optional.of(new Vec2((float) (1.0 - relativeZ), (float) relativeY));
+      case Direction.DOWN, Direction.UP -> Optional.empty();
+    };
+  }
 
-    private static Optional<Vec2> getRelativeHitCoordinatesForBlockFace(BlockHitResult hitResult, Direction blockFacing) {
-        Direction hitDirection = hitResult.getDirection();
-        if (blockFacing != hitDirection) {
-            return Optional.empty();
-        }
-        BlockPos hitBlockPos = hitResult.getBlockPos().relative(hitDirection);
-        Vec3 relativeHit = hitResult.getLocation().subtract(hitBlockPos.getX(), hitBlockPos.getY(), hitBlockPos.getZ());
-        double relativeX = relativeHit.x();
-        double relativeY = relativeHit.y();
-        double relativeZ = relativeHit.z();
-        return switch (hitDirection) {
-            default -> throw new MatchException(null, null);
-            case Direction.NORTH -> Optional.of(new Vec2((float)(1.0 - relativeX), (float)relativeY));
-            case Direction.SOUTH -> Optional.of(new Vec2((float)relativeX, (float)relativeY));
-            case Direction.WEST -> Optional.of(new Vec2((float)relativeZ, (float)relativeY));
-            case Direction.EAST -> Optional.of(new Vec2((float)(1.0 - relativeZ), (float)relativeY));
-            case Direction.DOWN, Direction.UP -> Optional.empty();
-        };
-    }
-
-    private static int getSection(float relativeCoordinate, int maxSections) {
-        float targetedPixel = relativeCoordinate * 16.0f;
-        float sectionSize = 16.0f / (float)maxSections;
-        return Mth.clamp(Mth.floor(targetedPixel / sectionSize), 0, maxSections - 1);
-    }
+  private static int getSection(float relativeCoordinate, int maxSections) {
+    float targetedPixel = relativeCoordinate * 16.0f;
+    float sectionSize = 16.0f / (float) maxSections;
+    return Mth.clamp(Mth.floor(targetedPixel / sectionSize), 0, maxSections - 1);
+  }
 }
-

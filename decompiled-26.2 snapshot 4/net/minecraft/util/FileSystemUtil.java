@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  org.slf4j.Logger
@@ -19,24 +19,20 @@ import java.util.Collections;
 import org.slf4j.Logger;
 
 public class FileSystemUtil {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static Path safeGetPath(URI probeUri) throws IOException {
-        try {
-            return Paths.get(probeUri);
-        }
-        catch (FileSystemNotFoundException fileSystemNotFoundException) {
-        }
-        catch (Throwable t) {
-            LOGGER.warn("Unable to get path for: {}", (Object)probeUri, (Object)t);
-        }
-        try {
-            FileSystems.newFileSystem(probeUri, Collections.emptyMap());
-        }
-        catch (FileSystemAlreadyExistsException fileSystemAlreadyExistsException) {
-            // empty catch block
-        }
-        return Paths.get(probeUri);
+  public static Path safeGetPath(URI probeUri) throws IOException {
+    try {
+      return Paths.get(probeUri);
+    } catch (FileSystemNotFoundException fileSystemNotFoundException) {
+    } catch (Throwable t) {
+      LOGGER.warn("Unable to get path for: {}", (Object) probeUri, (Object) t);
     }
+    try {
+      FileSystems.newFileSystem(probeUri, Collections.emptyMap());
+    } catch (FileSystemAlreadyExistsException fileSystemAlreadyExistsException) {
+      // empty catch block
+    }
+    return Paths.get(probeUri);
+  }
 }
-

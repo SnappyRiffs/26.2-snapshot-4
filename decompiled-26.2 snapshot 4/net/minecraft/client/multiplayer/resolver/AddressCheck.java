@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Streams
@@ -13,31 +13,33 @@ import com.google.common.collect.Streams;
 import com.mojang.blocklist.BlockListSupplier;
 import java.util.Objects;
 import java.util.ServiceLoader;
-import net.minecraft.client.multiplayer.resolver.ResolvedServerAddress;
-import net.minecraft.client.multiplayer.resolver.ServerAddress;
 
 public interface AddressCheck {
-    public boolean isAllowed(ResolvedServerAddress var1);
+  public boolean isAllowed(ResolvedServerAddress var1);
 
-    public boolean isAllowed(ServerAddress var1);
+  public boolean isAllowed(ServerAddress var1);
 
-    public static AddressCheck createFromService() {
-        final ImmutableList blockLists = (ImmutableList)Streams.stream(ServiceLoader.load(BlockListSupplier.class)).map(BlockListSupplier::createBlockList).filter(Objects::nonNull).collect(ImmutableList.toImmutableList());
-        return new AddressCheck(){
+  public static AddressCheck createFromService() {
+    final ImmutableList blockLists =
+        (ImmutableList)
+            Streams.stream(ServiceLoader.load(BlockListSupplier.class))
+                .map(BlockListSupplier::createBlockList)
+                .filter(Objects::nonNull)
+                .collect(ImmutableList.toImmutableList());
+    return new AddressCheck() {
 
-            @Override
-            public boolean isAllowed(ResolvedServerAddress address) {
-                String hostName = address.getHostName();
-                String hostIp = address.getHostIp();
-                return blockLists.stream().noneMatch(p -> p.test(hostName) || p.test(hostIp));
-            }
+      @Override
+      public boolean isAllowed(ResolvedServerAddress address) {
+        String hostName = address.getHostName();
+        String hostIp = address.getHostIp();
+        return blockLists.stream().noneMatch(p -> p.test(hostName) || p.test(hostIp));
+      }
 
-            @Override
-            public boolean isAllowed(ServerAddress address) {
-                String hostName = address.getHost();
-                return blockLists.stream().noneMatch(p -> p.test(hostName));
-            }
-        };
-    }
+      @Override
+      public boolean isAllowed(ServerAddress address) {
+        String hostName = address.getHost();
+        return blockLists.stream().noneMatch(p -> p.test(hostName));
+      }
+    };
+  }
 }
-

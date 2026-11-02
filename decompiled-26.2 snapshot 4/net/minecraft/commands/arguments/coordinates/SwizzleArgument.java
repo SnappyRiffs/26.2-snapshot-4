@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.ImmutableStringReader
  *  com.mojang.brigadier.Message
@@ -26,39 +26,40 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 
-public class SwizzleArgument
-implements ArgumentType<EnumSet<Direction.Axis>> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("xyz", "x");
-    private static final SimpleCommandExceptionType ERROR_INVALID = new SimpleCommandExceptionType((Message)Component.translatable("arguments.swizzle.invalid"));
+public class SwizzleArgument implements ArgumentType<EnumSet<Direction.Axis>> {
+  private static final Collection<String> EXAMPLES = Arrays.asList("xyz", "x");
+  private static final SimpleCommandExceptionType ERROR_INVALID =
+      new SimpleCommandExceptionType((Message) Component.translatable("arguments.swizzle.invalid"));
 
-    public static SwizzleArgument swizzle() {
-        return new SwizzleArgument();
-    }
+  public static SwizzleArgument swizzle() {
+    return new SwizzleArgument();
+  }
 
-    public static EnumSet<Direction.Axis> getSwizzle(CommandContext<CommandSourceStack> context, String name) {
-        return (EnumSet)context.getArgument(name, EnumSet.class);
-    }
+  public static EnumSet<Direction.Axis> getSwizzle(
+      CommandContext<CommandSourceStack> context, String name) {
+    return (EnumSet) context.getArgument(name, EnumSet.class);
+  }
 
-    public EnumSet<Direction.Axis> parse(StringReader reader) throws CommandSyntaxException {
-        EnumSet<Direction.Axis> result = EnumSet.noneOf(Direction.Axis.class);
-        while (reader.canRead() && reader.peek() != ' ') {
-            char c = reader.read();
-            Direction.Axis axis = switch (c) {
-                case 'x' -> Direction.Axis.X;
-                case 'y' -> Direction.Axis.Y;
-                case 'z' -> Direction.Axis.Z;
-                default -> throw ERROR_INVALID.createWithContext((ImmutableStringReader)reader);
-            };
-            if (result.contains(axis)) {
-                throw ERROR_INVALID.createWithContext((ImmutableStringReader)reader);
-            }
-            result.add(axis);
-        }
-        return result;
+  public EnumSet<Direction.Axis> parse(StringReader reader) throws CommandSyntaxException {
+    EnumSet<Direction.Axis> result = EnumSet.noneOf(Direction.Axis.class);
+    while (reader.canRead() && reader.peek() != ' ') {
+      char c = reader.read();
+      Direction.Axis axis =
+          switch (c) {
+            case 'x' -> Direction.Axis.X;
+            case 'y' -> Direction.Axis.Y;
+            case 'z' -> Direction.Axis.Z;
+            default -> throw ERROR_INVALID.createWithContext((ImmutableStringReader) reader);
+          };
+      if (result.contains(axis)) {
+        throw ERROR_INVALID.createWithContext((ImmutableStringReader) reader);
+      }
+      result.add(axis);
     }
+    return result;
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  */
@@ -17,84 +17,87 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CaveVines;
-import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class CaveVinesBlock
-extends GrowingPlantHeadBlock
-implements CaveVines {
-    public static final MapCodec<CaveVinesBlock> CODEC = CaveVinesBlock.simpleCodec(CaveVinesBlock::new);
-    private static final float CHANCE_OF_BERRIES_ON_GROWTH = 0.11f;
+public class CaveVinesBlock extends GrowingPlantHeadBlock implements CaveVines {
+  public static final MapCodec<CaveVinesBlock> CODEC =
+      CaveVinesBlock.simpleCodec(CaveVinesBlock::new);
+  private static final float CHANCE_OF_BERRIES_ON_GROWTH = 0.11f;
 
-    public MapCodec<CaveVinesBlock> codec() {
-        return CODEC;
-    }
+  public MapCodec<CaveVinesBlock> codec() {
+    return CODEC;
+  }
 
-    public CaveVinesBlock(BlockBehaviour.Properties properties) {
-        super(properties, Direction.DOWN, SHAPE, false, 0.1);
-        this.registerDefaultState((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(AGE, 0)).setValue(BERRIES, false));
-    }
+  public CaveVinesBlock(BlockBehaviour.Properties properties) {
+    super(properties, Direction.DOWN, SHAPE, false, 0.1);
+    this.registerDefaultState(
+        (BlockState)
+            ((BlockState) ((BlockState) this.stateDefinition.any()).setValue(AGE, 0))
+                .setValue(BERRIES, false));
+  }
 
-    @Override
-    protected int getBlocksToGrowWhenBonemealed(RandomSource random) {
-        return 1;
-    }
+  @Override
+  protected int getBlocksToGrowWhenBonemealed(RandomSource random) {
+    return 1;
+  }
 
-    @Override
-    protected boolean canGrowInto(BlockState state) {
-        return state.isAir();
-    }
+  @Override
+  protected boolean canGrowInto(BlockState state) {
+    return state.isAir();
+  }
 
-    @Override
-    protected Block getBodyBlock() {
-        return Blocks.CAVE_VINES_PLANT;
-    }
+  @Override
+  protected Block getBodyBlock() {
+    return Blocks.CAVE_VINES_PLANT;
+  }
 
-    @Override
-    protected BlockState updateBodyAfterConvertedFromHead(BlockState headState, BlockState bodyState) {
-        return (BlockState)bodyState.setValue(BERRIES, headState.getValue(BERRIES));
-    }
+  @Override
+  protected BlockState updateBodyAfterConvertedFromHead(
+      BlockState headState, BlockState bodyState) {
+    return (BlockState) bodyState.setValue(BERRIES, headState.getValue(BERRIES));
+  }
 
-    @Override
-    protected BlockState getGrowIntoState(BlockState growFromState, RandomSource random) {
-        return (BlockState)super.getGrowIntoState(growFromState, random).setValue(BERRIES, random.nextFloat() < 0.11f);
-    }
+  @Override
+  protected BlockState getGrowIntoState(BlockState growFromState, RandomSource random) {
+    return (BlockState)
+        super.getGrowIntoState(growFromState, random).setValue(BERRIES, random.nextFloat() < 0.11f);
+  }
 
-    @Override
-    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
-        return new ItemStack(Items.GLOW_BERRIES);
-    }
+  @Override
+  protected ItemStack getCloneItemStack(
+      LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+    return new ItemStack(Items.GLOW_BERRIES);
+  }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        return CaveVines.use(player, state, level, pos);
-    }
+  @Override
+  protected InteractionResult useWithoutItem(
+      BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    return CaveVines.use(player, state, level, pos);
+  }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(BERRIES);
-    }
+  @Override
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    super.createBlockStateDefinition(builder);
+    builder.add(BERRIES);
+  }
 
-    @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
-        return state.getValue(BERRIES) == false;
-    }
+  @Override
+  public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+    return state.getValue(BERRIES) == false;
+  }
 
-    @Override
-    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
-        return true;
-    }
+  @Override
+  public boolean isBonemealSuccess(
+      Level level, RandomSource random, BlockPos pos, BlockState state) {
+    return true;
+  }
 
-    @Override
-    public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-        level.setBlock(pos, (BlockState)state.setValue(BERRIES, true), 2);
-    }
+  @Override
+  public void performBonemeal(
+      ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+    level.setBlock(pos, (BlockState) state.setValue(BERRIES, true), 2);
+  }
 }
-

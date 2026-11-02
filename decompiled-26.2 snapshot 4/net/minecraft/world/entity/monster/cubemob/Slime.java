@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -26,7 +26,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.cubemob.AbstractCubeMob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -36,101 +35,128 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import org.jspecify.annotations.Nullable;
 
-public class Slime
-extends AbstractCubeMob
-implements Enemy {
-    public Slime(EntityType<? extends Slime> type, Level level) {
-        super((EntityType<? extends AbstractCubeMob>)type, level);
-    }
+public class Slime extends AbstractCubeMob implements Enemy {
+  public Slime(EntityType<? extends Slime> type, Level level) {
+    super((EntityType<? extends AbstractCubeMob>) type, level);
+  }
 
-    @Override
-    protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(2, new AbstractCubeMob.CubeMobAttackGoal(this));
-    }
+  @Override
+  protected void addBehaviourGoals() {
+    this.goalSelector.addGoal(2, new AbstractCubeMob.CubeMobAttackGoal(this));
+  }
 
-    @Override
-    protected void addTargetingGoals() {
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<Player>(this, Player.class, 10, true, false, (target, level) -> Math.abs(target.getY() - this.getY()) <= 4.0));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<IronGolem>((Mob)this, IronGolem.class, true));
-    }
+  @Override
+  protected void addTargetingGoals() {
+    this.targetSelector.addGoal(
+        1,
+        new NearestAttackableTargetGoal<Player>(
+            this,
+            Player.class,
+            10,
+            true,
+            false,
+            (target, level) -> Math.abs(target.getY() - this.getY()) <= 4.0));
+    this.targetSelector.addGoal(
+        3, new NearestAttackableTargetGoal<IronGolem>((Mob) this, IronGolem.class, true));
+  }
 
-    @Override
-    protected SoundEvent getHurtSound(DamageSource source) {
-        if (this.isTiny()) {
-            return SoundEvents.SLIME_HURT_SMALL;
+  @Override
+  protected SoundEvent getHurtSound(DamageSource source) {
+    if (this.isTiny()) {
+      return SoundEvents.SLIME_HURT_SMALL;
+    }
+    return SoundEvents.SLIME_HURT;
+  }
+
+  @Override
+  protected SoundEvent getDeathSound() {
+    if (this.isTiny()) {
+      return SoundEvents.SLIME_DEATH_SMALL;
+    }
+    return SoundEvents.SLIME_DEATH;
+  }
+
+  @Override
+  protected ParticleOptions getParticleType() {
+    return ParticleTypes.ITEM_SLIME;
+  }
+
+  @Override
+  protected SoundEvent getSquishSound() {
+    if (this.isTiny()) {
+      return SoundEvents.SLIME_SQUISH_SMALL;
+    }
+    return SoundEvents.SLIME_SQUISH;
+  }
+
+  @Override
+  protected SoundEvent getJumpSound() {
+    return this.isTiny() ? SoundEvents.SLIME_JUMP_SMALL : SoundEvents.SLIME_JUMP;
+  }
+
+  public static boolean checkSlimeSpawnRules(
+      EntityType<Slime> type,
+      LevelAccessor level,
+      EntitySpawnReason spawnReason,
+      BlockPos pos,
+      RandomSource random) {
+    if (level.getDifficulty() != Difficulty.PEACEFUL) {
+      boolean slimeChunk;
+      if (EntitySpawnReason.isSpawner(spawnReason)) {
+        return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
+      }
+      if (level.getBiome(pos).is(BiomeTags.ALLOWS_SURFACE_SLIME_SPAWNS)
+          && pos.getY() > 50
+          && pos.getY() < 70) {
+        float surfaceSlimeSpawnChance =
+            level
+                .environmentAttributes()
+                .getValue(EnvironmentAttributes.SURFACE_SLIME_SPAWN_CHANCE, pos)
+                .floatValue();
+        if (random.nextFloat() < surfaceSlimeSpawnChance
+            && level.getMaxLocalRawBrightness(pos) <= random.nextInt(8)) {
+          return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
         }
-        return SoundEvents.SLIME_HURT;
-    }
-
-    @Override
-    protected SoundEvent getDeathSound() {
-        if (this.isTiny()) {
-            return SoundEvents.SLIME_DEATH_SMALL;
-        }
-        return SoundEvents.SLIME_DEATH;
-    }
-
-    @Override
-    protected ParticleOptions getParticleType() {
-        return ParticleTypes.ITEM_SLIME;
-    }
-
-    @Override
-    protected SoundEvent getSquishSound() {
-        if (this.isTiny()) {
-            return SoundEvents.SLIME_SQUISH_SMALL;
-        }
-        return SoundEvents.SLIME_SQUISH;
-    }
-
-    @Override
-    protected SoundEvent getJumpSound() {
-        return this.isTiny() ? SoundEvents.SLIME_JUMP_SMALL : SoundEvents.SLIME_JUMP;
-    }
-
-    public static boolean checkSlimeSpawnRules(EntityType<Slime> type, LevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random) {
-        if (level.getDifficulty() != Difficulty.PEACEFUL) {
-            boolean slimeChunk;
-            if (EntitySpawnReason.isSpawner(spawnReason)) {
-                return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
-            }
-            if (level.getBiome(pos).is(BiomeTags.ALLOWS_SURFACE_SLIME_SPAWNS) && pos.getY() > 50 && pos.getY() < 70) {
-                float surfaceSlimeSpawnChance = level.environmentAttributes().getValue(EnvironmentAttributes.SURFACE_SLIME_SPAWN_CHANCE, pos).floatValue();
-                if (random.nextFloat() < surfaceSlimeSpawnChance && level.getMaxLocalRawBrightness(pos) <= random.nextInt(8)) {
-                    return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
-                }
-            }
-            if (!(level instanceof WorldGenLevel)) {
-                return false;
-            }
-            ChunkPos chunkPos = ChunkPos.containing(pos);
-            boolean bl = slimeChunk = WorldgenRandom.seedSlimeChunk(chunkPos.x(), chunkPos.z(), ((WorldGenLevel)level).getSeed(), 987234911L).nextInt(10) == 0;
-            if (random.nextInt(10) == 0 && slimeChunk && pos.getY() < 40) {
-                return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
-            }
-        }
+      }
+      if (!(level instanceof WorldGenLevel)) {
         return false;
+      }
+      ChunkPos chunkPos = ChunkPos.containing(pos);
+      boolean bl =
+          slimeChunk =
+              WorldgenRandom.seedSlimeChunk(
+                          chunkPos.x(), chunkPos.z(), ((WorldGenLevel) level).getSeed(), 987234911L)
+                      .nextInt(10)
+                  == 0;
+      if (random.nextInt(10) == 0 && slimeChunk && pos.getY() < 40) {
+        return Slime.checkMobSpawnRules(type, level, spawnReason, pos, random);
+      }
     }
+    return false;
+  }
 
-    @Override
-    protected boolean canBeABaby() {
-        return false;
-    }
+  @Override
+  protected boolean canBeABaby() {
+    return false;
+  }
 
-    @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
-        if (groupData == null) {
-            groupData = new AgeableMob.AgeableMobGroupData(false);
-        }
-        return super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+  @Override
+  public @Nullable SpawnGroupData finalizeSpawn(
+      ServerLevelAccessor level,
+      DifficultyInstance difficulty,
+      EntitySpawnReason spawnReason,
+      @Nullable SpawnGroupData groupData) {
+    if (groupData == null) {
+      groupData = new AgeableMob.AgeableMobGroupData(false);
     }
+    return super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+  }
 
-    @Override
-    public void setSize(int size, boolean updateHealth) {
-        super.setSize(size, updateHealth);
-        int actualSize = (Integer)this.entityData.get(ID_SIZE);
-        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(actualSize);
-        this.xpReward = actualSize;
-    }
+  @Override
+  public void setSize(int size, boolean updateHealth) {
+    super.setSize(size, updateHealth);
+    int actualSize = (Integer) this.entityData.get(ID_SIZE);
+    this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(actualSize);
+    this.xpReward = actualSize;
+  }
 }
-

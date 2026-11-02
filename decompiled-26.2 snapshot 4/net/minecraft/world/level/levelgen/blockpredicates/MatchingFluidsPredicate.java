@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -18,28 +18,33 @@ import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicateType;
-import net.minecraft.world.level.levelgen.blockpredicates.StateTestingPredicate;
 import net.minecraft.world.level.material.Fluid;
 
-class MatchingFluidsPredicate
-extends StateTestingPredicate {
-    private final HolderSet<Fluid> fluids;
-    public static final MapCodec<MatchingFluidsPredicate> CODEC = RecordCodecBuilder.mapCodec(i -> MatchingFluidsPredicate.stateTestingCodec(i).and((App)RegistryCodecs.homogeneousList(Registries.FLUID).fieldOf("fluids").forGetter(c -> c.fluids)).apply((Applicative)i, MatchingFluidsPredicate::new));
+class MatchingFluidsPredicate extends StateTestingPredicate {
+  private final HolderSet<Fluid> fluids;
+  public static final MapCodec<MatchingFluidsPredicate> CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              MatchingFluidsPredicate.stateTestingCodec(i)
+                  .and(
+                      (App)
+                          RegistryCodecs.homogeneousList(Registries.FLUID)
+                              .fieldOf("fluids")
+                              .forGetter(c -> c.fluids))
+                  .apply((Applicative) i, MatchingFluidsPredicate::new));
 
-    public MatchingFluidsPredicate(Vec3i offset, HolderSet<Fluid> fluids) {
-        super(offset);
-        this.fluids = fluids;
-    }
+  public MatchingFluidsPredicate(Vec3i offset, HolderSet<Fluid> fluids) {
+    super(offset);
+    this.fluids = fluids;
+  }
 
-    @Override
-    protected boolean test(BlockState state) {
-        return state.getFluidState().is(this.fluids);
-    }
+  @Override
+  protected boolean test(BlockState state) {
+    return state.getFluidState().is(this.fluids);
+  }
 
-    @Override
-    public BlockPredicateType<?> type() {
-        return BlockPredicateType.MATCHING_FLUIDS;
-    }
+  @Override
+  public BlockPredicateType<?> type() {
+    return BlockPredicateType.MATCHING_FLUIDS;
+  }
 }
-

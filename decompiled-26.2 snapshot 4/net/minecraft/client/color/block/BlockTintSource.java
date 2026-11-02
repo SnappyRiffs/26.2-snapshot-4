@@ -10,18 +10,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
 public interface BlockTintSource {
-    public int color(BlockState var1);
+  public int color(BlockState var1);
 
-    default public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-        return this.color(state);
-    }
+  public default int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+    return this.color(state);
+  }
 
-    default public int colorAsTerrainParticle(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-        return this.colorInWorld(state, level, pos);
-    }
+  public default int colorAsTerrainParticle(
+      BlockState state, BlockAndTintGetter level, BlockPos pos) {
+    return this.colorInWorld(state, level, pos);
+  }
 
-    default public Set<Property<?>> relevantProperties() {
-        return Set.of();
-    }
+  public default Set<Property<?>> relevantProperties() {
+    return Set.of();
+  }
 }
-

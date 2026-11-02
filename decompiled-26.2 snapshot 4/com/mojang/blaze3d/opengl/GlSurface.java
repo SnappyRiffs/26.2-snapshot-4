@@ -1,12 +1,11 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.lwjgl.glfw.GLFW
  */
 package com.mojang.blaze3d.opengl;
 
-import com.mojang.blaze3d.opengl.GlCommandEncoder;
 import com.mojang.blaze3d.systems.CommandEncoderBackend;
 import com.mojang.blaze3d.systems.GpuSurface;
 import com.mojang.blaze3d.systems.GpuSurfaceBackend;
@@ -17,46 +16,43 @@ import java.util.EnumSet;
 import java.util.Set;
 import org.lwjgl.glfw.GLFW;
 
-public class GlSurface
-implements GpuSurfaceBackend {
-    private static final Set<GpuSurface.PresentMode> SUPPORTED_PRESENT_MODES = EnumSet.of(GpuSurface.PresentMode.FIFO, GpuSurface.PresentMode.IMMEDIATE);
-    private final long windowHandle;
+public class GlSurface implements GpuSurfaceBackend {
+  private static final Set<GpuSurface.PresentMode> SUPPORTED_PRESENT_MODES =
+      EnumSet.of(GpuSurface.PresentMode.FIFO, GpuSurface.PresentMode.IMMEDIATE);
+  private final long windowHandle;
 
-    public GlSurface(long windowHandle) {
-        this.windowHandle = windowHandle;
-    }
+  public GlSurface(long windowHandle) {
+    this.windowHandle = windowHandle;
+  }
 
-    @Override
-    public void configure(GpuSurface.Configuration config) throws SurfaceException {
-        GLFW.glfwSwapInterval((int)(config.presentMode() == GpuSurface.PresentMode.FIFO ? 1 : 0));
-    }
+  @Override
+  public void configure(GpuSurface.Configuration config) throws SurfaceException {
+    GLFW.glfwSwapInterval((int) (config.presentMode() == GpuSurface.PresentMode.FIFO ? 1 : 0));
+  }
 
-    @Override
-    public boolean isSuboptimal() {
-        return false;
-    }
+  @Override
+  public boolean isSuboptimal() {
+    return false;
+  }
 
-    @Override
-    public void acquireNextTexture() {
-    }
+  @Override
+  public void acquireNextTexture() {}
 
-    @Override
-    public void blitFromTexture(CommandEncoderBackend commandEncoder, GpuTextureView textureView) {
-        ((GlCommandEncoder)commandEncoder).presentTexture(textureView);
-    }
+  @Override
+  public void blitFromTexture(CommandEncoderBackend commandEncoder, GpuTextureView textureView) {
+    ((GlCommandEncoder) commandEncoder).presentTexture(textureView);
+  }
 
-    @Override
-    public void present() {
-        GLFW.glfwSwapBuffers((long)this.windowHandle);
-    }
+  @Override
+  public void present() {
+    GLFW.glfwSwapBuffers((long) this.windowHandle);
+  }
 
-    @Override
-    public void close() {
-    }
+  @Override
+  public void close() {}
 
-    @Override
-    public Collection<GpuSurface.PresentMode> supportedPresentModes() {
-        return SUPPORTED_PRESENT_MODES;
-    }
+  @Override
+  public Collection<GpuSurface.PresentMode> supportedPresentModes() {
+    return SUPPORTED_PRESENT_MODES;
+  }
 }
-

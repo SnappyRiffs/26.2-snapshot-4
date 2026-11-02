@@ -6,6 +6,5 @@ package net.minecraft.client.gui.components;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface Renderable {
-    public void extractRenderState(GuiGraphicsExtractor var1, int var2, int var3, float var4);
+  public void extractRenderState(GuiGraphicsExtractor var1, int var2, int var3, float var4);
 }
-

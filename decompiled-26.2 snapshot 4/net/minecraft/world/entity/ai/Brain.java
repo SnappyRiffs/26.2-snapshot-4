@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.annotations.VisibleForTesting
  *  com.google.common.collect.ImmutableList
@@ -472,4 +472,3 @@ public class Brain<E extends LivingEntity> {
         public static final Codec<Packed> CODEC = RecordCodecBuilder.create(i -> i.group((App)MemoryMap.CODEC.fieldOf("memories").forGetter(Packed::memories)).apply((Applicative)i, Packed::new));
     }
 }
-

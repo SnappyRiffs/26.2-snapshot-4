@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  */
@@ -16,35 +16,35 @@ import java.util.stream.Stream;
 import net.minecraft.DetectedVersion;
 import net.minecraft.SharedConstants;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.structures.NbtToSnbt;
-import net.minecraft.data.structures.StructureUpdater;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.Bootstrap;
 
 public class SnbtDatafixer {
-    public static void main(String[] args) throws IOException {
-        SharedConstants.setVersion(DetectedVersion.BUILT_IN);
-        Bootstrap.bootStrap();
-        for (String dir : args) {
-            SnbtDatafixer.updateInDirectory(dir);
-        }
+  public static void main(String[] args) throws IOException {
+    SharedConstants.setVersion(DetectedVersion.BUILT_IN);
+    Bootstrap.bootStrap();
+    for (String dir : args) {
+      SnbtDatafixer.updateInDirectory(dir);
     }
+  }
 
-    private static void updateInDirectory(String structureDir) throws IOException {
-        try (Stream<Path> walk = Files.walk(Paths.get(structureDir, new String[0]), new FileVisitOption[0]);){
-            walk.filter(path -> path.toString().endsWith(".snbt")).forEach(path -> {
+  private static void updateInDirectory(String structureDir) throws IOException {
+    try (Stream<Path> walk =
+        Files.walk(Paths.get(structureDir, new String[0]), new FileVisitOption[0]); ) {
+      walk.filter(path -> path.toString().endsWith(".snbt"))
+          .forEach(
+              path -> {
                 try {
-                    String snbt = Files.readString(path);
-                    CompoundTag readSnbt = NbtUtils.snbtToStructure(snbt);
-                    CompoundTag updatedTag = StructureUpdater.update(path.toString(), readSnbt);
-                    NbtToSnbt.writeSnbt(CachedOutput.NO_CACHE, path, NbtUtils.structureToSnbt(updatedTag));
+                  String snbt = Files.readString(path);
+                  CompoundTag readSnbt = NbtUtils.snbtToStructure(snbt);
+                  CompoundTag updatedTag = StructureUpdater.update(path.toString(), readSnbt);
+                  NbtToSnbt.writeSnbt(
+                      CachedOutput.NO_CACHE, path, NbtUtils.structureToSnbt(updatedTag));
+                } catch (CommandSyntaxException | IOException e) {
+                  throw new RuntimeException(e);
                 }
-                catch (CommandSyntaxException | IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
+              });
     }
+  }
 }
-

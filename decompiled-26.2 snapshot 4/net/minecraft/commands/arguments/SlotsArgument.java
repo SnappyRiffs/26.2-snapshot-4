@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.ImmutableStringReader
  *  com.mojang.brigadier.StringReader
@@ -31,34 +31,35 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.SlotRange;
 import net.minecraft.world.inventory.SlotRanges;
 
-public class SlotsArgument
-implements ArgumentType<SlotRange> {
-    private static final Collection<String> EXAMPLES = List.of("container.*", "container.5", "weapon");
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_SLOT = new DynamicCommandExceptionType(id -> Component.translatableEscape("slot.unknown", id));
+public class SlotsArgument implements ArgumentType<SlotRange> {
+  private static final Collection<String> EXAMPLES =
+      List.of("container.*", "container.5", "weapon");
+  private static final DynamicCommandExceptionType ERROR_UNKNOWN_SLOT =
+      new DynamicCommandExceptionType(id -> Component.translatableEscape("slot.unknown", id));
 
-    public static SlotsArgument slots() {
-        return new SlotsArgument();
-    }
+  public static SlotsArgument slots() {
+    return new SlotsArgument();
+  }
 
-    public static SlotRange getSlots(CommandContext<CommandSourceStack> context, String name) {
-        return (SlotRange)context.getArgument(name, SlotRange.class);
-    }
+  public static SlotRange getSlots(CommandContext<CommandSourceStack> context, String name) {
+    return (SlotRange) context.getArgument(name, SlotRange.class);
+  }
 
-    public SlotRange parse(StringReader reader) throws CommandSyntaxException {
-        String name = ParserUtils.readWhile(reader, c -> c != ' ');
-        SlotRange result = SlotRanges.nameToIds(name);
-        if (result == null) {
-            throw ERROR_UNKNOWN_SLOT.createWithContext((ImmutableStringReader)reader, (Object)name);
-        }
-        return result;
+  public SlotRange parse(StringReader reader) throws CommandSyntaxException {
+    String name = ParserUtils.readWhile(reader, c -> c != ' ');
+    SlotRange result = SlotRanges.nameToIds(name);
+    if (result == null) {
+      throw ERROR_UNKNOWN_SLOT.createWithContext((ImmutableStringReader) reader, (Object) name);
     }
+    return result;
+  }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> contextBuilder, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(SlotRanges.allNames(), builder);
-    }
+  public <S> CompletableFuture<Suggestions> listSuggestions(
+      CommandContext<S> contextBuilder, SuggestionsBuilder builder) {
+    return SharedSuggestionProvider.suggest(SlotRanges.allNames(), builder);
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

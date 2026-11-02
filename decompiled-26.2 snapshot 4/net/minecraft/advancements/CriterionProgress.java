@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -11,43 +11,43 @@ import net.minecraft.network.FriendlyByteBuf;
 import org.jspecify.annotations.Nullable;
 
 public class CriterionProgress {
-    private @Nullable Instant obtained;
+  private @Nullable Instant obtained;
 
-    public CriterionProgress() {
-    }
+  public CriterionProgress() {}
 
-    public CriterionProgress(Instant obtained) {
-        this.obtained = obtained;
-    }
+  public CriterionProgress(Instant obtained) {
+    this.obtained = obtained;
+  }
 
-    public boolean isDone() {
-        return this.obtained != null;
-    }
+  public boolean isDone() {
+    return this.obtained != null;
+  }
 
-    public void grant() {
-        this.obtained = Instant.now();
-    }
+  public void grant() {
+    this.obtained = Instant.now();
+  }
 
-    public void revoke() {
-        this.obtained = null;
-    }
+  public void revoke() {
+    this.obtained = null;
+  }
 
-    public @Nullable Instant getObtained() {
-        return this.obtained;
-    }
+  public @Nullable Instant getObtained() {
+    return this.obtained;
+  }
 
-    public String toString() {
-        return "CriterionProgress{obtained=" + String.valueOf(this.obtained == null ? "false" : this.obtained) + "}";
-    }
+  public String toString() {
+    return "CriterionProgress{obtained="
+        + String.valueOf(this.obtained == null ? "false" : this.obtained)
+        + "}";
+  }
 
-    public void serializeToNetwork(FriendlyByteBuf output) {
-        output.writeNullable(this.obtained, FriendlyByteBuf::writeInstant);
-    }
+  public void serializeToNetwork(FriendlyByteBuf output) {
+    output.writeNullable(this.obtained, FriendlyByteBuf::writeInstant);
+  }
 
-    public static CriterionProgress fromNetwork(FriendlyByteBuf input) {
-        CriterionProgress result = new CriterionProgress();
-        result.obtained = input.readNullable(FriendlyByteBuf::readInstant);
-        return result;
-    }
+  public static CriterionProgress fromNetwork(FriendlyByteBuf input) {
+    CriterionProgress result = new CriterionProgress();
+    result.obtained = input.readNullable(FriendlyByteBuf::readInstant);
+    return result;
+  }
 }
-

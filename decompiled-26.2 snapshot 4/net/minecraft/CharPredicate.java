@@ -7,20 +7,19 @@ import java.util.Objects;
 
 @FunctionalInterface
 public interface CharPredicate {
-    public boolean test(char var1);
+  public boolean test(char var1);
 
-    default public CharPredicate and(CharPredicate other) {
-        Objects.requireNonNull(other);
-        return value -> this.test(value) && other.test(value);
-    }
+  public default CharPredicate and(CharPredicate other) {
+    Objects.requireNonNull(other);
+    return value -> this.test(value) && other.test(value);
+  }
 
-    default public CharPredicate negate() {
-        return value -> !this.test(value);
-    }
+  public default CharPredicate negate() {
+    return value -> !this.test(value);
+  }
 
-    default public CharPredicate or(CharPredicate other) {
-        Objects.requireNonNull(other);
-        return value -> this.test(value) || other.test(value);
-    }
+  public default CharPredicate or(CharPredicate other) {
+    Objects.requireNonNull(other);
+    return value -> this.test(value) || other.test(value);
+  }
 }
-

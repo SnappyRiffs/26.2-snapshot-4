@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.ImmutableMap$Builder
@@ -21,35 +21,39 @@ import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 
 public class KnownPacksManager {
-    private final PackRepository repository = ServerPacksSource.createVanillaTrustedRepository();
-    private final Map<KnownPack, String> knownPackToId;
+  private final PackRepository repository = ServerPacksSource.createVanillaTrustedRepository();
+  private final Map<KnownPack, String> knownPackToId;
 
-    public KnownPacksManager() {
-        this.repository.reload();
-        ImmutableMap.Builder knownPacks = ImmutableMap.builder();
-        this.repository.getAvailablePacks().forEach(pack -> {
-            PackLocationInfo location = pack.location();
-            location.knownPackInfo().ifPresent(knownPack -> knownPacks.put(knownPack, (Object)location.id()));
-        });
-        this.knownPackToId = knownPacks.build();
-    }
+  public KnownPacksManager() {
+    this.repository.reload();
+    ImmutableMap.Builder knownPacks = ImmutableMap.builder();
+    this.repository
+        .getAvailablePacks()
+        .forEach(
+            pack -> {
+              PackLocationInfo location = pack.location();
+              location
+                  .knownPackInfo()
+                  .ifPresent(knownPack -> knownPacks.put(knownPack, (Object) location.id()));
+            });
+    this.knownPackToId = knownPacks.build();
+  }
 
-    public List<KnownPack> trySelectingPacks(List<KnownPack> packsToSelect) {
-        ArrayList<KnownPack> response = new ArrayList<KnownPack>(packsToSelect.size());
-        ArrayList<String> selectedPacks = new ArrayList<String>(packsToSelect.size());
-        for (KnownPack knownPack : packsToSelect) {
-            String knownPackId = this.knownPackToId.get(knownPack);
-            if (knownPackId == null) continue;
-            selectedPacks.add(knownPackId);
-            response.add(knownPack);
-        }
-        this.repository.setSelected(selectedPacks);
-        return response;
+  public List<KnownPack> trySelectingPacks(List<KnownPack> packsToSelect) {
+    ArrayList<KnownPack> response = new ArrayList<KnownPack>(packsToSelect.size());
+    ArrayList<String> selectedPacks = new ArrayList<String>(packsToSelect.size());
+    for (KnownPack knownPack : packsToSelect) {
+      String knownPackId = this.knownPackToId.get(knownPack);
+      if (knownPackId == null) continue;
+      selectedPacks.add(knownPackId);
+      response.add(knownPack);
     }
+    this.repository.setSelected(selectedPacks);
+    return response;
+  }
 
-    public CloseableResourceManager createResourceManager() {
-        List<PackResources> openedPacks = this.repository.openAllSelected();
-        return new MultiPackResourceManager(PackType.SERVER_DATA, openedPacks);
-    }
+  public CloseableResourceManager createResourceManager() {
+    List<PackResources> openedPacks = this.repository.openAllSelected();
+    return new MultiPackResourceManager(PackType.SERVER_DATA, openedPacks);
+  }
 }
-

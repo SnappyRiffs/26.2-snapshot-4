@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Maps
  *  com.mojang.datafixers.DSL
@@ -20,34 +20,43 @@ import com.mojang.serialization.Dynamic;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.util.datafix.fixes.NamedEntityFix;
-import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.util.datafix.schemas.NamespacedSchema;
 
-public class EntityPaintingMotiveFix
-extends NamedEntityFix {
-    private static final Map<String, String> MAP = (Map)DataFixUtils.make((Object)Maps.newHashMap(), map -> {
-        map.put("donkeykong", "donkey_kong");
-        map.put("burningskull", "burning_skull");
-        map.put("skullandroses", "skull_and_roses");
-    });
+public class EntityPaintingMotiveFix extends NamedEntityFix {
+  private static final Map<String, String> MAP =
+      (Map)
+          DataFixUtils.make(
+              (Object) Maps.newHashMap(),
+              map -> {
+                map.put("donkeykong", "donkey_kong");
+                map.put("burningskull", "burning_skull");
+                map.put("skullandroses", "skull_and_roses");
+              });
 
-    public EntityPaintingMotiveFix(Schema outputSchema, boolean changesType) {
-        super(outputSchema, changesType, "EntityPaintingMotiveFix", References.ENTITY, "minecraft:painting");
-    }
+  public EntityPaintingMotiveFix(Schema outputSchema, boolean changesType) {
+    super(
+        outputSchema,
+        changesType,
+        "EntityPaintingMotiveFix",
+        References.ENTITY,
+        "minecraft:painting");
+  }
 
-    public Dynamic<?> fixTag(Dynamic<?> input) {
-        Optional motive = input.get("Motive").asString().result();
-        if (motive.isPresent()) {
-            String lowerCaseMotive = ((String)motive.get()).toLowerCase(Locale.ROOT);
-            return input.set("Motive", input.createString(NamespacedSchema.ensureNamespaced(MAP.getOrDefault(lowerCaseMotive, lowerCaseMotive))));
-        }
-        return input;
+  public Dynamic<?> fixTag(Dynamic<?> input) {
+    Optional motive = input.get("Motive").asString().result();
+    if (motive.isPresent()) {
+      String lowerCaseMotive = ((String) motive.get()).toLowerCase(Locale.ROOT);
+      return input.set(
+          "Motive",
+          input.createString(
+              NamespacedSchema.ensureNamespaced(
+                  MAP.getOrDefault(lowerCaseMotive, lowerCaseMotive))));
     }
+    return input;
+  }
 
-    @Override
-    protected Typed<?> fix(Typed<?> entity) {
-        return entity.update(DSL.remainderFinder(), this::fixTag);
-    }
+  @Override
+  protected Typed<?> fix(Typed<?> entity) {
+    return entity.update(DSL.remainderFinder(), this::fixTag);
+  }
 }
-

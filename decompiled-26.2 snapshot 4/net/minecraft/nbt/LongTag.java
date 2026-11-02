@@ -147,4 +147,3 @@ public record LongTag(long value) implements NumericTag
         }
     }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -14,16 +14,16 @@ import net.minecraft.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
 public class MapRenderState {
-    public @Nullable Identifier texture;
-    public final List<MapDecorationRenderState> decorations = new ArrayList<MapDecorationRenderState>();
+  public @Nullable Identifier texture;
+  public final List<MapDecorationRenderState> decorations =
+      new ArrayList<MapDecorationRenderState>();
 
-    public static class MapDecorationRenderState {
-        public @Nullable TextureAtlasSprite atlasSprite;
-        public byte x;
-        public byte y;
-        public byte rot;
-        public boolean renderOnFrame;
-        public @Nullable Component name;
-    }
+  public static class MapDecorationRenderState {
+    public @Nullable TextureAtlasSprite atlasSprite;
+    public byte x;
+    public byte y;
+    public byte rot;
+    public boolean renderOnFrame;
+    public @Nullable Component name;
+  }
 }
-

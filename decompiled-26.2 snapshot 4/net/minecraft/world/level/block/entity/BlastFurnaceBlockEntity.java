@@ -10,32 +10,27 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.BlastFurnaceMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTypes;
-import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BlastFurnaceBlockEntity
-extends AbstractFurnaceBlockEntity {
-    private static final Component DEFAULT_NAME = Component.translatable("container.blast_furnace");
+public class BlastFurnaceBlockEntity extends AbstractFurnaceBlockEntity {
+  private static final Component DEFAULT_NAME = Component.translatable("container.blast_furnace");
 
-    public BlastFurnaceBlockEntity(BlockPos worldPosition, BlockState blockState) {
-        super(BlockEntityTypes.BLAST_FURNACE, worldPosition, blockState, RecipeType.BLASTING);
-    }
+  public BlastFurnaceBlockEntity(BlockPos worldPosition, BlockState blockState) {
+    super(BlockEntityTypes.BLAST_FURNACE, worldPosition, blockState, RecipeType.BLASTING);
+  }
 
-    @Override
-    protected Component getDefaultName() {
-        return DEFAULT_NAME;
-    }
+  @Override
+  protected Component getDefaultName() {
+    return DEFAULT_NAME;
+  }
 
-    @Override
-    protected int getBurnDuration(FuelValues fuelValues, ItemStack itemStack) {
-        return super.getBurnDuration(fuelValues, itemStack) / 2;
-    }
+  @Override
+  protected int getBurnDuration(FuelValues fuelValues, ItemStack itemStack) {
+    return super.getBurnDuration(fuelValues, itemStack) / 2;
+  }
 
-    @Override
-    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
-        return new BlastFurnaceMenu(containerId, inventory, this, this.dataAccess);
-    }
+  @Override
+  protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+    return new BlastFurnaceMenu(containerId, inventory, this, this.dataAccess);
+  }
 }
-

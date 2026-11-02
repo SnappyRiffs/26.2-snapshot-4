@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -16,64 +16,66 @@ import net.minecraft.world.level.GameType;
 import org.jspecify.annotations.Nullable;
 
 public class WorldLoadEvent {
-    private boolean eventSent;
-    private @Nullable TelemetryProperty.GameMode gameMode;
-    private @Nullable String serverBrand;
-    private final @Nullable String minigameName;
+  private boolean eventSent;
+  private @Nullable TelemetryProperty.GameMode gameMode;
+  private @Nullable String serverBrand;
+  private final @Nullable String minigameName;
 
-    public WorldLoadEvent(@Nullable String minigameName) {
-        this.minigameName = minigameName;
+  public WorldLoadEvent(@Nullable String minigameName) {
+    this.minigameName = minigameName;
+  }
+
+  public void addProperties(TelemetryPropertyMap.Builder properties) {
+    if (this.serverBrand != null) {
+      properties.put(TelemetryProperty.SERVER_MODDED, !this.serverBrand.equals("vanilla"));
     }
+    properties.put(TelemetryProperty.SERVER_TYPE, this.getServerType());
+  }
 
-    public void addProperties(TelemetryPropertyMap.Builder properties) {
-        if (this.serverBrand != null) {
-            properties.put(TelemetryProperty.SERVER_MODDED, !this.serverBrand.equals("vanilla"));
-        }
-        properties.put(TelemetryProperty.SERVER_TYPE, this.getServerType());
+  private TelemetryProperty.ServerType getServerType() {
+    ServerData server = Minecraft.getInstance().getCurrentServer();
+    if (server != null && server.isRealm()) {
+      return TelemetryProperty.ServerType.REALM;
     }
-
-    private TelemetryProperty.ServerType getServerType() {
-        ServerData server = Minecraft.getInstance().getCurrentServer();
-        if (server != null && server.isRealm()) {
-            return TelemetryProperty.ServerType.REALM;
-        }
-        if (Minecraft.getInstance().hasSingleplayerServer()) {
-            return TelemetryProperty.ServerType.LOCAL;
-        }
-        return TelemetryProperty.ServerType.OTHER;
+    if (Minecraft.getInstance().hasSingleplayerServer()) {
+      return TelemetryProperty.ServerType.LOCAL;
     }
+    return TelemetryProperty.ServerType.OTHER;
+  }
 
-    public boolean send(TelemetryEventSender eventSender) {
-        if (this.eventSent || this.gameMode == null || this.serverBrand == null) {
-            return false;
-        }
-        this.eventSent = true;
-        eventSender.send(TelemetryEventType.WORLD_LOADED, properties -> {
-            properties.put(TelemetryProperty.GAME_MODE, this.gameMode);
-            if (this.minigameName != null) {
-                properties.put(TelemetryProperty.REALMS_MAP_CONTENT, this.minigameName);
-            }
+  public boolean send(TelemetryEventSender eventSender) {
+    if (this.eventSent || this.gameMode == null || this.serverBrand == null) {
+      return false;
+    }
+    this.eventSent = true;
+    eventSender.send(
+        TelemetryEventType.WORLD_LOADED,
+        properties -> {
+          properties.put(TelemetryProperty.GAME_MODE, this.gameMode);
+          if (this.minigameName != null) {
+            properties.put(TelemetryProperty.REALMS_MAP_CONTENT, this.minigameName);
+          }
         });
-        return true;
-    }
+    return true;
+  }
 
-    public void setGameMode(GameType type, boolean hardcore) {
-        this.gameMode = switch (type) {
-            default -> throw new MatchException(null, null);
-            case GameType.SURVIVAL -> {
-                if (hardcore) {
-                    yield TelemetryProperty.GameMode.HARDCORE;
-                }
-                yield TelemetryProperty.GameMode.SURVIVAL;
+  public void setGameMode(GameType type, boolean hardcore) {
+    this.gameMode =
+        switch (type) {
+          default -> throw new MatchException(null, null);
+          case GameType.SURVIVAL -> {
+            if (hardcore) {
+              yield TelemetryProperty.GameMode.HARDCORE;
             }
-            case GameType.CREATIVE -> TelemetryProperty.GameMode.CREATIVE;
-            case GameType.ADVENTURE -> TelemetryProperty.GameMode.ADVENTURE;
-            case GameType.SPECTATOR -> TelemetryProperty.GameMode.SPECTATOR;
+            yield TelemetryProperty.GameMode.SURVIVAL;
+          }
+          case GameType.CREATIVE -> TelemetryProperty.GameMode.CREATIVE;
+          case GameType.ADVENTURE -> TelemetryProperty.GameMode.ADVENTURE;
+          case GameType.SPECTATOR -> TelemetryProperty.GameMode.SPECTATOR;
         };
-    }
+  }
 
-    public void setServerBrand(String serverBrand) {
-        this.serverBrand = serverBrand;
-    }
+  public void setServerBrand(String serverBrand) {
+    this.serverBrand = serverBrand;
+  }
 }
-

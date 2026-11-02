@@ -3,12 +3,8 @@
  */
 package net.minecraft.nbt;
 
-import net.minecraft.nbt.NbtException;
-
-public class NbtAccounterException
-extends NbtException {
-    public NbtAccounterException(String message) {
-        super(message);
-    }
+public class NbtAccounterException extends NbtException {
+  public NbtAccounterException(String message) {
+    super(message);
+  }
 }
-

@@ -8,10 +8,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import javax.sound.sampled.AudioFormat;
 
-public interface AudioStream
-extends Closeable {
-    public AudioFormat getFormat();
+public interface AudioStream extends Closeable {
+  public AudioFormat getFormat();
 
-    public ByteBuffer read(int var1) throws IOException;
+  public ByteBuffer read(int var1) throws IOException;
 }
-

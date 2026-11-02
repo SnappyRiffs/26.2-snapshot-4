@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Maps
  *  com.mojang.logging.LogUtils
@@ -660,4 +660,3 @@ implements Tag {
         return codec.decode(ops, (MapLike)ops.getMap((Object)this).getOrThrow()).resultOrPartial(error -> LOGGER.error("Failed to read value ({}): {}", (Object)this, error));
     }
 }
-

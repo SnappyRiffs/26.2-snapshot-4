@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.arguments.ArgumentType
@@ -33,57 +33,92 @@ import net.minecraft.commands.execution.tasks.BuildContexts;
 import net.minecraft.commands.execution.tasks.FallthroughTask;
 
 public class ReturnCommand {
-    public static <T extends ExecutionCommandSource<T>> void register(CommandDispatcher<T> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)LiteralArgumentBuilder.literal((String)"return").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).then(RequiredArgumentBuilder.argument((String)"value", (ArgumentType)IntegerArgumentType.integer()).executes(new ReturnValueCustomExecutor()))).then(LiteralArgumentBuilder.literal((String)"fail").executes(new ReturnFailCustomExecutor()))).then(LiteralArgumentBuilder.literal((String)"run").forward((CommandNode)dispatcher.getRoot(), new ReturnFromCommandCustomModifier(), false)));
+  public static <T extends ExecutionCommandSource<T>> void register(
+      CommandDispatcher<T> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    ((LiteralArgumentBuilder)
+                            ((LiteralArgumentBuilder)
+                                    LiteralArgumentBuilder.literal((String) "return")
+                                        .requires(
+                                            Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                                .then(
+                                    RequiredArgumentBuilder.argument(
+                                            (String) "value",
+                                            (ArgumentType) IntegerArgumentType.integer())
+                                        .executes(new ReturnValueCustomExecutor())))
+                        .then(
+                            LiteralArgumentBuilder.literal((String) "fail")
+                                .executes(new ReturnFailCustomExecutor())))
+                .then(
+                    LiteralArgumentBuilder.literal((String) "run")
+                        .forward(
+                            (CommandNode) dispatcher.getRoot(),
+                            new ReturnFromCommandCustomModifier(),
+                            false)));
+  }
+
+  private static class ReturnValueCustomExecutor<T extends ExecutionCommandSource<T>>
+      implements CustomCommandExecutor.CommandAdapter<T> {
+    private ReturnValueCustomExecutor() {}
+
+    @Override
+    public void run(
+        T sender,
+        ContextChain<T> currentStep,
+        ChainModifiers modifiers,
+        ExecutionControl<T> output) {
+      int returnValue =
+          IntegerArgumentType.getInteger(
+              (CommandContext) currentStep.getTopContext(), (String) "value");
+      sender.callback().onSuccess(returnValue);
+      Frame frame = output.currentFrame();
+      frame.returnSuccess(returnValue);
+      frame.discard();
     }
+  }
 
-    private static class ReturnValueCustomExecutor<T extends ExecutionCommandSource<T>>
-    implements CustomCommandExecutor.CommandAdapter<T> {
-        private ReturnValueCustomExecutor() {
-        }
+  private static class ReturnFailCustomExecutor<T extends ExecutionCommandSource<T>>
+      implements CustomCommandExecutor.CommandAdapter<T> {
+    private ReturnFailCustomExecutor() {}
 
-        @Override
-        public void run(T sender, ContextChain<T> currentStep, ChainModifiers modifiers, ExecutionControl<T> output) {
-            int returnValue = IntegerArgumentType.getInteger((CommandContext)currentStep.getTopContext(), (String)"value");
-            sender.callback().onSuccess(returnValue);
-            Frame frame = output.currentFrame();
-            frame.returnSuccess(returnValue);
-            frame.discard();
-        }
+    @Override
+    public void run(
+        T sender,
+        ContextChain<T> currentStep,
+        ChainModifiers modifiers,
+        ExecutionControl<T> output) {
+      sender.callback().onFailure();
+      Frame frame = output.currentFrame();
+      frame.returnFailure();
+      frame.discard();
     }
+  }
 
-    private static class ReturnFailCustomExecutor<T extends ExecutionCommandSource<T>>
-    implements CustomCommandExecutor.CommandAdapter<T> {
-        private ReturnFailCustomExecutor() {
-        }
+  private static class ReturnFromCommandCustomModifier<T extends ExecutionCommandSource<T>>
+      implements CustomModifierExecutor.ModifierAdapter<T> {
+    private ReturnFromCommandCustomModifier() {}
 
-        @Override
-        public void run(T sender, ContextChain<T> currentStep, ChainModifiers modifiers, ExecutionControl<T> output) {
-            sender.callback().onFailure();
-            Frame frame = output.currentFrame();
-            frame.returnFailure();
-            frame.discard();
+    @Override
+    public void apply(
+        T originalSource,
+        List<T> currentSources,
+        ContextChain<T> currentStep,
+        ChainModifiers modifiers,
+        ExecutionControl<T> output) {
+      if (currentSources.isEmpty()) {
+        if (modifiers.isReturn()) {
+          output.queueNext(FallthroughTask.instance());
         }
+        return;
+      }
+      output.currentFrame().discard();
+      ContextChain nextState = currentStep.nextStage();
+      String command = nextState.getTopContext().getInput();
+      output.queueNext(
+          new BuildContexts.Continuation<T>(
+              command, nextState, modifiers.setReturn(), originalSource, currentSources));
     }
-
-    private static class ReturnFromCommandCustomModifier<T extends ExecutionCommandSource<T>>
-    implements CustomModifierExecutor.ModifierAdapter<T> {
-        private ReturnFromCommandCustomModifier() {
-        }
-
-        @Override
-        public void apply(T originalSource, List<T> currentSources, ContextChain<T> currentStep, ChainModifiers modifiers, ExecutionControl<T> output) {
-            if (currentSources.isEmpty()) {
-                if (modifiers.isReturn()) {
-                    output.queueNext(FallthroughTask.instance());
-                }
-                return;
-            }
-            output.currentFrame().discard();
-            ContextChain nextState = currentStep.nextStage();
-            String command = nextState.getTopContext().getInput();
-            output.queueNext(new BuildContexts.Continuation<T>(command, nextState, modifiers.setReturn(), originalSource, currentSources));
-        }
-    }
+  }
 }
-

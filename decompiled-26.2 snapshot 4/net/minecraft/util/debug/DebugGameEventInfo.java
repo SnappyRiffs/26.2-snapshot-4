@@ -12,6 +12,11 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
 public record DebugGameEventInfo(Holder<GameEvent> event, Vec3 pos) {
-    public static final StreamCodec<RegistryFriendlyByteBuf, DebugGameEventInfo> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.holderRegistry(Registries.GAME_EVENT), DebugGameEventInfo::event, Vec3.STREAM_CODEC, DebugGameEventInfo::pos, DebugGameEventInfo::new);
+  public static final StreamCodec<RegistryFriendlyByteBuf, DebugGameEventInfo> STREAM_CODEC =
+      StreamCodec.composite(
+          ByteBufCodecs.holderRegistry(Registries.GAME_EVENT),
+          DebugGameEventInfo::event,
+          Vec3.STREAM_CODEC,
+          DebugGameEventInfo::pos,
+          DebugGameEventInfo::new);
 }
-

@@ -5,22 +5,18 @@ package net.minecraft.client.model.monster.piglin;
 
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.monster.piglin.AdultPiglinModel;
-import net.minecraft.client.model.monster.piglin.ZombifiedPiglinModel;
 
-public class AdultZombifiedPiglinModel
-extends ZombifiedPiglinModel {
-    public AdultZombifiedPiglinModel(ModelPart root) {
-        super(root);
-    }
+public class AdultZombifiedPiglinModel extends ZombifiedPiglinModel {
+  public AdultZombifiedPiglinModel(ModelPart root) {
+    super(root);
+  }
 
-    @Override
-    float getDefaultEarAngleInDegrees() {
-        return 30.0f;
-    }
+  @Override
+  float getDefaultEarAngleInDegrees() {
+    return 30.0f;
+  }
 
-    public static LayerDefinition createBodyLayer() {
-        return AdultPiglinModel.createBodyLayer();
-    }
+  public static LayerDefinition createBodyLayer() {
+    return AdultPiglinModel.createBodyLayer();
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix4fc
  *  org.joml.Vector3f
@@ -11,7 +11,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.List;
 import net.minecraft.client.renderer.SubmitNodeCollection;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.feature.FeatureFrameContext;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -22,38 +21,56 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 
 public class ShadowFeatureRenderer {
-    private static final RenderType SHADOW_RENDER_TYPE = RenderTypes.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
+  private static final RenderType SHADOW_RENDER_TYPE =
+      RenderTypes.entityShadow(Identifier.withDefaultNamespace("textures/misc/shadow.png"));
 
-    public void renderTranslucent(SubmitNodeCollection nodeCollection, FeatureFrameContext context) {
-        VertexConsumer buffer = context.bufferSource().getBuffer(SHADOW_RENDER_TYPE);
-        for (Submit submit : nodeCollection.getShadowSubmits()) {
-            for (EntityRenderState.ShadowPiece piece : submit.pieces()) {
-                AABB aabb = piece.shapeBelow().bounds();
-                float x01 = piece.relativeX() + (float)aabb.minX;
-                float x11 = piece.relativeX() + (float)aabb.maxX;
-                float y01 = piece.relativeY() + (float)aabb.minY;
-                float z01 = piece.relativeZ() + (float)aabb.minZ;
-                float z11 = piece.relativeZ() + (float)aabb.maxZ;
-                float radius = submit.radius();
-                float u0 = -x01 / 2.0f / radius + 0.5f;
-                float u1 = -x11 / 2.0f / radius + 0.5f;
-                float v0 = -z01 / 2.0f / radius + 0.5f;
-                float v1 = -z11 / 2.0f / radius + 0.5f;
-                int color = ARGB.white(piece.alpha());
-                ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x01, y01, z01, u0, v0);
-                ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x01, y01, z11, u0, v1);
-                ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x11, y01, z11, u1, v1);
-                ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x11, y01, z01, u1, v0);
-            }
-        }
+  public void renderTranslucent(SubmitNodeCollection nodeCollection, FeatureFrameContext context) {
+    VertexConsumer buffer = context.bufferSource().getBuffer(SHADOW_RENDER_TYPE);
+    for (Submit submit : nodeCollection.getShadowSubmits()) {
+      for (EntityRenderState.ShadowPiece piece : submit.pieces()) {
+        AABB aabb = piece.shapeBelow().bounds();
+        float x01 = piece.relativeX() + (float) aabb.minX;
+        float x11 = piece.relativeX() + (float) aabb.maxX;
+        float y01 = piece.relativeY() + (float) aabb.minY;
+        float z01 = piece.relativeZ() + (float) aabb.minZ;
+        float z11 = piece.relativeZ() + (float) aabb.maxZ;
+        float radius = submit.radius();
+        float u0 = -x01 / 2.0f / radius + 0.5f;
+        float u1 = -x11 / 2.0f / radius + 0.5f;
+        float v0 = -z01 / 2.0f / radius + 0.5f;
+        float v1 = -z11 / 2.0f / radius + 0.5f;
+        int color = ARGB.white(piece.alpha());
+        ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x01, y01, z01, u0, v0);
+        ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x01, y01, z11, u0, v1);
+        ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x11, y01, z11, u1, v1);
+        ShadowFeatureRenderer.shadowVertex(submit.pose(), buffer, color, x11, y01, z01, u1, v0);
+      }
     }
+  }
 
-    private static void shadowVertex(Matrix4fc pose, VertexConsumer buffer, int color, float x, float y, float z, float u, float v) {
-        Vector3f position = pose.transformPosition(x, y, z, new Vector3f());
-        buffer.addVertex(position.x(), position.y(), position.z(), color, u, v, OverlayTexture.NO_OVERLAY, 0xF000F0, 0.0f, 1.0f, 0.0f);
-    }
+  private static void shadowVertex(
+      Matrix4fc pose,
+      VertexConsumer buffer,
+      int color,
+      float x,
+      float y,
+      float z,
+      float u,
+      float v) {
+    Vector3f position = pose.transformPosition(x, y, z, new Vector3f());
+    buffer.addVertex(
+        position.x(),
+        position.y(),
+        position.z(),
+        color,
+        u,
+        v,
+        OverlayTexture.NO_OVERLAY,
+        0xF000F0,
+        0.0f,
+        1.0f,
+        0.0f);
+  }
 
-    public record Submit(Matrix4fc pose, float radius, List<EntityRenderState.ShadowPiece> pieces) {
-    }
+  public record Submit(Matrix4fc pose, float radius, List<EntityRenderState.ShadowPiece> pieces) {}
 }
-

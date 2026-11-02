@@ -9,30 +9,31 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.configuration.ClientConfigurationPacketListener;
-import net.minecraft.network.protocol.configuration.ConfigurationPacketTypes;
 import net.minecraft.resources.Identifier;
 
-public record ClientboundUpdateEnabledFeaturesPacket(Set<Identifier> features) implements Packet<ClientConfigurationPacketListener>
-{
-    public static final StreamCodec<FriendlyByteBuf, ClientboundUpdateEnabledFeaturesPacket> STREAM_CODEC = Packet.codec(ClientboundUpdateEnabledFeaturesPacket::write, ClientboundUpdateEnabledFeaturesPacket::new);
+public record ClientboundUpdateEnabledFeaturesPacket(Set<Identifier> features)
+    implements Packet<ClientConfigurationPacketListener> {
+  public static final StreamCodec<FriendlyByteBuf, ClientboundUpdateEnabledFeaturesPacket>
+      STREAM_CODEC =
+          Packet.codec(
+              ClientboundUpdateEnabledFeaturesPacket::write,
+              ClientboundUpdateEnabledFeaturesPacket::new);
 
-    private ClientboundUpdateEnabledFeaturesPacket(FriendlyByteBuf input) {
-        this(input.readCollection(HashSet::new, FriendlyByteBuf::readIdentifier));
-    }
+  private ClientboundUpdateEnabledFeaturesPacket(FriendlyByteBuf input) {
+    this(input.readCollection(HashSet::new, FriendlyByteBuf::readIdentifier));
+  }
 
-    private void write(FriendlyByteBuf output) {
-        output.writeCollection(this.features, FriendlyByteBuf::writeIdentifier);
-    }
+  private void write(FriendlyByteBuf output) {
+    output.writeCollection(this.features, FriendlyByteBuf::writeIdentifier);
+  }
 
-    @Override
-    public PacketType<ClientboundUpdateEnabledFeaturesPacket> type() {
-        return ConfigurationPacketTypes.CLIENTBOUND_UPDATE_ENABLED_FEATURES;
-    }
+  @Override
+  public PacketType<ClientboundUpdateEnabledFeaturesPacket> type() {
+    return ConfigurationPacketTypes.CLIENTBOUND_UPDATE_ENABLED_FEATURES;
+  }
 
-    @Override
-    public void handle(ClientConfigurationPacketListener listener) {
-        listener.handleEnabledFeatures(this);
-    }
+  @Override
+  public void handle(ClientConfigurationPacketListener listener) {
+    listener.handleEnabledFeatures(this);
+  }
 }
-

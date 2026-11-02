@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonObject
@@ -18,23 +18,21 @@ import net.minecraft.util.LenientJsonParser;
 import org.slf4j.Logger;
 
 public record Ops(Set<String> ops) {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static Ops parse(String json) {
-        HashSet<String> ops = new HashSet<String>();
-        try {
-            JsonObject jsonObject = LenientJsonParser.parse(json).getAsJsonObject();
-            JsonElement opsArray = jsonObject.get("ops");
-            if (opsArray.isJsonArray()) {
-                for (JsonElement opsElement : opsArray.getAsJsonArray()) {
-                    ops.add(opsElement.getAsString());
-                }
-            }
+  public static Ops parse(String json) {
+    HashSet<String> ops = new HashSet<String>();
+    try {
+      JsonObject jsonObject = LenientJsonParser.parse(json).getAsJsonObject();
+      JsonElement opsArray = jsonObject.get("ops");
+      if (opsArray.isJsonArray()) {
+        for (JsonElement opsElement : opsArray.getAsJsonArray()) {
+          ops.add(opsElement.getAsString());
         }
-        catch (Exception e) {
-            LOGGER.error("Could not parse Ops", (Throwable)e);
-        }
-        return new Ops(ops);
+      }
+    } catch (Exception e) {
+      LOGGER.error("Could not parse Ops", (Throwable) e);
     }
+    return new Ops(ops);
+  }
 }
-

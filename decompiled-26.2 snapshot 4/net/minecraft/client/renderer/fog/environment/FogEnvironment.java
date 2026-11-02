@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -16,24 +16,25 @@ import net.minecraft.world.level.material.FogType;
 import org.jspecify.annotations.Nullable;
 
 public abstract class FogEnvironment {
-    public abstract void setupFog(FogData var1, Camera var2, ClientLevel var3, float var4, DeltaTracker var5);
+  public abstract void setupFog(
+      FogData var1, Camera var2, ClientLevel var3, float var4, DeltaTracker var5);
 
-    public boolean providesColor() {
-        return true;
-    }
+  public boolean providesColor() {
+    return true;
+  }
 
-    public int getBaseColor(ClientLevel level, Camera camera, int renderDistance, float partialTicks) {
-        return -1;
-    }
+  public int getBaseColor(
+      ClientLevel level, Camera camera, int renderDistance, float partialTicks) {
+    return -1;
+  }
 
-    public boolean modifiesDarkness() {
-        return false;
-    }
+  public boolean modifiesDarkness() {
+    return false;
+  }
 
-    public float getModifiedDarkness(LivingEntity entity, float darkness, float partialTickTime) {
-        return darkness;
-    }
+  public float getModifiedDarkness(LivingEntity entity, float darkness, float partialTickTime) {
+    return darkness;
+  }
 
-    public abstract boolean isApplicable(@Nullable FogType var1, Entity var2);
+  public abstract boolean isApplicable(@Nullable FogType var1, Entity var2);
 }
-

@@ -24,54 +24,114 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
 public interface PlayerDetector {
-    public static final PlayerDetector NO_CREATIVE_PLAYERS = (level, selector, pos, requiredPlayerRange, requireLineOfSight) -> selector.getPlayers(level, p -> p.blockPosition().closerThan(pos, requiredPlayerRange) && !p.isCreative() && !p.isSpectator()).stream().filter(player -> !requireLineOfSight || PlayerDetector.inLineOfSight(level, pos.getCenter(), player.getEyePosition())).map(Entity::getUUID).toList();
-    public static final PlayerDetector INCLUDING_CREATIVE_PLAYERS = (level, selector, pos, requiredPlayerRange, requireLineOfSight) -> selector.getPlayers(level, p -> p.blockPosition().closerThan(pos, requiredPlayerRange) && !p.isSpectator()).stream().filter(player -> !requireLineOfSight || PlayerDetector.inLineOfSight(level, pos.getCenter(), player.getEyePosition())).map(Entity::getUUID).toList();
-    public static final PlayerDetector SHEEP = (level, selector, pos, requiredPlayerRange, requireLineOfSight) -> {
+  public static final PlayerDetector NO_CREATIVE_PLAYERS =
+      (level, selector, pos, requiredPlayerRange, requireLineOfSight) ->
+          selector
+              .getPlayers(
+                  level,
+                  p ->
+                      p.blockPosition().closerThan(pos, requiredPlayerRange)
+                          && !p.isCreative()
+                          && !p.isSpectator())
+              .stream()
+              .filter(
+                  player ->
+                      !requireLineOfSight
+                          || PlayerDetector.inLineOfSight(
+                              level, pos.getCenter(), player.getEyePosition()))
+              .map(Entity::getUUID)
+              .toList();
+  public static final PlayerDetector INCLUDING_CREATIVE_PLAYERS =
+      (level, selector, pos, requiredPlayerRange, requireLineOfSight) ->
+          selector
+              .getPlayers(
+                  level,
+                  p -> p.blockPosition().closerThan(pos, requiredPlayerRange) && !p.isSpectator())
+              .stream()
+              .filter(
+                  player ->
+                      !requireLineOfSight
+                          || PlayerDetector.inLineOfSight(
+                              level, pos.getCenter(), player.getEyePosition()))
+              .map(Entity::getUUID)
+              .toList();
+  public static final PlayerDetector SHEEP =
+      (level, selector, pos, requiredPlayerRange, requireLineOfSight) -> {
         AABB area = new AABB(pos).inflate(requiredPlayerRange);
-        return selector.getEntities(level, EntityTypes.SHEEP, area, LivingEntity::isAlive).stream().filter(entity -> !requireLineOfSight || PlayerDetector.inLineOfSight(level, pos.getCenter(), entity.getEyePosition())).map(Entity::getUUID).toList();
-    };
+        return selector.getEntities(level, EntityTypes.SHEEP, area, LivingEntity::isAlive).stream()
+            .filter(
+                entity ->
+                    !requireLineOfSight
+                        || PlayerDetector.inLineOfSight(
+                            level, pos.getCenter(), entity.getEyePosition()))
+            .map(Entity::getUUID)
+            .toList();
+      };
 
-    public List<UUID> detect(ServerLevel var1, EntitySelector var2, BlockPos var3, double var4, boolean var6);
+  public List<UUID> detect(
+      ServerLevel var1, EntitySelector var2, BlockPos var3, double var4, boolean var6);
 
-    private static boolean inLineOfSight(Level level, Vec3 origin, Vec3 dest) {
-        BlockHitResult hitResult = level.clip(new ClipContext(dest, origin, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
-        return hitResult.getBlockPos().equals(BlockPos.containing(origin)) || hitResult.getType() == HitResult.Type.MISS;
-    }
+  private static boolean inLineOfSight(Level level, Vec3 origin, Vec3 dest) {
+    BlockHitResult hitResult =
+        level.clip(
+            new ClipContext(
+                dest,
+                origin,
+                ClipContext.Block.VISUAL,
+                ClipContext.Fluid.NONE,
+                CollisionContext.empty()));
+    return hitResult.getBlockPos().equals(BlockPos.containing(origin))
+        || hitResult.getType() == HitResult.Type.MISS;
+  }
 
-    public static interface EntitySelector {
-        public static final EntitySelector SELECT_FROM_LEVEL = new EntitySelector(){
+  public static interface EntitySelector {
+    public static final EntitySelector SELECT_FROM_LEVEL =
+        new EntitySelector() {
 
-            public List<ServerPlayer> getPlayers(ServerLevel level, Predicate<? super Player> selector) {
-                return level.getPlayers(selector);
-            }
+          public List<ServerPlayer> getPlayers(
+              ServerLevel level, Predicate<? super Player> selector) {
+            return level.getPlayers(selector);
+          }
 
-            @Override
-            public <T extends Entity> List<T> getEntities(ServerLevel level, EntityTypeTest<Entity, T> type, AABB aabb, Predicate<? super T> selector) {
-                return level.getEntities(type, aabb, selector);
-            }
+          @Override
+          public <T extends Entity> List<T> getEntities(
+              ServerLevel level,
+              EntityTypeTest<Entity, T> type,
+              AABB aabb,
+              Predicate<? super T> selector) {
+            return level.getEntities(type, aabb, selector);
+          }
         };
 
-        public List<? extends Player> getPlayers(ServerLevel var1, Predicate<? super Player> var2);
+    public List<? extends Player> getPlayers(ServerLevel var1, Predicate<? super Player> var2);
 
-        public <T extends Entity> List<T> getEntities(ServerLevel var1, EntityTypeTest<Entity, T> var2, AABB var3, Predicate<? super T> var4);
+    public <T extends Entity> List<T> getEntities(
+        ServerLevel var1, EntityTypeTest<Entity, T> var2, AABB var3, Predicate<? super T> var4);
 
-        public static EntitySelector onlySelectPlayer(Player player) {
-            return EntitySelector.onlySelectPlayers(List.of(player));
-        }
-
-        public static EntitySelector onlySelectPlayers(final List<Player> players) {
-            return new EntitySelector(){
-
-                public List<Player> getPlayers(ServerLevel level, Predicate<? super Player> selector) {
-                    return players.stream().filter(selector).toList();
-                }
-
-                @Override
-                public <T extends Entity> List<T> getEntities(ServerLevel level, EntityTypeTest<Entity, T> type, AABB bb, Predicate<? super T> selector) {
-                    return players.stream().map(type::tryCast).filter(Objects::nonNull).filter(selector).toList();
-                }
-            };
-        }
+    public static EntitySelector onlySelectPlayer(Player player) {
+      return EntitySelector.onlySelectPlayers(List.of(player));
     }
-}
 
+    public static EntitySelector onlySelectPlayers(final List<Player> players) {
+      return new EntitySelector() {
+
+        public List<Player> getPlayers(ServerLevel level, Predicate<? super Player> selector) {
+          return players.stream().filter(selector).toList();
+        }
+
+        @Override
+        public <T extends Entity> List<T> getEntities(
+            ServerLevel level,
+            EntityTypeTest<Entity, T> type,
+            AABB bb,
+            Predicate<? super T> selector) {
+          return players.stream()
+              .map(type::tryCast)
+              .filter(Objects::nonNull)
+              .filter(selector)
+              .toList();
+        }
+      };
+    }
+  }
+}

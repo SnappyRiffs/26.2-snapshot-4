@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonParseException
@@ -28,37 +28,35 @@ import java.io.IOException;
 import java.io.Reader;
 import org.jspecify.annotations.Nullable;
 
-public interface JsonEventLogReader<T>
-extends Closeable {
-    public static <T> JsonEventLogReader<T> create(final Codec<T> codec, Reader reader) {
-        final JsonReader jsonReader = new JsonReader(reader);
-        jsonReader.setStrictness(Strictness.LENIENT);
-        return new JsonEventLogReader<T>(){
+public interface JsonEventLogReader<T> extends Closeable {
+  public static <T> JsonEventLogReader<T> create(final Codec<T> codec, Reader reader) {
+    final JsonReader jsonReader = new JsonReader(reader);
+    jsonReader.setStrictness(Strictness.LENIENT);
+    return new JsonEventLogReader<T>() {
 
-            @Override
-            public @Nullable T next() throws IOException {
-                try {
-                    if (!jsonReader.hasNext()) {
-                        return null;
-                    }
-                    JsonElement json = JsonParser.parseReader((JsonReader)jsonReader);
-                    return codec.parse((DynamicOps)JsonOps.INSTANCE, (Object)json).getOrThrow(IOException::new);
-                }
-                catch (JsonParseException e) {
-                    throw new IOException(e);
-                }
-                catch (EOFException e) {
-                    return null;
-                }
-            }
+      @Override
+      public @Nullable T next() throws IOException {
+        try {
+          if (!jsonReader.hasNext()) {
+            return null;
+          }
+          JsonElement json = JsonParser.parseReader((JsonReader) jsonReader);
+          return codec
+              .parse((DynamicOps) JsonOps.INSTANCE, (Object) json)
+              .getOrThrow(IOException::new);
+        } catch (JsonParseException e) {
+          throw new IOException(e);
+        } catch (EOFException e) {
+          return null;
+        }
+      }
 
-            @Override
-            public void close() throws IOException {
-                jsonReader.close();
-            }
-        };
-    }
+      @Override
+      public void close() throws IOException {
+        jsonReader.close();
+      }
+    };
+  }
 
-    public @Nullable T next() throws IOException;
+  public @Nullable T next() throws IOException;
 }
-

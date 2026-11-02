@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -32,63 +32,138 @@ import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import org.jspecify.annotations.Nullable;
 
 public class EquipmentLayerRenderer {
-    private static final int NO_LAYER_COLOR = 0;
-    private final EquipmentAssetManager equipmentAssets;
-    private final Function<LayerTextureKey, Identifier> layerTextureLookup;
-    private final Function<TrimSpriteKey, TextureAtlasSprite> trimSpriteLookup;
+  private static final int NO_LAYER_COLOR = 0;
+  private final EquipmentAssetManager equipmentAssets;
+  private final Function<LayerTextureKey, Identifier> layerTextureLookup;
+  private final Function<TrimSpriteKey, TextureAtlasSprite> trimSpriteLookup;
 
-    public EquipmentLayerRenderer(EquipmentAssetManager equipmentAssets, TextureAtlas armorTrimAtlas) {
-        this.equipmentAssets = equipmentAssets;
-        this.layerTextureLookup = Util.memoize(key -> key.layer.getTextureLocation(key.layerType));
-        this.trimSpriteLookup = Util.memoize(key -> armorTrimAtlas.getSprite(key.spriteId()));
-    }
+  public EquipmentLayerRenderer(
+      EquipmentAssetManager equipmentAssets, TextureAtlas armorTrimAtlas) {
+    this.equipmentAssets = equipmentAssets;
+    this.layerTextureLookup = Util.memoize(key -> key.layer.getTextureLocation(key.layerType));
+    this.trimSpriteLookup = Util.memoize(key -> armorTrimAtlas.getSprite(key.spriteId()));
+  }
 
-    public <S> void renderLayers(EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId, Model<? super S> model, S state, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int outlineColor) {
-        this.renderLayers(layerType, equipmentAssetId, model, state, itemStack, poseStack, submitNodeCollector, lightCoords, null, outlineColor, 1);
-    }
+  public <S> void renderLayers(
+      EquipmentClientInfo.LayerType layerType,
+      ResourceKey<EquipmentAsset> equipmentAssetId,
+      Model<? super S> model,
+      S state,
+      ItemStack itemStack,
+      PoseStack poseStack,
+      SubmitNodeCollector submitNodeCollector,
+      int lightCoords,
+      int outlineColor) {
+    this.renderLayers(
+        layerType,
+        equipmentAssetId,
+        model,
+        state,
+        itemStack,
+        poseStack,
+        submitNodeCollector,
+        lightCoords,
+        null,
+        outlineColor,
+        1);
+  }
 
-    public <S> void renderLayers(EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId, Model<? super S> model, S state, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, @Nullable Identifier playerTextureOverride, int outlineColor, int order) {
-        List<EquipmentClientInfo.Layer> layers = this.equipmentAssets.get(equipmentAssetId).getLayers(layerType);
-        if (layers.isEmpty()) {
-            return;
-        }
-        int dyeColor = DyedItemColor.getOrDefault(itemStack, 0);
-        boolean renderFoil = itemStack.hasFoil();
-        int nextOrder = order;
-        for (EquipmentClientInfo.Layer layer : layers) {
-            int color = EquipmentLayerRenderer.getColorForLayer(layer, dyeColor);
-            if (color == 0) continue;
-            Identifier layerTexture = layer.usePlayerTexture() && playerTextureOverride != null ? playerTextureOverride : this.layerTextureLookup.apply(new LayerTextureKey(layerType, layer));
-            submitNodeCollector.order(nextOrder++).submitModel(model, state, poseStack, RenderTypes.armorCutoutNoCull(layerTexture), lightCoords, OverlayTexture.NO_OVERLAY, color, null, outlineColor, null);
-            if (renderFoil) {
-                submitNodeCollector.order(nextOrder++).submitModel(model, state, poseStack, RenderTypes.armorEntityGlint(), lightCoords, OverlayTexture.NO_OVERLAY, color, null, outlineColor, null);
-            }
-            renderFoil = false;
-        }
-        ArmorTrim trim = itemStack.get(DataComponents.TRIM);
-        if (trim != null && layerType != EquipmentClientInfo.LayerType.HUMANOID_BABY) {
-            TextureAtlasSprite sprite = this.trimSpriteLookup.apply(new TrimSpriteKey(trim, layerType, equipmentAssetId));
-            RenderType renderType = Sheets.armorTrimsSheet(trim.pattern().value().decal());
-            submitNodeCollector.order(nextOrder++).submitModel(model, state, poseStack, renderType, lightCoords, OverlayTexture.NO_OVERLAY, -1, sprite, outlineColor, null);
-        }
+  public <S> void renderLayers(
+      EquipmentClientInfo.LayerType layerType,
+      ResourceKey<EquipmentAsset> equipmentAssetId,
+      Model<? super S> model,
+      S state,
+      ItemStack itemStack,
+      PoseStack poseStack,
+      SubmitNodeCollector submitNodeCollector,
+      int lightCoords,
+      @Nullable Identifier playerTextureOverride,
+      int outlineColor,
+      int order) {
+    List<EquipmentClientInfo.Layer> layers =
+        this.equipmentAssets.get(equipmentAssetId).getLayers(layerType);
+    if (layers.isEmpty()) {
+      return;
     }
+    int dyeColor = DyedItemColor.getOrDefault(itemStack, 0);
+    boolean renderFoil = itemStack.hasFoil();
+    int nextOrder = order;
+    for (EquipmentClientInfo.Layer layer : layers) {
+      int color = EquipmentLayerRenderer.getColorForLayer(layer, dyeColor);
+      if (color == 0) continue;
+      Identifier layerTexture =
+          layer.usePlayerTexture() && playerTextureOverride != null
+              ? playerTextureOverride
+              : this.layerTextureLookup.apply(new LayerTextureKey(layerType, layer));
+      submitNodeCollector
+          .order(nextOrder++)
+          .submitModel(
+              model,
+              state,
+              poseStack,
+              RenderTypes.armorCutoutNoCull(layerTexture),
+              lightCoords,
+              OverlayTexture.NO_OVERLAY,
+              color,
+              null,
+              outlineColor,
+              null);
+      if (renderFoil) {
+        submitNodeCollector
+            .order(nextOrder++)
+            .submitModel(
+                model,
+                state,
+                poseStack,
+                RenderTypes.armorEntityGlint(),
+                lightCoords,
+                OverlayTexture.NO_OVERLAY,
+                color,
+                null,
+                outlineColor,
+                null);
+      }
+      renderFoil = false;
+    }
+    ArmorTrim trim = itemStack.get(DataComponents.TRIM);
+    if (trim != null && layerType != EquipmentClientInfo.LayerType.HUMANOID_BABY) {
+      TextureAtlasSprite sprite =
+          this.trimSpriteLookup.apply(new TrimSpriteKey(trim, layerType, equipmentAssetId));
+      RenderType renderType = Sheets.armorTrimsSheet(trim.pattern().value().decal());
+      submitNodeCollector
+          .order(nextOrder++)
+          .submitModel(
+              model,
+              state,
+              poseStack,
+              renderType,
+              lightCoords,
+              OverlayTexture.NO_OVERLAY,
+              -1,
+              sprite,
+              outlineColor,
+              null);
+    }
+  }
 
-    private static int getColorForLayer(EquipmentClientInfo.Layer layer, int dyeColor) {
-        Optional<EquipmentClientInfo.Dyeable> dyeable = layer.dyeable();
-        if (dyeable.isPresent()) {
-            int colorWhenUndyed = dyeable.get().colorWhenUndyed().map(ARGB::opaque).orElse(0);
-            return dyeColor != 0 ? dyeColor : colorWhenUndyed;
-        }
-        return -1;
+  private static int getColorForLayer(EquipmentClientInfo.Layer layer, int dyeColor) {
+    Optional<EquipmentClientInfo.Dyeable> dyeable = layer.dyeable();
+    if (dyeable.isPresent()) {
+      int colorWhenUndyed = dyeable.get().colorWhenUndyed().map(ARGB::opaque).orElse(0);
+      return dyeColor != 0 ? dyeColor : colorWhenUndyed;
     }
+    return -1;
+  }
 
-    private record LayerTextureKey(EquipmentClientInfo.LayerType layerType, EquipmentClientInfo.Layer layer) {
-    }
+  private record LayerTextureKey(
+      EquipmentClientInfo.LayerType layerType, EquipmentClientInfo.Layer layer) {}
 
-    private record TrimSpriteKey(ArmorTrim trim, EquipmentClientInfo.LayerType layerType, ResourceKey<EquipmentAsset> equipmentAssetId) {
-        public Identifier spriteId() {
-            return this.trim.layerAssetId(this.layerType.trimAssetPrefix(), this.equipmentAssetId);
-        }
+  private record TrimSpriteKey(
+      ArmorTrim trim,
+      EquipmentClientInfo.LayerType layerType,
+      ResourceKey<EquipmentAsset> equipmentAssetId) {
+    public Identifier spriteId() {
+      return this.trim.layerAssetId(this.layerType.trimAssetPrefix(), this.equipmentAssetId);
     }
+  }
 }
-

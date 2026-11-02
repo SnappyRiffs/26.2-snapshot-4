@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -14,6 +14,10 @@ import org.jspecify.annotations.Nullable;
 
 @FunctionalInterface
 public interface ItemModelPropertyTest {
-    public boolean get(ItemStack var1, @Nullable ClientLevel var2, @Nullable LivingEntity var3, int var4, ItemDisplayContext var5);
+  public boolean get(
+      ItemStack var1,
+      @Nullable ClientLevel var2,
+      @Nullable LivingEntity var3,
+      int var4,
+      ItemDisplayContext var5);
 }
-

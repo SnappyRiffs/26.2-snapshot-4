@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.Message
@@ -41,50 +41,116 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class EnchantCommand {
-    private static final DynamicCommandExceptionType ERROR_NOT_LIVING_ENTITY = new DynamicCommandExceptionType(target -> Component.translatableEscape("commands.enchant.failed.entity", target));
-    private static final DynamicCommandExceptionType ERROR_NO_ITEM = new DynamicCommandExceptionType(target -> Component.translatableEscape("commands.enchant.failed.itemless", target));
-    private static final DynamicCommandExceptionType ERROR_INCOMPATIBLE = new DynamicCommandExceptionType(item -> Component.translatableEscape("commands.enchant.failed.incompatible", item));
-    private static final Dynamic2CommandExceptionType ERROR_LEVEL_TOO_HIGH = new Dynamic2CommandExceptionType((level, max) -> Component.translatableEscape("commands.enchant.failed.level", level, max));
-    private static final SimpleCommandExceptionType ERROR_NOTHING_HAPPENED = new SimpleCommandExceptionType((Message)Component.translatable("commands.enchant.failed"));
+  private static final DynamicCommandExceptionType ERROR_NOT_LIVING_ENTITY =
+      new DynamicCommandExceptionType(
+          target -> Component.translatableEscape("commands.enchant.failed.entity", target));
+  private static final DynamicCommandExceptionType ERROR_NO_ITEM =
+      new DynamicCommandExceptionType(
+          target -> Component.translatableEscape("commands.enchant.failed.itemless", target));
+  private static final DynamicCommandExceptionType ERROR_INCOMPATIBLE =
+      new DynamicCommandExceptionType(
+          item -> Component.translatableEscape("commands.enchant.failed.incompatible", item));
+  private static final Dynamic2CommandExceptionType ERROR_LEVEL_TOO_HIGH =
+      new Dynamic2CommandExceptionType(
+          (level, max) ->
+              Component.translatableEscape("commands.enchant.failed.level", level, max));
+  private static final SimpleCommandExceptionType ERROR_NOTHING_HAPPENED =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.enchant.failed"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("enchant").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).then(Commands.argument("targets", EntityArgument.entities()).then(((RequiredArgumentBuilder)Commands.argument("enchantment", ResourceArgument.resource(context, Registries.ENCHANTMENT)).executes(c -> EnchantCommand.enchant((CommandSourceStack)c.getSource(), EntityArgument.getEntities((CommandContext<CommandSourceStack>)c, "targets"), ResourceArgument.getEnchantment((CommandContext<CommandSourceStack>)c, "enchantment"), 1))).then(Commands.argument("level", IntegerArgumentType.integer((int)0)).executes(c -> EnchantCommand.enchant((CommandSourceStack)c.getSource(), EntityArgument.getEntities((CommandContext<CommandSourceStack>)c, "targets"), ResourceArgument.getEnchantment((CommandContext<CommandSourceStack>)c, "enchantment"), IntegerArgumentType.getInteger((CommandContext)c, (String)"level")))))));
-    }
+  public static void register(
+      CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("enchant")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                .then(
+                    Commands.argument("targets", EntityArgument.entities())
+                        .then(
+                            ((RequiredArgumentBuilder)
+                                    Commands.argument(
+                                            "enchantment",
+                                            ResourceArgument.resource(
+                                                context, Registries.ENCHANTMENT))
+                                        .executes(
+                                            c ->
+                                                EnchantCommand.enchant(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    EntityArgument.getEntities(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "targets"),
+                                                    ResourceArgument.getEnchantment(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "enchantment"),
+                                                    1)))
+                                .then(
+                                    Commands.argument("level", IntegerArgumentType.integer((int) 0))
+                                        .executes(
+                                            c ->
+                                                EnchantCommand.enchant(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    EntityArgument.getEntities(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "targets"),
+                                                    ResourceArgument.getEnchantment(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "enchantment"),
+                                                    IntegerArgumentType.getInteger(
+                                                        (CommandContext) c, (String) "level")))))));
+  }
 
-    private static int enchant(CommandSourceStack source, Collection<? extends Entity> targets, Holder<Enchantment> enchantmentHolder, int level) throws CommandSyntaxException {
-        Enchantment enchantment = enchantmentHolder.value();
-        if (level > enchantment.getMaxLevel()) {
-            throw ERROR_LEVEL_TOO_HIGH.create((Object)level, (Object)enchantment.getMaxLevel());
-        }
-        int success = 0;
-        for (Entity entity : targets) {
-            if (entity instanceof LivingEntity) {
-                LivingEntity target = (LivingEntity)entity;
-                ItemStack item = target.getMainHandItem();
-                if (!item.isEmpty()) {
-                    if (enchantment.canEnchant(item) && EnchantmentHelper.isEnchantmentCompatible(EnchantmentHelper.getEnchantmentsForCrafting(item).keySet(), enchantmentHolder)) {
-                        item.enchant(enchantmentHolder, level);
-                        ++success;
-                        continue;
-                    }
-                    if (targets.size() != 1) continue;
-                    throw ERROR_INCOMPATIBLE.create((Object)item.getHoverName().getString());
-                }
-                if (targets.size() != 1) continue;
-                throw ERROR_NO_ITEM.create((Object)target.getName().getString());
-            }
-            if (targets.size() != 1) continue;
-            throw ERROR_NOT_LIVING_ENTITY.create((Object)entity.getName().getString());
-        }
-        if (success == 0) {
-            throw ERROR_NOTHING_HAPPENED.create();
-        }
-        if (targets.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.enchant.success.single", Enchantment.getFullname(enchantmentHolder, level), ((Entity)targets.iterator().next()).getDisplayName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.enchant.success.multiple", Enchantment.getFullname(enchantmentHolder, level), targets.size()), true);
-        }
-        return success;
+  private static int enchant(
+      CommandSourceStack source,
+      Collection<? extends Entity> targets,
+      Holder<Enchantment> enchantmentHolder,
+      int level)
+      throws CommandSyntaxException {
+    Enchantment enchantment = enchantmentHolder.value();
+    if (level > enchantment.getMaxLevel()) {
+      throw ERROR_LEVEL_TOO_HIGH.create((Object) level, (Object) enchantment.getMaxLevel());
     }
+    int success = 0;
+    for (Entity entity : targets) {
+      if (entity instanceof LivingEntity) {
+        LivingEntity target = (LivingEntity) entity;
+        ItemStack item = target.getMainHandItem();
+        if (!item.isEmpty()) {
+          if (enchantment.canEnchant(item)
+              && EnchantmentHelper.isEnchantmentCompatible(
+                  EnchantmentHelper.getEnchantmentsForCrafting(item).keySet(), enchantmentHolder)) {
+            item.enchant(enchantmentHolder, level);
+            ++success;
+            continue;
+          }
+          if (targets.size() != 1) continue;
+          throw ERROR_INCOMPATIBLE.create((Object) item.getHoverName().getString());
+        }
+        if (targets.size() != 1) continue;
+        throw ERROR_NO_ITEM.create((Object) target.getName().getString());
+      }
+      if (targets.size() != 1) continue;
+      throw ERROR_NOT_LIVING_ENTITY.create((Object) entity.getName().getString());
+    }
+    if (success == 0) {
+      throw ERROR_NOTHING_HAPPENED.create();
+    }
+    if (targets.size() == 1) {
+      source.sendSuccess(
+          () ->
+              Component.translatable(
+                  "commands.enchant.success.single",
+                  Enchantment.getFullname(enchantmentHolder, level),
+                  ((Entity) targets.iterator().next()).getDisplayName()),
+          true);
+    } else {
+      source.sendSuccess(
+          () ->
+              Component.translatable(
+                  "commands.enchant.success.multiple",
+                  Enchantment.getFullname(enchantmentHolder, level),
+                  targets.size()),
+          true);
+    }
+    return success;
+  }
 }
-

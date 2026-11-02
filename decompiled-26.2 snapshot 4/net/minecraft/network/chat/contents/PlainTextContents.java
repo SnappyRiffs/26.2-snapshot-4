@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -20,47 +20,50 @@ import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 
-public interface PlainTextContents
-extends ComponentContents {
-    public static final MapCodec<PlainTextContents> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Codec.STRING.fieldOf("text").forGetter(PlainTextContents::text)).apply((Applicative)i, PlainTextContents::create));
-    public static final PlainTextContents EMPTY = new PlainTextContents(){
+public interface PlainTextContents extends ComponentContents {
+  public static final MapCodec<PlainTextContents> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group((App) Codec.STRING.fieldOf("text").forGetter(PlainTextContents::text))
+                  .apply((Applicative) i, PlainTextContents::create));
+  public static final PlainTextContents EMPTY =
+      new PlainTextContents() {
 
         public String toString() {
-            return "empty";
+          return "empty";
         }
 
         @Override
         public String text() {
-            return "";
+          return "";
         }
-    };
+      };
 
-    public static PlainTextContents create(String text) {
-        return text.isEmpty() ? EMPTY : new LiteralContents(text);
+  public static PlainTextContents create(String text) {
+    return text.isEmpty() ? EMPTY : new LiteralContents(text);
+  }
+
+  public String text();
+
+  public default MapCodec<PlainTextContents> codec() {
+    return MAP_CODEC;
+  }
+
+  public record LiteralContents(String text) implements PlainTextContents {
+    @Override
+    public <T> Optional<T> visit(FormattedText.ContentConsumer<T> output) {
+      return output.accept(this.text);
     }
 
-    public String text();
-
-    default public MapCodec<PlainTextContents> codec() {
-        return MAP_CODEC;
+    @Override
+    public <T> Optional<T> visit(
+        FormattedText.StyledContentConsumer<T> output, Style currentStyle) {
+      return output.accept(currentStyle, this.text);
     }
 
-    public record LiteralContents(String text) implements PlainTextContents
-    {
-        @Override
-        public <T> Optional<T> visit(FormattedText.ContentConsumer<T> output) {
-            return output.accept(this.text);
-        }
-
-        @Override
-        public <T> Optional<T> visit(FormattedText.StyledContentConsumer<T> output, Style currentStyle) {
-            return output.accept(currentStyle, this.text);
-        }
-
-        @Override
-        public String toString() {
-            return "literal{" + this.text + "}";
-        }
+    @Override
+    public String toString() {
+      return "literal{" + this.text + "}";
     }
+  }
 }
-

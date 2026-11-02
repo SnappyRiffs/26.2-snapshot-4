@@ -8,92 +8,108 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import net.minecraft.client.input.InputQuirks;
 
 public interface InputWithModifiers {
-    public static final int NOT_DIGIT = -1;
+  public static final int NOT_DIGIT = -1;
 
-    @InputConstants.Value
-    public int input();
+  @InputConstants.Value
+  public int input();
 
-    @Modifiers
-    public int modifiers();
+  @Modifiers
+  public int modifiers();
 
-    default public boolean isSelection() {
-        return this.input() == 257 || this.input() == 32 || this.input() == 335;
+  public default boolean isSelection() {
+    return this.input() == 257 || this.input() == 32 || this.input() == 335;
+  }
+
+  public default boolean isConfirmation() {
+    return this.input() == 257 || this.input() == 335;
+  }
+
+  public default boolean isEscape() {
+    return this.input() == 256;
+  }
+
+  public default boolean isLeft() {
+    return this.input() == 263;
+  }
+
+  public default boolean isRight() {
+    return this.input() == 262;
+  }
+
+  public default boolean isUp() {
+    return this.input() == 265;
+  }
+
+  public default boolean isDown() {
+    return this.input() == 264;
+  }
+
+  public default boolean isCycleFocus() {
+    return this.input() == 258;
+  }
+
+  public default int getDigit() {
+    int value = this.input() - 48;
+    if (value >= 0 && value <= 9) {
+      return value;
     }
+    return -1;
+  }
 
-    default public boolean isConfirmation() {
-        return this.input() == 257 || this.input() == 335;
-    }
+  public default boolean hasAltDown() {
+    return (this.modifiers() & 4) != 0;
+  }
 
-    default public boolean isEscape() {
-        return this.input() == 256;
-    }
+  public default boolean hasShiftDown() {
+    return (this.modifiers() & 1) != 0;
+  }
 
-    default public boolean isLeft() {
-        return this.input() == 263;
-    }
+  public default boolean hasControlDown() {
+    return (this.modifiers() & 2) != 0;
+  }
 
-    default public boolean isRight() {
-        return this.input() == 262;
-    }
+  public default boolean hasControlDownWithQuirk() {
+    return (this.modifiers() & InputQuirks.EDIT_SHORTCUT_KEY_MODIFIER) != 0;
+  }
 
-    default public boolean isUp() {
-        return this.input() == 265;
-    }
+  public default boolean isSelectAll() {
+    return this.input() == 65
+        && this.hasControlDownWithQuirk()
+        && !this.hasShiftDown()
+        && !this.hasAltDown();
+  }
 
-    default public boolean isDown() {
-        return this.input() == 264;
-    }
+  public default boolean isCopy() {
+    return this.input() == 67
+        && this.hasControlDownWithQuirk()
+        && !this.hasShiftDown()
+        && !this.hasAltDown();
+  }
 
-    default public boolean isCycleFocus() {
-        return this.input() == 258;
-    }
+  public default boolean isPaste() {
+    return this.input() == 86
+        && this.hasControlDownWithQuirk()
+        && !this.hasShiftDown()
+        && !this.hasAltDown();
+  }
 
-    default public int getDigit() {
-        int value = this.input() - 48;
-        if (value >= 0 && value <= 9) {
-            return value;
-        }
-        return -1;
-    }
+  public default boolean isCut() {
+    return this.input() == 88
+        && this.hasControlDownWithQuirk()
+        && !this.hasShiftDown()
+        && !this.hasAltDown();
+  }
 
-    default public boolean hasAltDown() {
-        return (this.modifiers() & 4) != 0;
-    }
-
-    default public boolean hasShiftDown() {
-        return (this.modifiers() & 1) != 0;
-    }
-
-    default public boolean hasControlDown() {
-        return (this.modifiers() & 2) != 0;
-    }
-
-    default public boolean hasControlDownWithQuirk() {
-        return (this.modifiers() & InputQuirks.EDIT_SHORTCUT_KEY_MODIFIER) != 0;
-    }
-
-    default public boolean isSelectAll() {
-        return this.input() == 65 && this.hasControlDownWithQuirk() && !this.hasShiftDown() && !this.hasAltDown();
-    }
-
-    default public boolean isCopy() {
-        return this.input() == 67 && this.hasControlDownWithQuirk() && !this.hasShiftDown() && !this.hasAltDown();
-    }
-
-    default public boolean isPaste() {
-        return this.input() == 86 && this.hasControlDownWithQuirk() && !this.hasShiftDown() && !this.hasAltDown();
-    }
-
-    default public boolean isCut() {
-        return this.input() == 88 && this.hasControlDownWithQuirk() && !this.hasShiftDown() && !this.hasAltDown();
-    }
-
-    @Retention(value=RetentionPolicy.CLASS)
-    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
-    public static @interface Modifiers {
-    }
+  @Retention(value = RetentionPolicy.CLASS)
+  @Target(
+      value = {
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.METHOD,
+        ElementType.TYPE_USE
+      })
+  public static @interface Modifiers {}
 }
-

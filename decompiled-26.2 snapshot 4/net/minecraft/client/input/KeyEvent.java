@@ -8,18 +8,23 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import net.minecraft.client.input.InputWithModifiers;
 
-public record KeyEvent(@InputConstants.Value int key, int scancode, @InputWithModifiers.Modifiers int modifiers) implements InputWithModifiers
-{
-    @Override
-    public int input() {
-        return this.key;
-    }
+public record KeyEvent(
+    @InputConstants.Value int key, int scancode, @InputWithModifiers.Modifiers int modifiers)
+    implements InputWithModifiers {
+  @Override
+  public int input() {
+    return this.key;
+  }
 
-    @Retention(value=RetentionPolicy.CLASS)
-    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
-    public static @interface Action {
-    }
+  @Retention(value = RetentionPolicy.CLASS)
+  @Target(
+      value = {
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.METHOD,
+        ElementType.TYPE_USE
+      })
+  public static @interface Action {}
 }
-

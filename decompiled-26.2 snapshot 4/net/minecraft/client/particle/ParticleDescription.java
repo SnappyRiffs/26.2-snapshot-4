@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Streams
@@ -18,23 +18,27 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 
 public class ParticleDescription {
-    private final List<Identifier> textures;
+  private final List<Identifier> textures;
 
-    private ParticleDescription(List<Identifier> textures) {
-        this.textures = textures;
-    }
+  private ParticleDescription(List<Identifier> textures) {
+    this.textures = textures;
+  }
 
-    public List<Identifier> getTextures() {
-        return this.textures;
-    }
+  public List<Identifier> getTextures() {
+    return this.textures;
+  }
 
-    public static ParticleDescription fromJson(JsonObject data) {
-        JsonArray texturesData = GsonHelper.getAsJsonArray(data, "textures", null);
-        if (texturesData == null) {
-            return new ParticleDescription(List.of());
-        }
-        List textures = (List)Streams.stream((Iterable)texturesData).map(element -> GsonHelper.convertToString(element, "texture")).map(Identifier::parse).collect(ImmutableList.toImmutableList());
-        return new ParticleDescription(textures);
+  public static ParticleDescription fromJson(JsonObject data) {
+    JsonArray texturesData = GsonHelper.getAsJsonArray(data, "textures", null);
+    if (texturesData == null) {
+      return new ParticleDescription(List.of());
     }
+    List textures =
+        (List)
+            Streams.stream((Iterable) texturesData)
+                .map(element -> GsonHelper.convertToString(element, "texture"))
+                .map(Identifier::parse)
+                .collect(ImmutableList.toImmutableList());
+    return new ParticleDescription(textures);
+  }
 }
-

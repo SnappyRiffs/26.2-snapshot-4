@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -29,31 +29,38 @@ import net.minecraft.util.Util;
 import org.slf4j.Logger;
 
 public record Weighted<T>(T value, int weight) {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public Weighted {
-        if (weight < 0) {
-            throw Util.pauseInIde(new IllegalArgumentException("Weight should be >= 0"));
-        }
-        if (weight == 0 && SharedConstants.IS_RUNNING_IN_IDE) {
-            LOGGER.warn("Found 0 weight, make sure this is intentional!");
-        }
+  public Weighted {
+    if (weight < 0) {
+      throw Util.pauseInIde(new IllegalArgumentException("Weight should be >= 0"));
     }
+    if (weight == 0 && SharedConstants.IS_RUNNING_IN_IDE) {
+      LOGGER.warn("Found 0 weight, make sure this is intentional!");
+    }
+  }
 
-    public static <E> Codec<Weighted<E>> codec(Codec<E> elementCodec) {
-        return Weighted.codec(elementCodec.fieldOf("data"));
-    }
+  public static <E> Codec<Weighted<E>> codec(Codec<E> elementCodec) {
+    return Weighted.codec(elementCodec.fieldOf("data"));
+  }
 
-    public static <E> Codec<Weighted<E>> codec(MapCodec<E> elementCodec) {
-        return RecordCodecBuilder.create(i -> i.group((App)elementCodec.forGetter(Weighted::value), (App)ExtraCodecs.NON_NEGATIVE_INT.fieldOf("weight").forGetter(Weighted::weight)).apply((Applicative)i, Weighted::new));
-    }
+  public static <E> Codec<Weighted<E>> codec(MapCodec<E> elementCodec) {
+    return RecordCodecBuilder.create(
+        i ->
+            i.group(
+                    (App) elementCodec.forGetter(Weighted::value),
+                    (App)
+                        ExtraCodecs.NON_NEGATIVE_INT.fieldOf("weight").forGetter(Weighted::weight))
+                .apply((Applicative) i, Weighted::new));
+  }
 
-    public static <B extends ByteBuf, T> StreamCodec<B, Weighted<T>> streamCodec(StreamCodec<B, T> valueCodec) {
-        return StreamCodec.composite(valueCodec, Weighted::value, ByteBufCodecs.VAR_INT, Weighted::weight, Weighted::new);
-    }
+  public static <B extends ByteBuf, T> StreamCodec<B, Weighted<T>> streamCodec(
+      StreamCodec<B, T> valueCodec) {
+    return StreamCodec.composite(
+        valueCodec, Weighted::value, ByteBufCodecs.VAR_INT, Weighted::weight, Weighted::new);
+  }
 
-    public <U> Weighted<U> map(Function<T, U> function) {
-        return new Weighted<U>(function.apply(this.value()), this.weight);
-    }
+  public <U> Weighted<U> map(Function<T, U> function) {
+    return new Weighted<U>(function.apply(this.value()), this.weight);
+  }
 }
-

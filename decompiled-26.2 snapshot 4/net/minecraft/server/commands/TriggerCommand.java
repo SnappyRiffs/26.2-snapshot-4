@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.mojang.brigadier.CommandDispatcher
@@ -45,59 +45,140 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 public class TriggerCommand {
-    private static final SimpleCommandExceptionType ERROR_NOT_PRIMED = new SimpleCommandExceptionType((Message)Component.translatable("commands.trigger.failed.unprimed"));
-    private static final SimpleCommandExceptionType ERROR_INVALID_OBJECTIVE = new SimpleCommandExceptionType((Message)Component.translatable("commands.trigger.failed.invalid"));
+  private static final SimpleCommandExceptionType ERROR_NOT_PRIMED =
+      new SimpleCommandExceptionType(
+          (Message) Component.translatable("commands.trigger.failed.unprimed"));
+  private static final SimpleCommandExceptionType ERROR_INVALID_OBJECTIVE =
+      new SimpleCommandExceptionType(
+          (Message) Component.translatable("commands.trigger.failed.invalid"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)Commands.literal("trigger").then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)Commands.argument("objective", ObjectiveArgument.objective()).suggests((c, p) -> TriggerCommand.suggestObjectives((CommandSourceStack)c.getSource(), p)).executes(c -> TriggerCommand.simpleTrigger((CommandSourceStack)c.getSource(), ((CommandSourceStack)c.getSource()).getPlayerOrException(), ObjectiveArgument.getObjective((CommandContext<CommandSourceStack>)c, "objective")))).then(Commands.literal("add").then(Commands.argument("value", IntegerArgumentType.integer()).executes(c -> TriggerCommand.addValue((CommandSourceStack)c.getSource(), ((CommandSourceStack)c.getSource()).getPlayerOrException(), ObjectiveArgument.getObjective((CommandContext<CommandSourceStack>)c, "objective"), IntegerArgumentType.getInteger((CommandContext)c, (String)"value")))))).then(Commands.literal("set").then(Commands.argument("value", IntegerArgumentType.integer()).executes(c -> TriggerCommand.setValue((CommandSourceStack)c.getSource(), ((CommandSourceStack)c.getSource()).getPlayerOrException(), ObjectiveArgument.getObjective((CommandContext<CommandSourceStack>)c, "objective"), IntegerArgumentType.getInteger((CommandContext)c, (String)"value")))))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            Commands.literal("trigger")
+                .then(
+                    ((RequiredArgumentBuilder)
+                            ((RequiredArgumentBuilder)
+                                    Commands.argument("objective", ObjectiveArgument.objective())
+                                        .suggests(
+                                            (c, p) ->
+                                                TriggerCommand.suggestObjectives(
+                                                    (CommandSourceStack) c.getSource(), p))
+                                        .executes(
+                                            c ->
+                                                TriggerCommand.simpleTrigger(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    ((CommandSourceStack) c.getSource())
+                                                        .getPlayerOrException(),
+                                                    ObjectiveArgument.getObjective(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "objective"))))
+                                .then(
+                                    Commands.literal("add")
+                                        .then(
+                                            Commands.argument(
+                                                    "value", IntegerArgumentType.integer())
+                                                .executes(
+                                                    c ->
+                                                        TriggerCommand.addValue(
+                                                            (CommandSourceStack) c.getSource(),
+                                                            ((CommandSourceStack) c.getSource())
+                                                                .getPlayerOrException(),
+                                                            ObjectiveArgument.getObjective(
+                                                                (CommandContext<CommandSourceStack>)
+                                                                    c,
+                                                                "objective"),
+                                                            IntegerArgumentType.getInteger(
+                                                                (CommandContext) c,
+                                                                (String) "value"))))))
+                        .then(
+                            Commands.literal("set")
+                                .then(
+                                    Commands.argument("value", IntegerArgumentType.integer())
+                                        .executes(
+                                            c ->
+                                                TriggerCommand.setValue(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    ((CommandSourceStack) c.getSource())
+                                                        .getPlayerOrException(),
+                                                    ObjectiveArgument.getObjective(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "objective"),
+                                                    IntegerArgumentType.getInteger(
+                                                        (CommandContext) c, (String) "value")))))));
+  }
 
-    public static CompletableFuture<Suggestions> suggestObjectives(CommandSourceStack source, SuggestionsBuilder builder) {
-        Entity entity = source.getEntity();
-        ArrayList result = Lists.newArrayList();
-        if (entity != null) {
-            ServerScoreboard scoreboard = source.getServer().getScoreboard();
-            for (Objective objective : scoreboard.getObjectives()) {
-                ReadOnlyScoreInfo scoreInfo;
-                if (objective.getCriteria() != ObjectiveCriteria.TRIGGER || (scoreInfo = scoreboard.getPlayerScoreInfo(entity, objective)) == null || scoreInfo.isLocked()) continue;
-                result.add(objective.getName());
-            }
-        }
-        return SharedSuggestionProvider.suggest(result, builder);
+  public static CompletableFuture<Suggestions> suggestObjectives(
+      CommandSourceStack source, SuggestionsBuilder builder) {
+    Entity entity = source.getEntity();
+    ArrayList result = Lists.newArrayList();
+    if (entity != null) {
+      ServerScoreboard scoreboard = source.getServer().getScoreboard();
+      for (Objective objective : scoreboard.getObjectives()) {
+        ReadOnlyScoreInfo scoreInfo;
+        if (objective.getCriteria() != ObjectiveCriteria.TRIGGER
+            || (scoreInfo = scoreboard.getPlayerScoreInfo(entity, objective)) == null
+            || scoreInfo.isLocked()) continue;
+        result.add(objective.getName());
+      }
     }
+    return SharedSuggestionProvider.suggest(result, builder);
+  }
 
-    private static int addValue(CommandSourceStack source, ServerPlayer player, Objective objective, int amount) throws CommandSyntaxException {
-        ScoreAccess score = TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
-        int newValue = score.add(amount);
-        source.sendSuccess(() -> Component.translatable("commands.trigger.add.success", objective.getFormattedDisplayName(), amount), true);
-        return newValue;
-    }
+  private static int addValue(
+      CommandSourceStack source, ServerPlayer player, Objective objective, int amount)
+      throws CommandSyntaxException {
+    ScoreAccess score =
+        TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
+    int newValue = score.add(amount);
+    source.sendSuccess(
+        () ->
+            Component.translatable(
+                "commands.trigger.add.success", objective.getFormattedDisplayName(), amount),
+        true);
+    return newValue;
+  }
 
-    private static int setValue(CommandSourceStack source, ServerPlayer player, Objective objective, int amount) throws CommandSyntaxException {
-        ScoreAccess score = TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
-        score.set(amount);
-        source.sendSuccess(() -> Component.translatable("commands.trigger.set.success", objective.getFormattedDisplayName(), amount), true);
-        return amount;
-    }
+  private static int setValue(
+      CommandSourceStack source, ServerPlayer player, Objective objective, int amount)
+      throws CommandSyntaxException {
+    ScoreAccess score =
+        TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
+    score.set(amount);
+    source.sendSuccess(
+        () ->
+            Component.translatable(
+                "commands.trigger.set.success", objective.getFormattedDisplayName(), amount),
+        true);
+    return amount;
+  }
 
-    private static int simpleTrigger(CommandSourceStack source, ServerPlayer player, Objective objective) throws CommandSyntaxException {
-        ScoreAccess score = TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
-        int newValue = score.add(1);
-        source.sendSuccess(() -> Component.translatable("commands.trigger.simple.success", objective.getFormattedDisplayName()), true);
-        return newValue;
-    }
+  private static int simpleTrigger(
+      CommandSourceStack source, ServerPlayer player, Objective objective)
+      throws CommandSyntaxException {
+    ScoreAccess score =
+        TriggerCommand.getScore(source.getServer().getScoreboard(), player, objective);
+    int newValue = score.add(1);
+    source.sendSuccess(
+        () ->
+            Component.translatable(
+                "commands.trigger.simple.success", objective.getFormattedDisplayName()),
+        true);
+    return newValue;
+  }
 
-    private static ScoreAccess getScore(Scoreboard scoreboard, ScoreHolder scoreHolder, Objective objective) throws CommandSyntaxException {
-        if (objective.getCriteria() != ObjectiveCriteria.TRIGGER) {
-            throw ERROR_INVALID_OBJECTIVE.create();
-        }
-        ReadOnlyScoreInfo scoreInfo = scoreboard.getPlayerScoreInfo(scoreHolder, objective);
-        if (scoreInfo == null || scoreInfo.isLocked()) {
-            throw ERROR_NOT_PRIMED.create();
-        }
-        ScoreAccess score = scoreboard.getOrCreatePlayerScore(scoreHolder, objective);
-        score.lock();
-        return score;
+  private static ScoreAccess getScore(
+      Scoreboard scoreboard, ScoreHolder scoreHolder, Objective objective)
+      throws CommandSyntaxException {
+    if (objective.getCriteria() != ObjectiveCriteria.TRIGGER) {
+      throw ERROR_INVALID_OBJECTIVE.create();
     }
+    ReadOnlyScoreInfo scoreInfo = scoreboard.getPlayerScoreInfo(scoreHolder, objective);
+    if (scoreInfo == null || scoreInfo.isLocked()) {
+      throw ERROR_NOT_PRIMED.create();
+    }
+    ScoreAccess score = scoreboard.getOrCreatePlayerScore(scoreHolder, objective);
+    score.lock();
+    return score;
+  }
 }
-

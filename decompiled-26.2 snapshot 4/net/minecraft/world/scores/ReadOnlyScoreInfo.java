@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -12,18 +12,18 @@ import net.minecraft.network.chat.numbers.NumberFormat;
 import org.jspecify.annotations.Nullable;
 
 public interface ReadOnlyScoreInfo {
-    public int value();
+  public int value();
 
-    public boolean isLocked();
+  public boolean isLocked();
 
-    public @Nullable NumberFormat numberFormat();
+  public @Nullable NumberFormat numberFormat();
 
-    default public MutableComponent formatValue(NumberFormat defaultFormat) {
-        return Objects.requireNonNullElse(this.numberFormat(), defaultFormat).format(this.value());
-    }
+  public default MutableComponent formatValue(NumberFormat defaultFormat) {
+    return Objects.requireNonNullElse(this.numberFormat(), defaultFormat).format(this.value());
+  }
 
-    public static MutableComponent safeFormatValue(@Nullable ReadOnlyScoreInfo scoreInfo, NumberFormat defaultFormat) {
-        return scoreInfo != null ? scoreInfo.formatValue(defaultFormat) : defaultFormat.format(0);
-    }
+  public static MutableComponent safeFormatValue(
+      @Nullable ReadOnlyScoreInfo scoreInfo, NumberFormat defaultFormat) {
+    return scoreInfo != null ? scoreInfo.formatValue(defaultFormat) : defaultFormat.format(0);
+  }
 }
-

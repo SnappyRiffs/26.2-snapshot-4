@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.authlib.GameProfileRepository
  *  com.mojang.authlib.minecraft.MinecraftSessionService
@@ -23,23 +23,35 @@ import net.minecraft.server.players.UserNameToIdResolver;
 import net.minecraft.util.SignatureValidator;
 import org.jspecify.annotations.Nullable;
 
-public record Services(MinecraftSessionService sessionService, ServicesKeySet servicesKeySet, GameProfileRepository profileRepository, UserNameToIdResolver nameToIdCache, ProfileResolver profileResolver) {
-    private static final String USERID_CACHE_FILE = "usercache.json";
+public record Services(
+    MinecraftSessionService sessionService,
+    ServicesKeySet servicesKeySet,
+    GameProfileRepository profileRepository,
+    UserNameToIdResolver nameToIdCache,
+    ProfileResolver profileResolver) {
+  private static final String USERID_CACHE_FILE = "usercache.json";
 
-    public static Services create(YggdrasilAuthenticationService serviceAccess, File nameCacheDir) {
-        MinecraftSessionService sessionService = serviceAccess.createMinecraftSessionService();
-        GameProfileRepository profileRepository = serviceAccess.createProfileRepository();
-        CachedUserNameToIdResolver profileCache = new CachedUserNameToIdResolver(profileRepository, new File(nameCacheDir, USERID_CACHE_FILE));
-        ProfileResolver.Cached profileResolver = new ProfileResolver.Cached(sessionService, profileCache);
-        return new Services(sessionService, serviceAccess.getServicesKeySet(), profileRepository, profileCache, profileResolver);
-    }
+  public static Services create(YggdrasilAuthenticationService serviceAccess, File nameCacheDir) {
+    MinecraftSessionService sessionService = serviceAccess.createMinecraftSessionService();
+    GameProfileRepository profileRepository = serviceAccess.createProfileRepository();
+    CachedUserNameToIdResolver profileCache =
+        new CachedUserNameToIdResolver(
+            profileRepository, new File(nameCacheDir, USERID_CACHE_FILE));
+    ProfileResolver.Cached profileResolver =
+        new ProfileResolver.Cached(sessionService, profileCache);
+    return new Services(
+        sessionService,
+        serviceAccess.getServicesKeySet(),
+        profileRepository,
+        profileCache,
+        profileResolver);
+  }
 
-    public @Nullable SignatureValidator profileKeySignatureValidator() {
-        return SignatureValidator.from(this.servicesKeySet, ServicesKeyType.PROFILE_KEY);
-    }
+  public @Nullable SignatureValidator profileKeySignatureValidator() {
+    return SignatureValidator.from(this.servicesKeySet, ServicesKeyType.PROFILE_KEY);
+  }
 
-    public boolean canValidateProfileKeys() {
-        return !this.servicesKeySet.keys(ServicesKeyType.PROFILE_KEY).isEmpty();
-    }
+  public boolean canValidateProfileKeys() {
+    return !this.servicesKeySet.keys(ServicesKeyType.PROFILE_KEY).isEmpty();
+  }
 }
-

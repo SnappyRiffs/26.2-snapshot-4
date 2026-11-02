@@ -3,10 +3,6 @@
  */
 package net.minecraft.world.inventory.tooltip;
 
-import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.component.BundleContents;
 
-public record BundleTooltip(BundleContents contents) implements TooltipComponent
-{
-}
-
+public record BundleTooltip(BundleContents contents) implements TooltipComponent {}

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.util.concurrent.ThreadFactoryBuilder
  *  io.netty.channel.Channel
@@ -50,94 +50,104 @@ import java.util.concurrent.ThreadFactory;
 import org.jspecify.annotations.Nullable;
 
 public abstract class EventLoopGroupHolder {
-    private static final EventLoopGroupHolder NIO = new EventLoopGroupHolder("NIO", NioSocketChannel.class, NioServerSocketChannel.class){
+  private static final EventLoopGroupHolder NIO =
+      new EventLoopGroupHolder("NIO", NioSocketChannel.class, NioServerSocketChannel.class) {
 
         @Override
         protected IoHandlerFactory ioHandlerFactory() {
-            return NioIoHandler.newFactory();
+          return NioIoHandler.newFactory();
         }
-    };
-    private static final EventLoopGroupHolder EPOLL = new EventLoopGroupHolder("Epoll", EpollSocketChannel.class, EpollServerSocketChannel.class){
+      };
+  private static final EventLoopGroupHolder EPOLL =
+      new EventLoopGroupHolder("Epoll", EpollSocketChannel.class, EpollServerSocketChannel.class) {
 
         @Override
         protected IoHandlerFactory ioHandlerFactory() {
-            return EpollIoHandler.newFactory();
+          return EpollIoHandler.newFactory();
         }
-    };
-    private static final EventLoopGroupHolder KQUEUE = new EventLoopGroupHolder("Kqueue", KQueueSocketChannel.class, KQueueServerSocketChannel.class){
+      };
+  private static final EventLoopGroupHolder KQUEUE =
+      new EventLoopGroupHolder(
+          "Kqueue", KQueueSocketChannel.class, KQueueServerSocketChannel.class) {
 
         @Override
         protected IoHandlerFactory ioHandlerFactory() {
-            return KQueueIoHandler.newFactory();
+          return KQueueIoHandler.newFactory();
         }
-    };
-    private static final EventLoopGroupHolder LOCAL = new EventLoopGroupHolder("Local", LocalChannel.class, LocalServerChannel.class){
+      };
+  private static final EventLoopGroupHolder LOCAL =
+      new EventLoopGroupHolder("Local", LocalChannel.class, LocalServerChannel.class) {
 
         @Override
         protected IoHandlerFactory ioHandlerFactory() {
-            return LocalIoHandler.newFactory();
+          return LocalIoHandler.newFactory();
         }
-    };
-    private final String type;
-    private final Class<? extends Channel> channelCls;
-    private final Class<? extends ServerChannel> serverChannelCls;
-    private volatile @Nullable EventLoopGroup group;
+      };
+  private final String type;
+  private final Class<? extends Channel> channelCls;
+  private final Class<? extends ServerChannel> serverChannelCls;
+  private volatile @Nullable EventLoopGroup group;
 
-    public static EventLoopGroupHolder remote(boolean allowNativeTransport) {
-        if (allowNativeTransport) {
-            if (KQueue.isAvailable()) {
-                return KQUEUE;
-            }
-            if (Epoll.isAvailable()) {
-                return EPOLL;
-            }
-        }
-        return NIO;
+  public static EventLoopGroupHolder remote(boolean allowNativeTransport) {
+    if (allowNativeTransport) {
+      if (KQueue.isAvailable()) {
+        return KQUEUE;
+      }
+      if (Epoll.isAvailable()) {
+        return EPOLL;
+      }
     }
+    return NIO;
+  }
 
-    public static EventLoopGroupHolder local() {
-        return LOCAL;
-    }
+  public static EventLoopGroupHolder local() {
+    return LOCAL;
+  }
 
-    private EventLoopGroupHolder(String type, Class<? extends Channel> channelCls, Class<? extends ServerChannel> serverChannelCls) {
-        this.type = type;
-        this.channelCls = channelCls;
-        this.serverChannelCls = serverChannelCls;
-    }
+  private EventLoopGroupHolder(
+      String type,
+      Class<? extends Channel> channelCls,
+      Class<? extends ServerChannel> serverChannelCls) {
+    this.type = type;
+    this.channelCls = channelCls;
+    this.serverChannelCls = serverChannelCls;
+  }
 
-    private ThreadFactory createThreadFactory() {
-        return new ThreadFactoryBuilder().setNameFormat("Netty " + this.type + " IO #%d").setDaemon(true).build();
-    }
+  private ThreadFactory createThreadFactory() {
+    return new ThreadFactoryBuilder()
+        .setNameFormat("Netty " + this.type + " IO #%d")
+        .setDaemon(true)
+        .build();
+  }
 
-    protected abstract IoHandlerFactory ioHandlerFactory();
+  protected abstract IoHandlerFactory ioHandlerFactory();
 
-    private EventLoopGroup createEventLoopGroup() {
-        return new MultiThreadIoEventLoopGroup(this.createThreadFactory(), this.ioHandlerFactory());
-    }
+  private EventLoopGroup createEventLoopGroup() {
+    return new MultiThreadIoEventLoopGroup(this.createThreadFactory(), this.ioHandlerFactory());
+  }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public EventLoopGroup eventLoopGroup() {
-        EventLoopGroup result = this.group;
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public EventLoopGroup eventLoopGroup() {
+    EventLoopGroup result = this.group;
+    if (result == null) {
+      EventLoopGroupHolder eventLoopGroupHolder = this;
+      synchronized (eventLoopGroupHolder) {
+        result = this.group;
         if (result == null) {
-            EventLoopGroupHolder eventLoopGroupHolder = this;
-            synchronized (eventLoopGroupHolder) {
-                result = this.group;
-                if (result == null) {
-                    this.group = result = this.createEventLoopGroup();
-                }
-            }
+          this.group = result = this.createEventLoopGroup();
         }
-        return result;
+      }
     }
+    return result;
+  }
 
-    public Class<? extends Channel> channelCls() {
-        return this.channelCls;
-    }
+  public Class<? extends Channel> channelCls() {
+    return this.channelCls;
+  }
 
-    public Class<? extends ServerChannel> serverChannelCls() {
-        return this.serverChannelCls;
-    }
+  public Class<? extends ServerChannel> serverChannelCls() {
+    return this.serverChannelCls;
+  }
 }
-

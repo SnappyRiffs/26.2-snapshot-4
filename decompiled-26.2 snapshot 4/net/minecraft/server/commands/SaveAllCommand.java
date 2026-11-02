@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.Message
@@ -21,21 +21,34 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 
 public class SaveAllCommand {
-    private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType((Message)Component.translatable("commands.save.failed"));
+  private static final SimpleCommandExceptionType ERROR_FAILED =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.save.failed"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("save-all").requires(Commands.hasPermission(Commands.LEVEL_OWNERS))).executes(c -> SaveAllCommand.saveAll((CommandSourceStack)c.getSource(), false))).then(Commands.literal("flush").executes(c -> SaveAllCommand.saveAll((CommandSourceStack)c.getSource(), true))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    ((LiteralArgumentBuilder)
+                            Commands.literal("save-all")
+                                .requires(Commands.hasPermission(Commands.LEVEL_OWNERS)))
+                        .executes(
+                            c -> SaveAllCommand.saveAll((CommandSourceStack) c.getSource(), false)))
+                .then(
+                    Commands.literal("flush")
+                        .executes(
+                            c ->
+                                SaveAllCommand.saveAll((CommandSourceStack) c.getSource(), true))));
+  }
 
-    private static int saveAll(CommandSourceStack source, boolean flush) throws CommandSyntaxException {
-        source.sendSuccess(() -> Component.translatable("commands.save.saving"), false);
-        MinecraftServer server = source.getServer();
-        boolean success = server.saveEverything(true, flush, true);
-        if (!success) {
-            throw ERROR_FAILED.create();
-        }
-        source.sendSuccess(() -> Component.translatable("commands.save.success"), true);
-        return 1;
+  private static int saveAll(CommandSourceStack source, boolean flush)
+      throws CommandSyntaxException {
+    source.sendSuccess(() -> Component.translatable("commands.save.saving"), false);
+    MinecraftServer server = source.getServer();
+    boolean success = server.saveEverything(true, flush, true);
+    if (!success) {
+      throw ERROR_FAILED.create();
     }
+    source.sendSuccess(() -> Component.translatable("commands.save.success"), true);
+    return 1;
+  }
 }
-

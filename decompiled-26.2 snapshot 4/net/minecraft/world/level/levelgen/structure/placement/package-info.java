@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.NullMarked
  */
@@ -8,5 +8,3 @@
 package net.minecraft.world.level.levelgen.structure.placement;
 
 import org.jspecify.annotations.NullMarked;
-
-

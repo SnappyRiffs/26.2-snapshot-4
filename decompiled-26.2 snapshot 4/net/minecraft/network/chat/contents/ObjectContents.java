@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.exceptions.CommandSyntaxException
  *  com.mojang.datafixers.kinds.App
@@ -27,36 +27,46 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.objects.ObjectInfo;
 import net.minecraft.network.chat.contents.objects.ObjectInfos;
 
-public record ObjectContents(ObjectInfo contents, Optional<Component> fallback) implements ComponentContents
-{
-    private static final String PLACEHOLDER = Character.toString('\ufffc');
-    public static final MapCodec<ObjectContents> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)ObjectInfos.CODEC.forGetter(ObjectContents::contents), (App)ComponentSerialization.CODEC.optionalFieldOf("fallback").forGetter(ObjectContents::fallback)).apply((Applicative)i, ObjectContents::new));
+public record ObjectContents(ObjectInfo contents, Optional<Component> fallback)
+    implements ComponentContents {
+  private static final String PLACEHOLDER = Character.toString('\ufffc');
+  public static final MapCodec<ObjectContents> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App) ObjectInfos.CODEC.forGetter(ObjectContents::contents),
+                      (App)
+                          ComponentSerialization.CODEC
+                              .optionalFieldOf("fallback")
+                              .forGetter(ObjectContents::fallback))
+                  .apply((Applicative) i, ObjectContents::new));
 
-    public MapCodec<ObjectContents> codec() {
-        return MAP_CODEC;
-    }
+  public MapCodec<ObjectContents> codec() {
+    return MAP_CODEC;
+  }
 
-    @Override
-    public MutableComponent resolve(ResolutionContext context, int recursionDepth) throws CommandSyntaxException {
-        Optional<MutableComponent> fallback = ComponentUtils.resolve(context, this.fallback, recursionDepth);
-        ObjectInfo validatedContents = context.validate(this.contents);
-        if (validatedContents == null) {
-            return fallback.orElseGet(() -> Component.literal(this.contents.defaultFallback()));
-        }
-        return MutableComponent.create(new ObjectContents(validatedContents, fallback.map(o -> o)));
+  @Override
+  public MutableComponent resolve(ResolutionContext context, int recursionDepth)
+      throws CommandSyntaxException {
+    Optional<MutableComponent> fallback =
+        ComponentUtils.resolve(context, this.fallback, recursionDepth);
+    ObjectInfo validatedContents = context.validate(this.contents);
+    if (validatedContents == null) {
+      return fallback.orElseGet(() -> Component.literal(this.contents.defaultFallback()));
     }
+    return MutableComponent.create(new ObjectContents(validatedContents, fallback.map(o -> o)));
+  }
 
-    @Override
-    public <T> Optional<T> visit(FormattedText.ContentConsumer<T> output) {
-        if (this.fallback.isPresent()) {
-            return this.fallback.get().visit(output);
-        }
-        return output.accept(this.contents.defaultFallback());
+  @Override
+  public <T> Optional<T> visit(FormattedText.ContentConsumer<T> output) {
+    if (this.fallback.isPresent()) {
+      return this.fallback.get().visit(output);
     }
+    return output.accept(this.contents.defaultFallback());
+  }
 
-    @Override
-    public <T> Optional<T> visit(FormattedText.StyledContentConsumer<T> output, Style currentStyle) {
-        return output.accept(currentStyle.withFont(this.contents.fontDescription()), PLACEHOLDER);
-    }
+  @Override
+  public <T> Optional<T> visit(FormattedText.StyledContentConsumer<T> output, Style currentStyle) {
+    return output.accept(currentStyle.withFont(this.contents.fontDescription()), PLACEHOLDER);
+  }
 }
-

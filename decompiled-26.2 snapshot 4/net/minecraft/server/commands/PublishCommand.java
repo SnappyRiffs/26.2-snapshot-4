@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.Message
@@ -37,27 +37,84 @@ import net.minecraft.world.level.GameType;
 import org.jspecify.annotations.Nullable;
 
 public class PublishCommand {
-    private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType((Message)Component.translatable("commands.publish.failed"));
-    private static final DynamicCommandExceptionType ERROR_ALREADY_PUBLISHED = new DynamicCommandExceptionType(port -> Component.translatableEscape("commands.publish.alreadyPublished", port));
+  private static final SimpleCommandExceptionType ERROR_FAILED =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.publish.failed"));
+  private static final DynamicCommandExceptionType ERROR_ALREADY_PUBLISHED =
+      new DynamicCommandExceptionType(
+          port -> Component.translatableEscape("commands.publish.alreadyPublished", port));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("publish").requires(Commands.hasPermission(Commands.LEVEL_OWNERS))).executes(c -> PublishCommand.publish((CommandSourceStack)c.getSource(), HttpUtil.getAvailablePort(), false, null))).then(((RequiredArgumentBuilder)Commands.argument("allowCommands", BoolArgumentType.bool()).executes(c -> PublishCommand.publish((CommandSourceStack)c.getSource(), HttpUtil.getAvailablePort(), BoolArgumentType.getBool((CommandContext)c, (String)"allowCommands"), null))).then(((RequiredArgumentBuilder)Commands.argument("gamemode", GameModeArgument.gameMode()).executes(c -> PublishCommand.publish((CommandSourceStack)c.getSource(), HttpUtil.getAvailablePort(), BoolArgumentType.getBool((CommandContext)c, (String)"allowCommands"), GameModeArgument.getGameMode((CommandContext<CommandSourceStack>)c, "gamemode")))).then(Commands.argument("port", IntegerArgumentType.integer((int)0, (int)65535)).executes(c -> PublishCommand.publish((CommandSourceStack)c.getSource(), IntegerArgumentType.getInteger((CommandContext)c, (String)"port"), BoolArgumentType.getBool((CommandContext)c, (String)"allowCommands"), GameModeArgument.getGameMode((CommandContext<CommandSourceStack>)c, "gamemode")))))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    ((LiteralArgumentBuilder)
+                            Commands.literal("publish")
+                                .requires(Commands.hasPermission(Commands.LEVEL_OWNERS)))
+                        .executes(
+                            c ->
+                                PublishCommand.publish(
+                                    (CommandSourceStack) c.getSource(),
+                                    HttpUtil.getAvailablePort(),
+                                    false,
+                                    null)))
+                .then(
+                    ((RequiredArgumentBuilder)
+                            Commands.argument("allowCommands", BoolArgumentType.bool())
+                                .executes(
+                                    c ->
+                                        PublishCommand.publish(
+                                            (CommandSourceStack) c.getSource(),
+                                            HttpUtil.getAvailablePort(),
+                                            BoolArgumentType.getBool(
+                                                (CommandContext) c, (String) "allowCommands"),
+                                            null)))
+                        .then(
+                            ((RequiredArgumentBuilder)
+                                    Commands.argument("gamemode", GameModeArgument.gameMode())
+                                        .executes(
+                                            c ->
+                                                PublishCommand.publish(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    HttpUtil.getAvailablePort(),
+                                                    BoolArgumentType.getBool(
+                                                        (CommandContext) c,
+                                                        (String) "allowCommands"),
+                                                    GameModeArgument.getGameMode(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "gamemode"))))
+                                .then(
+                                    Commands.argument(
+                                            "port",
+                                            IntegerArgumentType.integer((int) 0, (int) 65535))
+                                        .executes(
+                                            c ->
+                                                PublishCommand.publish(
+                                                    (CommandSourceStack) c.getSource(),
+                                                    IntegerArgumentType.getInteger(
+                                                        (CommandContext) c, (String) "port"),
+                                                    BoolArgumentType.getBool(
+                                                        (CommandContext) c,
+                                                        (String) "allowCommands"),
+                                                    GameModeArgument.getGameMode(
+                                                        (CommandContext<CommandSourceStack>) c,
+                                                        "gamemode")))))));
+  }
 
-    private static int publish(CommandSourceStack source, int port, boolean allowCommands, @Nullable GameType type) throws CommandSyntaxException {
-        if (source.getServer().isPublished()) {
-            throw ERROR_ALREADY_PUBLISHED.create((Object)source.getServer().getPort());
-        }
-        if (!source.getServer().publishServer(type, allowCommands, port)) {
-            throw ERROR_FAILED.create();
-        }
-        source.sendSuccess(() -> PublishCommand.getSuccessMessage(port), true);
-        return port;
+  private static int publish(
+      CommandSourceStack source, int port, boolean allowCommands, @Nullable GameType type)
+      throws CommandSyntaxException {
+    if (source.getServer().isPublished()) {
+      throw ERROR_ALREADY_PUBLISHED.create((Object) source.getServer().getPort());
     }
+    if (!source.getServer().publishServer(type, allowCommands, port)) {
+      throw ERROR_FAILED.create();
+    }
+    source.sendSuccess(() -> PublishCommand.getSuccessMessage(port), true);
+    return port;
+  }
 
-    public static MutableComponent getSuccessMessage(int port) {
-        MutableComponent portText = ComponentUtils.copyOnClickText(String.valueOf(port));
-        return Component.translatable("commands.publish.started", portText);
-    }
+  public static MutableComponent getSuccessMessage(int port) {
+    MutableComponent portText = ComponentUtils.copyOnClickText(String.valueOf(port));
+    return Component.translatable("commands.publish.started", portText);
+  }
 }
-

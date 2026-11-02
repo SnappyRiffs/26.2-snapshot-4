@@ -8,6 +8,5 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.HumanoidArm;
 
 public interface ArmedModel<T extends EntityRenderState> {
-    public void translateToHand(T var1, HumanoidArm var2, PoseStack var3);
+  public void translateToHand(T var1, HumanoidArm var2, PoseStack var3);
 }
-

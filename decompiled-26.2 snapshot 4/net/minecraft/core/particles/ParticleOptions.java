@@ -3,9 +3,6 @@
  */
 package net.minecraft.core.particles;
 
-import net.minecraft.core.particles.ParticleType;
-
 public interface ParticleOptions {
-    public ParticleType<?> getType();
+  public ParticleType<?> getType();
 }
-

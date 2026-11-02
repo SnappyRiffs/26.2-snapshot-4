@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -26,20 +26,40 @@ import net.minecraft.world.entity.variant.SpawnCondition;
 import net.minecraft.world.entity.variant.SpawnContext;
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 
-public record FrogVariant(ClientAsset.ResourceTexture assetInfo, SpawnPrioritySelectors spawnConditions) implements PriorityProvider<SpawnContext, SpawnCondition>
-{
-    public static final Codec<FrogVariant> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group((App)ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(FrogVariant::assetInfo), (App)SpawnPrioritySelectors.CODEC.fieldOf("spawn_conditions").forGetter(FrogVariant::spawnConditions)).apply((Applicative)i, FrogVariant::new));
-    public static final Codec<FrogVariant> NETWORK_CODEC = RecordCodecBuilder.create(i -> i.group((App)ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(FrogVariant::assetInfo)).apply((Applicative)i, FrogVariant::new));
-    public static final Codec<Holder<FrogVariant>> CODEC = RegistryFixedCodec.create(Registries.FROG_VARIANT);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<FrogVariant>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.FROG_VARIANT);
+public record FrogVariant(
+    ClientAsset.ResourceTexture assetInfo, SpawnPrioritySelectors spawnConditions)
+    implements PriorityProvider<SpawnContext, SpawnCondition> {
+  public static final Codec<FrogVariant> DIRECT_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(
+                              FrogVariant::assetInfo),
+                      (App)
+                          SpawnPrioritySelectors.CODEC
+                              .fieldOf("spawn_conditions")
+                              .forGetter(FrogVariant::spawnConditions))
+                  .apply((Applicative) i, FrogVariant::new));
+  public static final Codec<FrogVariant> NETWORK_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(
+                              FrogVariant::assetInfo))
+                  .apply((Applicative) i, FrogVariant::new));
+  public static final Codec<Holder<FrogVariant>> CODEC =
+      RegistryFixedCodec.create(Registries.FROG_VARIANT);
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<FrogVariant>> STREAM_CODEC =
+      ByteBufCodecs.holderRegistry(Registries.FROG_VARIANT);
 
-    private FrogVariant(ClientAsset.ResourceTexture assetInfo) {
-        this(assetInfo, SpawnPrioritySelectors.EMPTY);
-    }
+  private FrogVariant(ClientAsset.ResourceTexture assetInfo) {
+    this(assetInfo, SpawnPrioritySelectors.EMPTY);
+  }
 
-    @Override
-    public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
-        return this.spawnConditions.selectors();
-    }
+  @Override
+  public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
+    return this.spawnConditions.selectors();
+  }
 }
-

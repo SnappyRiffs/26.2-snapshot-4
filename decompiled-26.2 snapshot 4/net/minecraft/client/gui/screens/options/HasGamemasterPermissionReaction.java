@@ -4,6 +4,5 @@
 package net.minecraft.client.gui.screens.options;
 
 public interface HasGamemasterPermissionReaction {
-    public void onGamemasterPermissionChanged(boolean var1);
+  public void onGamemasterPermissionChanged(boolean var1);
 }
-

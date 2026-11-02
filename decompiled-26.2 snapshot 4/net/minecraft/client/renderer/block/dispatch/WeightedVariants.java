@@ -4,8 +4,6 @@
 package net.minecraft.client.renderer.block.dispatch;
 
 import java.util.List;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
@@ -14,56 +12,55 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.util.random.WeightedList;
 
-public class WeightedVariants
-implements BlockStateModel {
-    private final WeightedList<BlockStateModel> list;
-    private final Material.Baked particleMaterial;
-    @BakedQuad.MaterialFlags
-    private final int materialFlags;
+public class WeightedVariants implements BlockStateModel {
+  private final WeightedList<BlockStateModel> list;
+  private final Material.Baked particleMaterial;
+  @BakedQuad.MaterialFlags private final int materialFlags;
 
-    public WeightedVariants(WeightedList<BlockStateModel> list) {
-        this.list = list;
-        BlockStateModel firstModel = list.unwrap().getFirst().value();
-        this.particleMaterial = firstModel.particleMaterial();
-        this.materialFlags = WeightedVariants.computeMaterialFlags(list);
+  public WeightedVariants(WeightedList<BlockStateModel> list) {
+    this.list = list;
+    BlockStateModel firstModel = list.unwrap().getFirst().value();
+    this.particleMaterial = firstModel.particleMaterial();
+    this.materialFlags = WeightedVariants.computeMaterialFlags(list);
+  }
+
+  @BakedQuad.MaterialFlags
+  private static int computeMaterialFlags(WeightedList<BlockStateModel> list) {
+    int flags = 0;
+    for (Weighted<BlockStateModel> entry : list.unwrap()) {
+      flags |= entry.value().materialFlags();
     }
+    return flags;
+  }
 
-    @BakedQuad.MaterialFlags
-    private static int computeMaterialFlags(WeightedList<BlockStateModel> list) {
-        int flags = 0;
-        for (Weighted<BlockStateModel> entry : list.unwrap()) {
-            flags |= entry.value().materialFlags();
-        }
-        return flags;
+  @Override
+  public Material.Baked particleMaterial() {
+    return this.particleMaterial;
+  }
+
+  @Override
+  @BakedQuad.MaterialFlags
+  public int materialFlags() {
+    return this.materialFlags;
+  }
+
+  @Override
+  public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
+    this.list.getRandomOrThrow(random).collectParts(random, output);
+  }
+
+  public record Unbaked(WeightedList<BlockStateModel.Unbaked> entries)
+      implements BlockStateModel.Unbaked {
+    @Override
+    public BlockStateModel bake(ModelBaker modelBakery) {
+      return new WeightedVariants(this.entries.map(m -> m.bake(modelBakery)));
     }
 
     @Override
-    public Material.Baked particleMaterial() {
-        return this.particleMaterial;
+    public void resolveDependencies(ResolvableModel.Resolver resolver) {
+      this.entries
+          .unwrap()
+          .forEach(v -> ((BlockStateModel.Unbaked) v.value()).resolveDependencies(resolver));
     }
-
-    @Override
-    @BakedQuad.MaterialFlags
-    public int materialFlags() {
-        return this.materialFlags;
-    }
-
-    @Override
-    public void collectParts(RandomSource random, List<BlockStateModelPart> output) {
-        this.list.getRandomOrThrow(random).collectParts(random, output);
-    }
-
-    public record Unbaked(WeightedList<BlockStateModel.Unbaked> entries) implements BlockStateModel.Unbaked
-    {
-        @Override
-        public BlockStateModel bake(ModelBaker modelBakery) {
-            return new WeightedVariants(this.entries.map(m -> m.bake(modelBakery)));
-        }
-
-        @Override
-        public void resolveDependencies(ResolvableModel.Resolver resolver) {
-            this.entries.unwrap().forEach(v -> ((BlockStateModel.Unbaked)v.value()).resolveDependencies(resolver));
-        }
-    }
+  }
 }
-

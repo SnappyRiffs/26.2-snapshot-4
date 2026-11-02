@@ -131,4 +131,3 @@ extends Entity {
 
     protected abstract Item getDropItem();
 }
-

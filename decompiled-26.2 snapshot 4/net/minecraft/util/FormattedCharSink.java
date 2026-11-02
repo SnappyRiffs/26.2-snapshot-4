@@ -7,6 +7,5 @@ import net.minecraft.network.chat.Style;
 
 @FunctionalInterface
 public interface FormattedCharSink {
-    public boolean accept(int var1, Style var2, int var3);
+  public boolean accept(int var1, Style var2, int var3);
 }
-

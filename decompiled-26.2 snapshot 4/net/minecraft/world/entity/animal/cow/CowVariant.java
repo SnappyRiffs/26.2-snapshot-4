@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -28,43 +28,73 @@ import net.minecraft.world.entity.variant.SpawnCondition;
 import net.minecraft.world.entity.variant.SpawnContext;
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 
-public record CowVariant(ModelAndTexture<ModelType> modelAndTexture, ClientAsset.ResourceTexture babyTexture, SpawnPrioritySelectors spawnConditions) implements PriorityProvider<SpawnContext, SpawnCondition>
-{
-    public static final Codec<CowVariant> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group((App)ModelAndTexture.codec(ModelType.CODEC, ModelType.NORMAL).forGetter(CowVariant::modelAndTexture), (App)ClientAsset.ResourceTexture.CODEC.fieldOf("baby_asset_id").forGetter(CowVariant::babyTexture), (App)SpawnPrioritySelectors.CODEC.fieldOf("spawn_conditions").forGetter(CowVariant::spawnConditions)).apply((Applicative)i, CowVariant::new));
-    public static final Codec<CowVariant> NETWORK_CODEC = RecordCodecBuilder.create(i -> i.group((App)ModelAndTexture.codec(ModelType.CODEC, ModelType.NORMAL).forGetter(CowVariant::modelAndTexture), (App)ClientAsset.ResourceTexture.CODEC.fieldOf("baby_asset_id").forGetter(CowVariant::babyTexture)).apply((Applicative)i, CowVariant::new));
-    public static final Codec<Holder<CowVariant>> CODEC = RegistryFixedCodec.create(Registries.COW_VARIANT);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<CowVariant>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.COW_VARIANT);
+public record CowVariant(
+    ModelAndTexture<ModelType> modelAndTexture,
+    ClientAsset.ResourceTexture babyTexture,
+    SpawnPrioritySelectors spawnConditions)
+    implements PriorityProvider<SpawnContext, SpawnCondition> {
+  public static final Codec<CowVariant> DIRECT_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ModelAndTexture.codec(ModelType.CODEC, ModelType.NORMAL)
+                              .forGetter(CowVariant::modelAndTexture),
+                      (App)
+                          ClientAsset.ResourceTexture.CODEC
+                              .fieldOf("baby_asset_id")
+                              .forGetter(CowVariant::babyTexture),
+                      (App)
+                          SpawnPrioritySelectors.CODEC
+                              .fieldOf("spawn_conditions")
+                              .forGetter(CowVariant::spawnConditions))
+                  .apply((Applicative) i, CowVariant::new));
+  public static final Codec<CowVariant> NETWORK_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ModelAndTexture.codec(ModelType.CODEC, ModelType.NORMAL)
+                              .forGetter(CowVariant::modelAndTexture),
+                      (App)
+                          ClientAsset.ResourceTexture.CODEC
+                              .fieldOf("baby_asset_id")
+                              .forGetter(CowVariant::babyTexture))
+                  .apply((Applicative) i, CowVariant::new));
+  public static final Codec<Holder<CowVariant>> CODEC =
+      RegistryFixedCodec.create(Registries.COW_VARIANT);
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<CowVariant>> STREAM_CODEC =
+      ByteBufCodecs.holderRegistry(Registries.COW_VARIANT);
 
-    private CowVariant(ModelAndTexture<ModelType> assetInfo, ClientAsset.ResourceTexture babyTexture) {
-        this(assetInfo, babyTexture, SpawnPrioritySelectors.EMPTY);
+  private CowVariant(
+      ModelAndTexture<ModelType> assetInfo, ClientAsset.ResourceTexture babyTexture) {
+    this(assetInfo, babyTexture, SpawnPrioritySelectors.EMPTY);
+  }
+
+  @Override
+  public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
+    return this.spawnConditions.selectors();
+  }
+
+  public static enum ModelType implements StringRepresentable {
+    NORMAL("normal"),
+    COLD("cold"),
+    WARM("warm");
+
+    public static final Codec<ModelType> CODEC;
+    private final String name;
+
+    private ModelType(String name) {
+      this.name = name;
     }
 
     @Override
-    public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
-        return this.spawnConditions.selectors();
+    public String getSerializedName() {
+      return this.name;
     }
 
-    public static enum ModelType implements StringRepresentable
-    {
-        NORMAL("normal"),
-        COLD("cold"),
-        WARM("warm");
-
-        public static final Codec<ModelType> CODEC;
-        private final String name;
-
-        private ModelType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getSerializedName() {
-            return this.name;
-        }
-
-        static {
-            CODEC = StringRepresentable.fromEnum(ModelType::values);
-        }
+    static {
+      CODEC = StringRepresentable.fromEnum(ModelType::values);
     }
+  }
 }
-

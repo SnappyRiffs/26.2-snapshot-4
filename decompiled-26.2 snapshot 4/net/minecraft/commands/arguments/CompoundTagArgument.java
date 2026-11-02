@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.arguments.ArgumentType
@@ -18,27 +18,24 @@ import java.util.Collection;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 
-public class CompoundTagArgument
-implements ArgumentType<CompoundTag> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("{}", "{foo=bar}");
+public class CompoundTagArgument implements ArgumentType<CompoundTag> {
+  private static final Collection<String> EXAMPLES = Arrays.asList("{}", "{foo=bar}");
 
-    private CompoundTagArgument() {
-    }
+  private CompoundTagArgument() {}
 
-    public static CompoundTagArgument compoundTag() {
-        return new CompoundTagArgument();
-    }
+  public static CompoundTagArgument compoundTag() {
+    return new CompoundTagArgument();
+  }
 
-    public static <S> CompoundTag getCompoundTag(CommandContext<S> context, String name) {
-        return (CompoundTag)context.getArgument(name, CompoundTag.class);
-    }
+  public static <S> CompoundTag getCompoundTag(CommandContext<S> context, String name) {
+    return (CompoundTag) context.getArgument(name, CompoundTag.class);
+  }
 
-    public CompoundTag parse(StringReader reader) throws CommandSyntaxException {
-        return TagParser.parseCompoundAsArgument(reader);
-    }
+  public CompoundTag parse(StringReader reader) throws CommandSyntaxException {
+    return TagParser.parseCompoundAsArgument(reader);
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

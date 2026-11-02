@@ -7,29 +7,30 @@ import java.util.Arrays;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 
-public class SoundOptionsScreen
-extends OptionsSubScreen {
-    private static final Component TITLE = Component.translatable("options.sounds.title");
+public class SoundOptionsScreen extends OptionsSubScreen {
+  private static final Component TITLE = Component.translatable("options.sounds.title");
 
-    public SoundOptionsScreen(Screen lastScreen, Options options) {
-        super(lastScreen, options, TITLE);
-    }
+  public SoundOptionsScreen(Screen lastScreen, Options options) {
+    super(lastScreen, options, TITLE);
+  }
 
-    @Override
-    protected void addOptions() {
-        this.list.addBig(this.options.getSoundSourceOptionInstance(SoundSource.MASTER));
-        this.list.addSmall(this.getAllSoundOptionsExceptMaster());
-        this.list.addBig(this.options.soundDevice());
-        this.list.addSmall(this.options.showSubtitles(), this.options.directionalAudio());
-        this.list.addSmall(this.options.musicFrequency(), this.options.musicToast());
-    }
+  @Override
+  protected void addOptions() {
+    this.list.addBig(this.options.getSoundSourceOptionInstance(SoundSource.MASTER));
+    this.list.addSmall(this.getAllSoundOptionsExceptMaster());
+    this.list.addBig(this.options.soundDevice());
+    this.list.addSmall(this.options.showSubtitles(), this.options.directionalAudio());
+    this.list.addSmall(this.options.musicFrequency(), this.options.musicToast());
+  }
 
-    private OptionInstance<?>[] getAllSoundOptionsExceptMaster() {
-        return (OptionInstance[])Arrays.stream(SoundSource.values()).filter(s -> s != SoundSource.MASTER).map(this.options::getSoundSourceOptionInstance).toArray(OptionInstance[]::new);
-    }
+  private OptionInstance<?>[] getAllSoundOptionsExceptMaster() {
+    return (OptionInstance[])
+        Arrays.stream(SoundSource.values())
+            .filter(s -> s != SoundSource.MASTER)
+            .map(this.options::getSoundSourceOptionInstance)
+            .toArray(OptionInstance[]::new);
+  }
 }
-

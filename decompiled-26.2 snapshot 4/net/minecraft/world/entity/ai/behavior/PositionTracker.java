@@ -8,10 +8,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public interface PositionTracker {
-    public Vec3 currentPosition();
+  public Vec3 currentPosition();
 
-    public BlockPos currentBlockPosition();
+  public BlockPos currentBlockPosition();
 
-    public boolean isVisibleBy(LivingEntity var1);
+  public boolean isVisibleBy(LivingEntity var1);
 }
-

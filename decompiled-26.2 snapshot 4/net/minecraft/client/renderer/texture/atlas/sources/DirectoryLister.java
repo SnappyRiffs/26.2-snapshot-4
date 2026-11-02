@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -21,21 +21,29 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
-public record DirectoryLister(String sourcePath, String idPrefix) implements SpriteSource
-{
-    public static final MapCodec<DirectoryLister> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Codec.STRING.fieldOf("source").forGetter(DirectoryLister::sourcePath), (App)Codec.STRING.fieldOf("prefix").forGetter(DirectoryLister::idPrefix)).apply((Applicative)i, DirectoryLister::new));
+public record DirectoryLister(String sourcePath, String idPrefix) implements SpriteSource {
+  public static final MapCodec<DirectoryLister> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App) Codec.STRING.fieldOf("source").forGetter(DirectoryLister::sourcePath),
+                      (App) Codec.STRING.fieldOf("prefix").forGetter(DirectoryLister::idPrefix))
+                  .apply((Applicative) i, DirectoryLister::new));
 
-    @Override
-    public void run(ResourceManager resourceManager, SpriteSource.Output output) {
-        FileToIdConverter converter = new FileToIdConverter("textures/" + this.sourcePath, ".png");
-        converter.listMatchingResources(resourceManager).forEach((identifier, resource) -> {
-            Identifier spriteLocation = converter.fileToId((Identifier)identifier).withPrefix(this.idPrefix);
-            output.add(spriteLocation, (Resource)resource);
-        });
-    }
+  @Override
+  public void run(ResourceManager resourceManager, SpriteSource.Output output) {
+    FileToIdConverter converter = new FileToIdConverter("textures/" + this.sourcePath, ".png");
+    converter
+        .listMatchingResources(resourceManager)
+        .forEach(
+            (identifier, resource) -> {
+              Identifier spriteLocation =
+                  converter.fileToId((Identifier) identifier).withPrefix(this.idPrefix);
+              output.add(spriteLocation, (Resource) resource);
+            });
+  }
 
-    public MapCodec<DirectoryLister> codec() {
-        return MAP_CODEC;
-    }
+  public MapCodec<DirectoryLister> codec() {
+    return MAP_CODEC;
+  }
 }
-

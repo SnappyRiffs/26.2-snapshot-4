@@ -6,23 +6,21 @@ package com.mojang.realmsclient.client.worldupload;
 import com.mojang.realmsclient.client.UploadStatus;
 
 public interface RealmsWorldUploadStatusTracker {
-    public UploadStatus getUploadStatus();
+  public UploadStatus getUploadStatus();
 
-    public void setUploading();
+  public void setUploading();
 
-    public static RealmsWorldUploadStatusTracker noOp() {
-        return new RealmsWorldUploadStatusTracker(){
-            private final UploadStatus uploadStatus = new UploadStatus();
+  public static RealmsWorldUploadStatusTracker noOp() {
+    return new RealmsWorldUploadStatusTracker() {
+      private final UploadStatus uploadStatus = new UploadStatus();
 
-            @Override
-            public UploadStatus getUploadStatus() {
-                return this.uploadStatus;
-            }
+      @Override
+      public UploadStatus getUploadStatus() {
+        return this.uploadStatus;
+      }
 
-            @Override
-            public void setUploading() {
-            }
-        };
-    }
+      @Override
+      public void setUploading() {}
+    };
+  }
 }
-

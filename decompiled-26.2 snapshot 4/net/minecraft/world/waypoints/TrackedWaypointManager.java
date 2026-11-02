@@ -3,10 +3,4 @@
  */
 package net.minecraft.world.waypoints;
 
-import net.minecraft.world.waypoints.TrackedWaypoint;
-import net.minecraft.world.waypoints.WaypointManager;
-
-public interface TrackedWaypointManager
-extends WaypointManager<TrackedWaypoint> {
-}
-
+public interface TrackedWaypointManager extends WaypointManager<TrackedWaypoint> {}

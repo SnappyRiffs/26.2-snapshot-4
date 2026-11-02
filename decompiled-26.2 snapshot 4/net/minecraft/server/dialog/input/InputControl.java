@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  */
@@ -10,8 +10,10 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public interface InputControl {
-    public static final MapCodec<InputControl> MAP_CODEC = BuiltInRegistries.INPUT_CONTROL_TYPE.byNameCodec().dispatchMap(InputControl::mapCodec, c -> c);
+  public static final MapCodec<InputControl> MAP_CODEC =
+      BuiltInRegistries.INPUT_CONTROL_TYPE
+          .byNameCodec()
+          .dispatchMap(InputControl::mapCodec, c -> c);
 
-    public MapCodec<? extends InputControl> mapCodec();
+  public MapCodec<? extends InputControl> mapCodec();
 }
-

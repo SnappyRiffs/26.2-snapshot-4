@@ -13,41 +13,39 @@ import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.network.protocol.status.ServerStatusPacketListener;
 import net.minecraft.network.protocol.status.ServerboundStatusRequestPacket;
 
-public class ServerStatusPacketListenerImpl
-implements ServerStatusPacketListener {
-    private static final Component DISCONNECT_REASON = Component.translatable("multiplayer.status.request_handled");
-    private final ServerStatus status;
-    private final Connection connection;
-    private boolean hasRequestedStatus;
+public class ServerStatusPacketListenerImpl implements ServerStatusPacketListener {
+  private static final Component DISCONNECT_REASON =
+      Component.translatable("multiplayer.status.request_handled");
+  private final ServerStatus status;
+  private final Connection connection;
+  private boolean hasRequestedStatus;
 
-    public ServerStatusPacketListenerImpl(ServerStatus status, Connection connection) {
-        this.status = status;
-        this.connection = connection;
-    }
+  public ServerStatusPacketListenerImpl(ServerStatus status, Connection connection) {
+    this.status = status;
+    this.connection = connection;
+  }
 
-    @Override
-    public void onDisconnect(DisconnectionDetails details) {
-    }
+  @Override
+  public void onDisconnect(DisconnectionDetails details) {}
 
-    @Override
-    public boolean isAcceptingMessages() {
-        return this.connection.isConnected();
-    }
+  @Override
+  public boolean isAcceptingMessages() {
+    return this.connection.isConnected();
+  }
 
-    @Override
-    public void handleStatusRequest(ServerboundStatusRequestPacket packet) {
-        if (this.hasRequestedStatus) {
-            this.connection.disconnect(DISCONNECT_REASON);
-            return;
-        }
-        this.hasRequestedStatus = true;
-        this.connection.send(new ClientboundStatusResponsePacket(this.status));
+  @Override
+  public void handleStatusRequest(ServerboundStatusRequestPacket packet) {
+    if (this.hasRequestedStatus) {
+      this.connection.disconnect(DISCONNECT_REASON);
+      return;
     }
+    this.hasRequestedStatus = true;
+    this.connection.send(new ClientboundStatusResponsePacket(this.status));
+  }
 
-    @Override
-    public void handlePingRequest(ServerboundPingRequestPacket packet) {
-        this.connection.send(new ClientboundPongResponsePacket(packet.getTime()));
-        this.connection.disconnect(DISCONNECT_REASON);
-    }
+  @Override
+  public void handlePingRequest(ServerboundPingRequestPacket packet) {
+    this.connection.send(new ClientboundPongResponsePacket(packet.getTime()));
+    this.connection.disconnect(DISCONNECT_REASON);
+  }
 }
-

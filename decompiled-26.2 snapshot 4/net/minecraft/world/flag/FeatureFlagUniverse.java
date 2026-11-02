@@ -4,14 +4,13 @@
 package net.minecraft.world.flag;
 
 public class FeatureFlagUniverse {
-    private final String id;
+  private final String id;
 
-    public FeatureFlagUniverse(String id) {
-        this.id = id;
-    }
+  public FeatureFlagUniverse(String id) {
+    this.id = id;
+  }
 
-    public String toString() {
-        return this.id;
-    }
+  public String toString() {
+    return this.id;
+  }
 }
-

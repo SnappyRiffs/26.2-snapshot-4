@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.jtracy.TracyClient
  *  com.mojang.logging.LogListeners
@@ -13,27 +13,29 @@ import com.mojang.logging.LogListeners;
 import org.slf4j.event.Level;
 
 public class TracyBootstrap {
-    private static boolean setup;
+  private static boolean setup;
 
-    public static void setup() {
-        if (setup) {
-            return;
-        }
-        TracyClient.load();
-        if (!TracyClient.isAvailable()) {
-            return;
-        }
-        LogListeners.addListener((String)"Tracy", (message, level) -> TracyClient.message((String)message, (int)TracyBootstrap.messageColor(level)));
-        setup = true;
+  public static void setup() {
+    if (setup) {
+      return;
     }
+    TracyClient.load();
+    if (!TracyClient.isAvailable()) {
+      return;
+    }
+    LogListeners.addListener(
+        (String) "Tracy",
+        (message, level) ->
+            TracyClient.message((String) message, (int) TracyBootstrap.messageColor(level)));
+    setup = true;
+  }
 
-    private static int messageColor(Level level) {
-        return switch (level) {
-            default -> 0xFFFFFF;
-            case Level.DEBUG -> 0xAAAAAA;
-            case Level.WARN -> 0xFFFFAA;
-            case Level.ERROR -> 0xFFAAAA;
-        };
-    }
+  private static int messageColor(Level level) {
+    return switch (level) {
+      default -> 0xFFFFFF;
+      case Level.DEBUG -> 0xAAAAAA;
+      case Level.WARN -> 0xFFFFAA;
+      case Level.ERROR -> 0xFFAAAA;
+    };
+  }
 }
-

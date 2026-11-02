@@ -10,47 +10,48 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.slot.SlotCollection;
 
 public interface ContainerComponentManipulator<T> {
-    public DataComponentType<T> type();
+  public DataComponentType<T> type();
 
-    public T empty();
+  public T empty();
 
-    public T setContents(T var1, Stream<ItemStack> var2);
+  public T setContents(T var1, Stream<ItemStack> var2);
 
-    public Stream<ItemStack> getContents(T var1);
+  public Stream<ItemStack> getContents(T var1);
 
-    default public void setContents(ItemStack itemStack, T defaultValue, Stream<ItemStack> newContents) {
-        T currentValue = itemStack.getOrDefault(this.type(), defaultValue);
-        T newValue = this.setContents(currentValue, newContents);
-        itemStack.set(this.type(), newValue);
-    }
+  public default void setContents(
+      ItemStack itemStack, T defaultValue, Stream<ItemStack> newContents) {
+    T currentValue = itemStack.getOrDefault(this.type(), defaultValue);
+    T newValue = this.setContents(currentValue, newContents);
+    itemStack.set(this.type(), newValue);
+  }
 
-    default public void setContents(ItemStack itemStack, Stream<ItemStack> newContents) {
-        this.setContents(itemStack, this.empty(), newContents);
-    }
+  public default void setContents(ItemStack itemStack, Stream<ItemStack> newContents) {
+    this.setContents(itemStack, this.empty(), newContents);
+  }
 
-    default public void modifyItems(ItemStack itemStack, UnaryOperator<ItemStack> modifier) {
-        T contents = itemStack.get(this.type());
-        if (contents != null) {
-            UnaryOperator nonEmptyModifier = currentItemStack -> {
-                if (currentItemStack.isEmpty()) {
-                    return currentItemStack;
-                }
-                ItemStack newItemStack = (ItemStack)modifier.apply((ItemStack)currentItemStack);
-                newItemStack.limitSize(newItemStack.getMaxStackSize());
-                return newItemStack;
-            };
-            this.setContents(itemStack, this.getContents(contents).map(nonEmptyModifier));
-        }
-    }
-
-    default public SlotCollection getSlots(ItemStack itemStack) {
-        return () -> {
-            T contents = itemStack.get(this.type());
-            if (contents != null) {
-                return this.getContents(contents).filter(stack -> !stack.isEmpty());
+  public default void modifyItems(ItemStack itemStack, UnaryOperator<ItemStack> modifier) {
+    T contents = itemStack.get(this.type());
+    if (contents != null) {
+      UnaryOperator nonEmptyModifier =
+          currentItemStack -> {
+            if (currentItemStack.isEmpty()) {
+              return currentItemStack;
             }
-            return Stream.empty();
-        };
+            ItemStack newItemStack = (ItemStack) modifier.apply((ItemStack) currentItemStack);
+            newItemStack.limitSize(newItemStack.getMaxStackSize());
+            return newItemStack;
+          };
+      this.setContents(itemStack, this.getContents(contents).map(nonEmptyModifier));
     }
-}
+  }
 
+  public default SlotCollection getSlots(ItemStack itemStack) {
+    return () -> {
+      T contents = itemStack.get(this.type());
+      if (contents != null) {
+        return this.getContents(contents).filter(stack -> !stack.isEmpty());
+      }
+      return Stream.empty();
+    };
+  }
+}

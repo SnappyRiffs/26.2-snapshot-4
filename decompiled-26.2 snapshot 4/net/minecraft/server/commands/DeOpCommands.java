@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.Message
@@ -27,26 +27,51 @@ import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 
 public class DeOpCommands {
-    private static final SimpleCommandExceptionType ERROR_NOT_OP = new SimpleCommandExceptionType((Message)Component.translatable("commands.deop.failed"));
+  private static final SimpleCommandExceptionType ERROR_NOT_OP =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.deop.failed"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("deop").requires(Commands.hasPermission(Commands.LEVEL_ADMINS))).then(Commands.argument("targets", GameProfileArgument.gameProfile()).suggests((c, p) -> SharedSuggestionProvider.suggest(((CommandSourceStack)c.getSource()).getServer().getPlayerList().getOpNames(), p)).executes(c -> DeOpCommands.deopPlayers((CommandSourceStack)c.getSource(), GameProfileArgument.getGameProfiles((CommandContext<CommandSourceStack>)c, "targets")))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("deop")
+                        .requires(Commands.hasPermission(Commands.LEVEL_ADMINS)))
+                .then(
+                    Commands.argument("targets", GameProfileArgument.gameProfile())
+                        .suggests(
+                            (c, p) ->
+                                SharedSuggestionProvider.suggest(
+                                    ((CommandSourceStack) c.getSource())
+                                        .getServer()
+                                        .getPlayerList()
+                                        .getOpNames(),
+                                    p))
+                        .executes(
+                            c ->
+                                DeOpCommands.deopPlayers(
+                                    (CommandSourceStack) c.getSource(),
+                                    GameProfileArgument.getGameProfiles(
+                                        (CommandContext<CommandSourceStack>) c, "targets")))));
+  }
 
-    private static int deopPlayers(CommandSourceStack source, Collection<NameAndId> players) throws CommandSyntaxException {
-        PlayerList list = source.getServer().getPlayerList();
-        int count = 0;
-        for (NameAndId player : players) {
-            if (!list.isOp(player)) continue;
-            list.deop(player);
-            ++count;
-            source.sendSuccess(() -> Component.translatable("commands.deop.success", ((NameAndId)players.iterator().next()).name()), true);
-        }
-        if (count == 0) {
-            throw ERROR_NOT_OP.create();
-        }
-        source.getServer().kickUnlistedPlayers();
-        return count;
+  private static int deopPlayers(CommandSourceStack source, Collection<NameAndId> players)
+      throws CommandSyntaxException {
+    PlayerList list = source.getServer().getPlayerList();
+    int count = 0;
+    for (NameAndId player : players) {
+      if (!list.isOp(player)) continue;
+      list.deop(player);
+      ++count;
+      source.sendSuccess(
+          () ->
+              Component.translatable(
+                  "commands.deop.success", ((NameAndId) players.iterator().next()).name()),
+          true);
     }
+    if (count == 0) {
+      throw ERROR_NOT_OP.create();
+    }
+    source.getServer().kickUnlistedPlayers();
+    return count;
+  }
 }
-

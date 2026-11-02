@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -15,18 +15,16 @@ import net.minecraft.core.Direction;
 import org.jspecify.annotations.Nullable;
 
 public interface BlockStateModelPart {
-    public List<BakedQuad> getQuads(@Nullable Direction var1);
+  public List<BakedQuad> getQuads(@Nullable Direction var1);
 
-    public boolean useAmbientOcclusion();
+  public boolean useAmbientOcclusion();
 
-    public Material.Baked particleMaterial();
+  public Material.Baked particleMaterial();
 
-    @BakedQuad.MaterialFlags
-    public int materialFlags();
+  @BakedQuad.MaterialFlags
+  public int materialFlags();
 
-    public static interface Unbaked
-    extends ResolvableModel {
-        public BlockStateModelPart bake(ModelBaker var1);
-    }
+  public static interface Unbaked extends ResolvableModel {
+    public BlockStateModelPart bake(ModelBaker var1);
+  }
 }
-

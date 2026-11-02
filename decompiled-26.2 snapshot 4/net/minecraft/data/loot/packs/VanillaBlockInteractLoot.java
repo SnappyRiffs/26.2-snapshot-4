@@ -21,14 +21,70 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePrope
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
-public record VanillaBlockInteractLoot(HolderLookup.Provider registries) implements LootTableSubProvider
-{
-    @Override
-    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
-        output.accept(BuiltInLootTables.HARVEST_BEEHIVE, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).add((LootPoolEntryContainer.Builder<?>)((Object)LootItem.lootTableItem(Items.HONEYCOMB).apply(SetItemCountFunction.setCount(ConstantValue.exactly(3.0f)))))));
-        output.accept(BuiltInLootTables.HARVEST_CAVE_VINE, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).add(LootItem.lootTableItem(Items.GLOW_BERRIES))));
-        output.accept(BuiltInLootTables.HARVEST_SWEET_BERRY_BUSH, LootTable.lootTable().withPool(LootPool.lootPool().add((LootPoolEntryContainer.Builder<?>)((LootPoolEntryContainer.Builder)((Object)LootItem.lootTableItem(Items.SWEET_BERRIES).apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f))))).when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(Blocks.SWEET_BERRY_BUSH).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(SweetBerryBushBlock.AGE, 3))))).withPool(LootPool.lootPool().add((LootPoolEntryContainer.Builder<?>)((Object)LootItem.lootTableItem(Items.SWEET_BERRIES).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0f, 2.0f)))))));
-        output.accept(BuiltInLootTables.CARVE_PUMPKIN, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).add((LootPoolEntryContainer.Builder<?>)((Object)LootItem.lootTableItem(Items.PUMPKIN_SEEDS).apply(SetItemCountFunction.setCount(ConstantValue.exactly(4.0f)))))));
-    }
+public record VanillaBlockInteractLoot(HolderLookup.Provider registries)
+    implements LootTableSubProvider {
+  @Override
+  public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
+    output.accept(
+        BuiltInLootTables.HARVEST_BEEHIVE,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1.0f))
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((Object)
+                                LootItem.lootTableItem(Items.HONEYCOMB)
+                                    .apply(
+                                        SetItemCountFunction.setCount(
+                                            ConstantValue.exactly(3.0f)))))));
+    output.accept(
+        BuiltInLootTables.HARVEST_CAVE_VINE,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.GLOW_BERRIES))));
+    output.accept(
+        BuiltInLootTables.HARVEST_SWEET_BERRY_BUSH,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((LootPoolEntryContainer.Builder)
+                                    ((Object)
+                                        LootItem.lootTableItem(Items.SWEET_BERRIES)
+                                            .apply(
+                                                SetItemCountFunction.setCount(
+                                                    ConstantValue.exactly(1.0f)))))
+                                .when(
+                                    LootItemBlockStatePropertyCondition.hasBlockStateProperties(
+                                            Blocks.SWEET_BERRY_BUSH)
+                                        .setProperties(
+                                            StatePropertiesPredicate.Builder.properties()
+                                                .hasProperty(SweetBerryBushBlock.AGE, 3)))))
+            .withPool(
+                LootPool.lootPool()
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((Object)
+                                LootItem.lootTableItem(Items.SWEET_BERRIES)
+                                    .apply(
+                                        SetItemCountFunction.setCount(
+                                            UniformGenerator.between(1.0f, 2.0f)))))));
+    output.accept(
+        BuiltInLootTables.CARVE_PUMPKIN,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1.0f))
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((Object)
+                                LootItem.lootTableItem(Items.PUMPKIN_SEEDS)
+                                    .apply(
+                                        SetItemCountFunction.setCount(
+                                            ConstantValue.exactly(4.0f)))))));
+  }
 }
-

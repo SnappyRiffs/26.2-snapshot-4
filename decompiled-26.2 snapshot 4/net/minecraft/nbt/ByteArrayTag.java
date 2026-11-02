@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.apache.commons.lang3.ArrayUtils
  */
@@ -173,4 +173,3 @@ implements CollectionTag {
         return visitor.visit(this.data);
     }
 }
-

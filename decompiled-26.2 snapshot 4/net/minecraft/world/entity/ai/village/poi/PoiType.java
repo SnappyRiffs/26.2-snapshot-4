@@ -9,14 +9,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.state.BlockState;
 
 public record PoiType(Set<BlockState> matchingStates, int maxTickets, int validRange) {
-    public static final Predicate<Holder<PoiType>> NONE = poiType -> false;
+  public static final Predicate<Holder<PoiType>> NONE = poiType -> false;
 
-    public PoiType {
-        matchingStates = Set.copyOf(matchingStates);
-    }
+  public PoiType {
+    matchingStates = Set.copyOf(matchingStates);
+  }
 
-    public boolean is(BlockState state) {
-        return this.matchingStates.contains(state);
-    }
+  public boolean is(BlockState state) {
+    return this.matchingStates.contains(state);
+  }
 }
-

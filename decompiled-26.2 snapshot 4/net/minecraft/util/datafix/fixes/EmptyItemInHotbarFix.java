@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
@@ -26,27 +26,39 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.datafixers.util.Unit;
 import com.mojang.serialization.Dynamic;
 import java.util.Optional;
-import net.minecraft.util.datafix.fixes.References;
 
-public class EmptyItemInHotbarFix
-extends DataFix {
-    public EmptyItemInHotbarFix(Schema outputSchema) {
-        super(outputSchema, false);
-    }
+public class EmptyItemInHotbarFix extends DataFix {
+  public EmptyItemInHotbarFix(Schema outputSchema) {
+    super(outputSchema, false);
+  }
 
-    public TypeRewriteRule makeRule() {
-        OpticFinder itemStackF = DSL.typeFinder((Type)this.getInputSchema().getType(References.ITEM_STACK));
-        return this.fixTypeEverywhereTyped("EmptyItemInHotbarFix", this.getInputSchema().getType(References.HOTBAR), input -> input.update(itemStackF, namedStack -> namedStack.mapSecond(itemStack -> {
-            boolean isEmpty;
-            Optional<String> id = ((Either)itemStack.getFirst()).left().map(Pair::getSecond);
-            Dynamic remainder = (Dynamic)((Pair)itemStack.getSecond()).getSecond();
-            boolean isAir = id.isEmpty() || id.get().equals("minecraft:air");
-            boolean bl = isEmpty = remainder.get("Count").asInt(0) <= 0;
-            if (isAir || isEmpty) {
-                return Pair.of((Object)Either.right((Object)Unit.INSTANCE), (Object)Pair.of((Object)Either.right((Object)Unit.INSTANCE), (Object)remainder.emptyMap()));
-            }
-            return itemStack;
-        })));
-    }
+  public TypeRewriteRule makeRule() {
+    OpticFinder itemStackF =
+        DSL.typeFinder((Type) this.getInputSchema().getType(References.ITEM_STACK));
+    return this.fixTypeEverywhereTyped(
+        "EmptyItemInHotbarFix",
+        this.getInputSchema().getType(References.HOTBAR),
+        input ->
+            input.update(
+                itemStackF,
+                namedStack ->
+                    namedStack.mapSecond(
+                        itemStack -> {
+                          boolean isEmpty;
+                          Optional<String> id =
+                              ((Either) itemStack.getFirst()).left().map(Pair::getSecond);
+                          Dynamic remainder = (Dynamic) ((Pair) itemStack.getSecond()).getSecond();
+                          boolean isAir = id.isEmpty() || id.get().equals("minecraft:air");
+                          boolean bl = isEmpty = remainder.get("Count").asInt(0) <= 0;
+                          if (isAir || isEmpty) {
+                            return Pair.of(
+                                (Object) Either.right((Object) Unit.INSTANCE),
+                                (Object)
+                                    Pair.of(
+                                        (Object) Either.right((Object) Unit.INSTANCE),
+                                        (Object) remainder.emptyMap()));
+                          }
+                          return itemStack;
+                        })));
+  }
 }
-

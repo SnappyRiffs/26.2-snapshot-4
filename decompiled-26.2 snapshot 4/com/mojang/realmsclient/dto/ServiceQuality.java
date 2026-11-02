@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.TypeAdapter
  *  com.google.gson.stream.JsonReader
@@ -21,53 +21,51 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public enum ServiceQuality {
-    GREAT(1, "icon/ping_5"),
-    GOOD(2, "icon/ping_4"),
-    OKAY(3, "icon/ping_3"),
-    POOR(4, "icon/ping_2"),
-    UNKNOWN(5, "icon/ping_unknown");
+  GREAT(1, "icon/ping_5"),
+  GOOD(2, "icon/ping_4"),
+  OKAY(3, "icon/ping_3"),
+  POOR(4, "icon/ping_2"),
+  UNKNOWN(5, "icon/ping_unknown");
 
-    private final int value;
-    private final Identifier icon;
+  private final int value;
+  private final Identifier icon;
 
-    private ServiceQuality(int value, String iconPath) {
-        this.value = value;
-        this.icon = Identifier.withDefaultNamespace(iconPath);
+  private ServiceQuality(int value, String iconPath) {
+    this.value = value;
+    this.icon = Identifier.withDefaultNamespace(iconPath);
+  }
+
+  public static @Nullable ServiceQuality byValue(int value) {
+    for (ServiceQuality quality : ServiceQuality.values()) {
+      if (quality.getValue() != value) continue;
+      return quality;
+    }
+    return null;
+  }
+
+  public int getValue() {
+    return this.value;
+  }
+
+  public Identifier getIcon() {
+    return this.icon;
+  }
+
+  public static class RealmsServiceQualityJsonAdapter extends TypeAdapter<ServiceQuality> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    public void write(JsonWriter jsonWriter, ServiceQuality quality) throws IOException {
+      jsonWriter.value((long) quality.value);
     }
 
-    public static @Nullable ServiceQuality byValue(int value) {
-        for (ServiceQuality quality : ServiceQuality.values()) {
-            if (quality.getValue() != value) continue;
-            return quality;
-        }
-        return null;
+    public ServiceQuality read(JsonReader jsonReader) throws IOException {
+      int value = jsonReader.nextInt();
+      ServiceQuality quality = ServiceQuality.byValue(value);
+      if (quality == null) {
+        LOGGER.warn("Unsupported ServiceQuality {}", (Object) value);
+        return UNKNOWN;
+      }
+      return quality;
     }
-
-    public int getValue() {
-        return this.value;
-    }
-
-    public Identifier getIcon() {
-        return this.icon;
-    }
-
-    public static class RealmsServiceQualityJsonAdapter
-    extends TypeAdapter<ServiceQuality> {
-        private static final Logger LOGGER = LogUtils.getLogger();
-
-        public void write(JsonWriter jsonWriter, ServiceQuality quality) throws IOException {
-            jsonWriter.value((long)quality.value);
-        }
-
-        public ServiceQuality read(JsonReader jsonReader) throws IOException {
-            int value = jsonReader.nextInt();
-            ServiceQuality quality = ServiceQuality.byValue(value);
-            if (quality == null) {
-                LOGGER.warn("Unsupported ServiceQuality {}", (Object)value);
-                return UNKNOWN;
-            }
-            return quality;
-        }
-    }
+  }
 }
-

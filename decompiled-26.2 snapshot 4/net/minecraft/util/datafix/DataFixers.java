@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.util.concurrent.ThreadFactoryBuilder
@@ -1290,4 +1290,3 @@ public class DataFixers {
         FILE_FIXER = fileFixerUpper.build(DATA_FIXER);
     }
 }
-

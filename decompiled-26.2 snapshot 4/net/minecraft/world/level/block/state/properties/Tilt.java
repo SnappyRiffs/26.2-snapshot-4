@@ -5,28 +5,26 @@ package net.minecraft.world.level.block.state.properties;
 
 import net.minecraft.util.StringRepresentable;
 
-public enum Tilt implements StringRepresentable
-{
-    NONE("none", true),
-    UNSTABLE("unstable", false),
-    PARTIAL("partial", true),
-    FULL("full", true);
+public enum Tilt implements StringRepresentable {
+  NONE("none", true),
+  UNSTABLE("unstable", false),
+  PARTIAL("partial", true),
+  FULL("full", true);
 
-    private final String name;
-    private final boolean causesVibration;
+  private final String name;
+  private final boolean causesVibration;
 
-    private Tilt(String name, boolean causesVibration) {
-        this.name = name;
-        this.causesVibration = causesVibration;
-    }
+  private Tilt(String name, boolean causesVibration) {
+    this.name = name;
+    this.causesVibration = causesVibration;
+  }
 
-    @Override
-    public String getSerializedName() {
-        return this.name;
-    }
+  @Override
+  public String getSerializedName() {
+    return this.name;
+  }
 
-    public boolean causesVibration() {
-        return this.causesVibration;
-    }
+  public boolean causesVibration() {
+    return this.causesVibration;
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.mojang.brigadier.ImmutableStringReader
@@ -35,51 +35,56 @@ import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
-public class ObjectiveCriteriaArgument
-implements ArgumentType<ObjectiveCriteria> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("foo", "foo.bar.baz", "minecraft:foo");
-    public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(value -> Component.translatableEscape("argument.criteria.invalid", value));
+public class ObjectiveCriteriaArgument implements ArgumentType<ObjectiveCriteria> {
+  private static final Collection<String> EXAMPLES =
+      Arrays.asList("foo", "foo.bar.baz", "minecraft:foo");
+  public static final DynamicCommandExceptionType ERROR_INVALID_VALUE =
+      new DynamicCommandExceptionType(
+          value -> Component.translatableEscape("argument.criteria.invalid", value));
 
-    private ObjectiveCriteriaArgument() {
-    }
+  private ObjectiveCriteriaArgument() {}
 
-    public static ObjectiveCriteriaArgument criteria() {
-        return new ObjectiveCriteriaArgument();
-    }
+  public static ObjectiveCriteriaArgument criteria() {
+    return new ObjectiveCriteriaArgument();
+  }
 
-    public static ObjectiveCriteria getCriteria(CommandContext<CommandSourceStack> context, String name) {
-        return (ObjectiveCriteria)context.getArgument(name, ObjectiveCriteria.class);
-    }
+  public static ObjectiveCriteria getCriteria(
+      CommandContext<CommandSourceStack> context, String name) {
+    return (ObjectiveCriteria) context.getArgument(name, ObjectiveCriteria.class);
+  }
 
-    public ObjectiveCriteria parse(StringReader reader) throws CommandSyntaxException {
-        int start = reader.getCursor();
-        while (reader.canRead() && reader.peek() != ' ') {
-            reader.skip();
-        }
-        String id = reader.getString().substring(start, reader.getCursor());
-        return ObjectiveCriteria.byName(id).orElseThrow(() -> {
-            reader.setCursor(start);
-            return ERROR_INVALID_VALUE.createWithContext((ImmutableStringReader)reader, (Object)id);
-        });
+  public ObjectiveCriteria parse(StringReader reader) throws CommandSyntaxException {
+    int start = reader.getCursor();
+    while (reader.canRead() && reader.peek() != ' ') {
+      reader.skip();
     }
+    String id = reader.getString().substring(start, reader.getCursor());
+    return ObjectiveCriteria.byName(id)
+        .orElseThrow(
+            () -> {
+              reader.setCursor(start);
+              return ERROR_INVALID_VALUE.createWithContext(
+                  (ImmutableStringReader) reader, (Object) id);
+            });
+  }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        ArrayList ids = Lists.newArrayList(ObjectiveCriteria.getCustomCriteriaNames());
-        for (StatType statType : BuiltInRegistries.STAT_TYPE) {
-            for (Object value : statType.getRegistry()) {
-                String name = this.getName(statType, value);
-                ids.add(name);
-            }
-        }
-        return SharedSuggestionProvider.suggest(ids, builder);
+  public <S> CompletableFuture<Suggestions> listSuggestions(
+      CommandContext<S> context, SuggestionsBuilder builder) {
+    ArrayList ids = Lists.newArrayList(ObjectiveCriteria.getCustomCriteriaNames());
+    for (StatType statType : BuiltInRegistries.STAT_TYPE) {
+      for (Object value : statType.getRegistry()) {
+        String name = this.getName(statType, value);
+        ids.add(name);
+      }
     }
+    return SharedSuggestionProvider.suggest(ids, builder);
+  }
 
-    public <T> String getName(StatType<T> type, Object value) {
-        return Stat.buildName(type, value);
-    }
+  public <T> String getName(StatType<T> type, Object value) {
+    return Stat.buildName(type, value);
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

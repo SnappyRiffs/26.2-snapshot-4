@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -15,18 +15,42 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public class GeodeLayerSettings {
-    private static final Codec<Double> LAYER_RANGE = Codec.doubleRange((double)0.01, (double)50.0);
-    public static final Codec<GeodeLayerSettings> CODEC = RecordCodecBuilder.create(i -> i.group((App)LAYER_RANGE.fieldOf("filling").orElse((Object)1.7).forGetter(c -> c.filling), (App)LAYER_RANGE.fieldOf("inner_layer").orElse((Object)2.2).forGetter(c -> c.innerLayer), (App)LAYER_RANGE.fieldOf("middle_layer").orElse((Object)3.2).forGetter(c -> c.middleLayer), (App)LAYER_RANGE.fieldOf("outer_layer").orElse((Object)4.2).forGetter(c -> c.outerLayer)).apply((Applicative)i, GeodeLayerSettings::new));
-    public final double filling;
-    public final double innerLayer;
-    public final double middleLayer;
-    public final double outerLayer;
+  private static final Codec<Double> LAYER_RANGE = Codec.doubleRange((double) 0.01, (double) 50.0);
+  public static final Codec<GeodeLayerSettings> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          LAYER_RANGE
+                              .fieldOf("filling")
+                              .orElse((Object) 1.7)
+                              .forGetter(c -> c.filling),
+                      (App)
+                          LAYER_RANGE
+                              .fieldOf("inner_layer")
+                              .orElse((Object) 2.2)
+                              .forGetter(c -> c.innerLayer),
+                      (App)
+                          LAYER_RANGE
+                              .fieldOf("middle_layer")
+                              .orElse((Object) 3.2)
+                              .forGetter(c -> c.middleLayer),
+                      (App)
+                          LAYER_RANGE
+                              .fieldOf("outer_layer")
+                              .orElse((Object) 4.2)
+                              .forGetter(c -> c.outerLayer))
+                  .apply((Applicative) i, GeodeLayerSettings::new));
+  public final double filling;
+  public final double innerLayer;
+  public final double middleLayer;
+  public final double outerLayer;
 
-    public GeodeLayerSettings(double filling, double innerLayer, double middleLayer, double outerLayer) {
-        this.filling = filling;
-        this.innerLayer = innerLayer;
-        this.middleLayer = middleLayer;
-        this.outerLayer = outerLayer;
-    }
+  public GeodeLayerSettings(
+      double filling, double innerLayer, double middleLayer, double outerLayer) {
+    this.filling = filling;
+    this.innerLayer = innerLayer;
+    this.middleLayer = middleLayer;
+    this.outerLayer = outerLayer;
+  }
 }
-

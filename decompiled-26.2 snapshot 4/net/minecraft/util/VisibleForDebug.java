@@ -3,6 +3,4 @@
  */
 package net.minecraft.util;
 
-public @interface VisibleForDebug {
-}
-
+public @interface VisibleForDebug {}

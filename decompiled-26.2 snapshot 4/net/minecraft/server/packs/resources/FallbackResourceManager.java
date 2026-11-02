@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
  *  com.google.common.collect.Lists
@@ -320,4 +320,3 @@ implements ResourceManager {
         }
     }
 }
-

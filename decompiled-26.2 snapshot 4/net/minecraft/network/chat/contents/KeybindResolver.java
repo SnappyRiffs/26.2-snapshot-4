@@ -8,10 +8,9 @@ import java.util.function.Supplier;
 import net.minecraft.network.chat.Component;
 
 public class KeybindResolver {
-    static Function<String, Supplier<Component>> keyResolver = name -> () -> Component.literal(name);
+  static Function<String, Supplier<Component>> keyResolver = name -> () -> Component.literal(name);
 
-    public static void setKeyResolver(Function<String, Supplier<Component>> resolver) {
-        keyResolver = resolver;
-    }
+  public static void setKeyResolver(Function<String, Supplier<Component>> resolver) {
+    keyResolver = resolver;
+  }
 }
-

@@ -6,8 +6,7 @@ package net.minecraft.world.level.entity;
 import java.util.UUID;
 
 public interface UniquelyIdentifyable {
-    public UUID getUUID();
+  public UUID getUUID();
 
-    public boolean isRemoved();
+  public boolean isRemoved();
 }
-

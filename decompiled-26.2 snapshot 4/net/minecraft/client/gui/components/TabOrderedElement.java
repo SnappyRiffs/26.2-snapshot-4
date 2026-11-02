@@ -4,8 +4,7 @@
 package net.minecraft.client.gui.components;
 
 public interface TabOrderedElement {
-    default public int getTabOrderGroup() {
-        return 0;
-    }
+  public default int getTabOrderGroup() {
+    return 0;
+  }
 }
-

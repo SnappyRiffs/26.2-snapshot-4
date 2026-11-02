@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -22,18 +22,25 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.component.BundleContents;
 
-public record BundlePredicate(Optional<CollectionPredicate<ItemInstance, ItemPredicate>> items) implements SingleComponentItemPredicate<BundleContents>
-{
-    public static final Codec<BundlePredicate> CODEC = RecordCodecBuilder.create(i -> i.group((App)CollectionPredicate.codec(ItemPredicate.CODEC).optionalFieldOf("items").forGetter(BundlePredicate::items)).apply((Applicative)i, BundlePredicate::new));
+public record BundlePredicate(Optional<CollectionPredicate<ItemInstance, ItemPredicate>> items)
+    implements SingleComponentItemPredicate<BundleContents> {
+  public static final Codec<BundlePredicate> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          CollectionPredicate.codec(ItemPredicate.CODEC)
+                              .optionalFieldOf("items")
+                              .forGetter(BundlePredicate::items))
+                  .apply((Applicative) i, BundlePredicate::new));
 
-    @Override
-    public DataComponentType<BundleContents> componentType() {
-        return DataComponents.BUNDLE_CONTENTS;
-    }
+  @Override
+  public DataComponentType<BundleContents> componentType() {
+    return DataComponents.BUNDLE_CONTENTS;
+  }
 
-    @Override
-    public boolean matches(BundleContents value) {
-        return !this.items.isPresent() || this.items.get().test(value.items());
-    }
+  @Override
+  public boolean matches(BundleContents value) {
+    return !this.items.isPresent() || this.items.get().test(value.items());
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.BiMap
  *  com.google.common.collect.HashBiMap
@@ -758,4 +758,3 @@ public class ExtraCodecs {
         }
     }
 }
-

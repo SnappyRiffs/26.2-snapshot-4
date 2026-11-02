@@ -6,24 +6,21 @@ package net.minecraft.server.jsonrpc.internalapi;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.jsonrpc.internalapi.MinecraftExecutorService;
 
-public class MinecraftExecutorServiceImpl
-implements MinecraftExecutorService {
-    private final DedicatedServer server;
+public class MinecraftExecutorServiceImpl implements MinecraftExecutorService {
+  private final DedicatedServer server;
 
-    public MinecraftExecutorServiceImpl(DedicatedServer server) {
-        this.server = server;
-    }
+  public MinecraftExecutorServiceImpl(DedicatedServer server) {
+    this.server = server;
+  }
 
-    @Override
-    public <V> CompletableFuture<V> submit(Supplier<V> supplier) {
-        return this.server.submit(supplier);
-    }
+  @Override
+  public <V> CompletableFuture<V> submit(Supplier<V> supplier) {
+    return this.server.submit(supplier);
+  }
 
-    @Override
-    public CompletableFuture<Void> submit(Runnable runnable) {
-        return this.server.submit(runnable);
-    }
+  @Override
+  public CompletableFuture<Void> submit(Runnable runnable) {
+    return this.server.submit(runnable);
+  }
 }
-

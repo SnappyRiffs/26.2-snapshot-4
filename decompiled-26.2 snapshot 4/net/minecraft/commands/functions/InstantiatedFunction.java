@@ -8,8 +8,7 @@ import net.minecraft.commands.execution.UnboundEntryAction;
 import net.minecraft.resources.Identifier;
 
 public interface InstantiatedFunction<T> {
-    public Identifier id();
+  public Identifier id();
 
-    public List<UnboundEntryAction<T>> entries();
+  public List<UnboundEntryAction<T>> entries();
 }
-

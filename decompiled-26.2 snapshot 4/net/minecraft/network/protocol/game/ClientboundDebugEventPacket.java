@@ -7,22 +7,24 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.GamePacketTypes;
 import net.minecraft.util.debug.DebugSubscription;
 
-public record ClientboundDebugEventPacket(DebugSubscription.Event<?> event) implements Packet<ClientGamePacketListener>
-{
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundDebugEventPacket> STREAM_CODEC = StreamCodec.composite(DebugSubscription.Event.STREAM_CODEC, ClientboundDebugEventPacket::event, ClientboundDebugEventPacket::new);
+public record ClientboundDebugEventPacket(DebugSubscription.Event<?> event)
+    implements Packet<ClientGamePacketListener> {
+  public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundDebugEventPacket>
+      STREAM_CODEC =
+          StreamCodec.composite(
+              DebugSubscription.Event.STREAM_CODEC,
+              ClientboundDebugEventPacket::event,
+              ClientboundDebugEventPacket::new);
 
-    @Override
-    public PacketType<ClientboundDebugEventPacket> type() {
-        return GamePacketTypes.CLIENTBOUND_DEBUG_EVENT;
-    }
+  @Override
+  public PacketType<ClientboundDebugEventPacket> type() {
+    return GamePacketTypes.CLIENTBOUND_DEBUG_EVENT;
+  }
 
-    @Override
-    public void handle(ClientGamePacketListener listener) {
-        listener.handleDebugEvent(this);
-    }
+  @Override
+  public void handle(ClientGamePacketListener listener) {
+    listener.handleDebugEvent(this);
+  }
 }
-

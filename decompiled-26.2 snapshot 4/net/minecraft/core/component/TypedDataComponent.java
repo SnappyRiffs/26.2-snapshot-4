@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.DataResult
@@ -66,4 +66,3 @@ public record TypedDataComponent<T>(DataComponentType<T> type, T value) {
         return String.valueOf(this.type) + "=>" + String.valueOf(this.value);
     }
 }
-

@@ -4,8 +4,7 @@
 package net.minecraft.core;
 
 public interface HolderOwner<T> {
-    default public boolean canSerializeIn(HolderOwner<T> context) {
-        return context == this;
-    }
+  public default boolean canSerializeIn(HolderOwner<T> context) {
+    return context == this;
+  }
 }
-

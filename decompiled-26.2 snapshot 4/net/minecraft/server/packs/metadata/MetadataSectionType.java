@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  */
@@ -10,14 +10,13 @@ import com.mojang.serialization.Codec;
 import java.util.Optional;
 
 public record MetadataSectionType<T>(String name, Codec<T> codec) {
-    public WithValue<T> withValue(T value) {
-        return new WithValue<T>(this, value);
-    }
+  public WithValue<T> withValue(T value) {
+    return new WithValue<T>(this, value);
+  }
 
-    public record WithValue<T>(MetadataSectionType<T> type, T value) {
-        public <U> Optional<U> unwrapToType(MetadataSectionType<U> type) {
-            return type == this.type ? Optional.of(this.value) : Optional.empty();
-        }
+  public record WithValue<T>(MetadataSectionType<T> type, T value) {
+    public <U> Optional<U> unwrapToType(MetadataSectionType<U> type) {
+      return type == this.type ? Optional.of(this.value) : Optional.empty();
     }
+  }
 }
-

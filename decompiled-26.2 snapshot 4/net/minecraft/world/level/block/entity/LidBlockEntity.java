@@ -4,6 +4,5 @@
 package net.minecraft.world.level.block.entity;
 
 public interface LidBlockEntity {
-    public float getOpenNess(float var1);
+  public float getOpenNess(float var1);
 }
-

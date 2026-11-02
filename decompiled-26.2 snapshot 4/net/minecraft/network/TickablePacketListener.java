@@ -3,10 +3,6 @@
  */
 package net.minecraft.network;
 
-import net.minecraft.network.PacketListener;
-
-public interface TickablePacketListener
-extends PacketListener {
-    public void tick();
+public interface TickablePacketListener extends PacketListener {
+  public void tick();
 }
-

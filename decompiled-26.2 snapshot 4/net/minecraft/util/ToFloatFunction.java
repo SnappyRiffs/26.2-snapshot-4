@@ -5,6 +5,5 @@ package net.minecraft.util;
 
 @FunctionalInterface
 public interface ToFloatFunction<T> {
-    public float applyAsFloat(T var1);
+  public float applyAsFloat(T var1);
 }
-

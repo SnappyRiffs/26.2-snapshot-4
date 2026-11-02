@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.ImmutableMap
@@ -47,78 +47,167 @@ import net.minecraft.world.entity.ai.behavior.TryFindWater;
 import net.minecraft.world.entity.ai.behavior.declarative.BehaviorBuilder;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
-import net.minecraft.world.entity.animal.axolotl.Axolotl;
-import net.minecraft.world.entity.animal.axolotl.PlayDead;
-import net.minecraft.world.entity.animal.axolotl.ValidatePlayDead;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.Level;
 
 public class AxolotlAi {
-    private static final UniformInt ADULT_FOLLOW_RANGE = UniformInt.of(5, 16);
-    private static final float SPEED_MULTIPLIER_WHEN_MAKING_LOVE = 0.2f;
-    private static final float SPEED_MULTIPLIER_ON_LAND = 0.15f;
-    private static final float SPEED_MULTIPLIER_WHEN_IDLING_IN_WATER = 0.5f;
-    private static final float SPEED_MULTIPLIER_WHEN_CHASING_IN_WATER = 0.6f;
-    private static final float SPEED_MULTIPLIER_WHEN_FOLLOWING_ADULT_IN_WATER = 0.6f;
+  private static final UniformInt ADULT_FOLLOW_RANGE = UniformInt.of(5, 16);
+  private static final float SPEED_MULTIPLIER_WHEN_MAKING_LOVE = 0.2f;
+  private static final float SPEED_MULTIPLIER_ON_LAND = 0.15f;
+  private static final float SPEED_MULTIPLIER_WHEN_IDLING_IN_WATER = 0.5f;
+  private static final float SPEED_MULTIPLIER_WHEN_CHASING_IN_WATER = 0.6f;
+  private static final float SPEED_MULTIPLIER_WHEN_FOLLOWING_ADULT_IN_WATER = 0.6f;
 
-    protected static List<ActivityData<Axolotl>> getActivities() {
-        return List.of(AxolotlAi.initCoreActivity(), AxolotlAi.initIdleActivity(), AxolotlAi.initFightActivity(), AxolotlAi.initPlayDeadActivity());
-    }
+  protected static List<ActivityData<Axolotl>> getActivities() {
+    return List.of(
+        AxolotlAi.initCoreActivity(),
+        AxolotlAi.initIdleActivity(),
+        AxolotlAi.initFightActivity(),
+        AxolotlAi.initPlayDeadActivity());
+  }
 
-    protected static ActivityData<Axolotl> initPlayDeadActivity() {
-        return ActivityData.create(Activity.PLAY_DEAD, ImmutableList.of((Object)Pair.of((Object)0, (Object)new PlayDead()), (Object)Pair.of((Object)1, EraseMemoryIf.create(BehaviorUtils::isBreeding, MemoryModuleType.PLAY_DEAD_TICKS))), ImmutableSet.of((Object)Pair.of(MemoryModuleType.PLAY_DEAD_TICKS, (Object)((Object)MemoryStatus.VALUE_PRESENT))), ImmutableSet.of(MemoryModuleType.PLAY_DEAD_TICKS));
-    }
+  protected static ActivityData<Axolotl> initPlayDeadActivity() {
+    return ActivityData.create(
+        Activity.PLAY_DEAD,
+        ImmutableList.of(
+            (Object) Pair.of((Object) 0, (Object) new PlayDead()),
+            (Object)
+                Pair.of(
+                    (Object) 1,
+                    EraseMemoryIf.create(
+                        BehaviorUtils::isBreeding, MemoryModuleType.PLAY_DEAD_TICKS))),
+        ImmutableSet.of(
+            (Object)
+                Pair.of(
+                    MemoryModuleType.PLAY_DEAD_TICKS,
+                    (Object) ((Object) MemoryStatus.VALUE_PRESENT))),
+        ImmutableSet.of(MemoryModuleType.PLAY_DEAD_TICKS));
+  }
 
-    protected static ActivityData<Axolotl> initFightActivity() {
-        return ActivityData.create(Activity.FIGHT, 0, ImmutableList.of(StopAttackingIfTargetInvalid.create(Axolotl::onStopAttacking), SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(AxolotlAi::getSpeedModifierChasing), MeleeAttack.create(20), EraseMemoryIf.create(BehaviorUtils::isBreeding, MemoryModuleType.ATTACK_TARGET)), MemoryModuleType.ATTACK_TARGET);
-    }
+  protected static ActivityData<Axolotl> initFightActivity() {
+    return ActivityData.create(
+        Activity.FIGHT,
+        0,
+        ImmutableList.of(
+            StopAttackingIfTargetInvalid.create(Axolotl::onStopAttacking),
+            SetWalkTargetFromAttackTargetIfTargetOutOfReach.create(
+                AxolotlAi::getSpeedModifierChasing),
+            MeleeAttack.create(20),
+            EraseMemoryIf.create(BehaviorUtils::isBreeding, MemoryModuleType.ATTACK_TARGET)),
+        MemoryModuleType.ATTACK_TARGET);
+  }
 
-    protected static ActivityData<Axolotl> initCoreActivity() {
-        return ActivityData.create(Activity.CORE, 0, ImmutableList.of((Object)new LookAtTargetSink(45, 90), (Object)new MoveToTargetSink(), ValidatePlayDead.create(), (Object)new CountDownCooldownTicks(MemoryModuleType.TEMPTATION_COOLDOWN_TICKS)));
-    }
+  protected static ActivityData<Axolotl> initCoreActivity() {
+    return ActivityData.create(
+        Activity.CORE,
+        0,
+        ImmutableList.of(
+            (Object) new LookAtTargetSink(45, 90),
+            (Object) new MoveToTargetSink(),
+            ValidatePlayDead.create(),
+            (Object) new CountDownCooldownTicks(MemoryModuleType.TEMPTATION_COOLDOWN_TICKS)));
+  }
 
-    protected static ActivityData<Axolotl> initIdleActivity() {
-        return ActivityData.create(Activity.IDLE, ImmutableList.of((Object)Pair.of((Object)0, SetEntityLookTargetSometimes.create(EntityTypes.PLAYER, 6.0f, UniformInt.of(30, 60))), (Object)Pair.of((Object)1, (Object)new AnimalMakeLove(EntityTypes.AXOLOTL, 0.2f, 2)), (Object)Pair.of((Object)2, new RunOne(ImmutableList.of((Object)Pair.of((Object)new FollowTemptation(AxolotlAi::getSpeedModifier), (Object)1), (Object)Pair.of(BabyFollowAdult.create(ADULT_FOLLOW_RANGE, AxolotlAi::getSpeedModifierFollowingAdult, MemoryModuleType.NEAREST_VISIBLE_ADULT, false), (Object)1)))), (Object)Pair.of((Object)3, StartAttacking.create(AxolotlAi::findNearestValidAttackTarget)), (Object)Pair.of((Object)3, TryFindWater.create(6, 0.15f)), (Object)Pair.of((Object)4, new GateBehavior((Map<MemoryModuleType<?>, MemoryStatus>)ImmutableMap.of(MemoryModuleType.WALK_TARGET, (Object)((Object)MemoryStatus.VALUE_ABSENT)), (Set<MemoryModuleType<?>>)ImmutableSet.of(), GateBehavior.OrderPolicy.ORDERED, GateBehavior.RunningPolicy.TRY_ALL, ImmutableList.of((Object)Pair.of(RandomStroll.swim(0.5f), (Object)2), (Object)Pair.of(RandomStroll.stroll(0.15f, false), (Object)2), (Object)Pair.of(SetWalkTargetFromLookTarget.create(AxolotlAi::canSetWalkTargetFromLookTarget, AxolotlAi::getSpeedModifier, 3), (Object)3), (Object)Pair.of(BehaviorBuilder.triggerIf(Entity::isInWater), (Object)5), (Object)Pair.of(BehaviorBuilder.triggerIf(Entity::onGround), (Object)5))))));
-    }
+  protected static ActivityData<Axolotl> initIdleActivity() {
+    return ActivityData.create(
+        Activity.IDLE,
+        ImmutableList.of(
+            (Object)
+                Pair.of(
+                    (Object) 0,
+                    SetEntityLookTargetSometimes.create(
+                        EntityTypes.PLAYER, 6.0f, UniformInt.of(30, 60))),
+            (Object) Pair.of((Object) 1, (Object) new AnimalMakeLove(EntityTypes.AXOLOTL, 0.2f, 2)),
+            (Object)
+                Pair.of(
+                    (Object) 2,
+                    new RunOne(
+                        ImmutableList.of(
+                            (Object)
+                                Pair.of(
+                                    (Object) new FollowTemptation(AxolotlAi::getSpeedModifier),
+                                    (Object) 1),
+                            (Object)
+                                Pair.of(
+                                    BabyFollowAdult.create(
+                                        ADULT_FOLLOW_RANGE,
+                                        AxolotlAi::getSpeedModifierFollowingAdult,
+                                        MemoryModuleType.NEAREST_VISIBLE_ADULT,
+                                        false),
+                                    (Object) 1)))),
+            (Object)
+                Pair.of((Object) 3, StartAttacking.create(AxolotlAi::findNearestValidAttackTarget)),
+            (Object) Pair.of((Object) 3, TryFindWater.create(6, 0.15f)),
+            (Object)
+                Pair.of(
+                    (Object) 4,
+                    new GateBehavior(
+                        (Map<MemoryModuleType<?>, MemoryStatus>)
+                            ImmutableMap.of(
+                                MemoryModuleType.WALK_TARGET,
+                                (Object) ((Object) MemoryStatus.VALUE_ABSENT)),
+                        (Set<MemoryModuleType<?>>) ImmutableSet.of(),
+                        GateBehavior.OrderPolicy.ORDERED,
+                        GateBehavior.RunningPolicy.TRY_ALL,
+                        ImmutableList.of(
+                            (Object) Pair.of(RandomStroll.swim(0.5f), (Object) 2),
+                            (Object) Pair.of(RandomStroll.stroll(0.15f, false), (Object) 2),
+                            (Object)
+                                Pair.of(
+                                    SetWalkTargetFromLookTarget.create(
+                                        AxolotlAi::canSetWalkTargetFromLookTarget,
+                                        AxolotlAi::getSpeedModifier,
+                                        3),
+                                    (Object) 3),
+                            (Object)
+                                Pair.of(BehaviorBuilder.triggerIf(Entity::isInWater), (Object) 5),
+                            (Object)
+                                Pair.of(
+                                    BehaviorBuilder.triggerIf(Entity::onGround), (Object) 5))))));
+  }
 
-    private static boolean canSetWalkTargetFromLookTarget(LivingEntity body) {
-        Level level = body.level();
-        Optional<PositionTracker> lookTarget = body.getBrain().getMemory(MemoryModuleType.LOOK_TARGET);
-        if (lookTarget.isPresent()) {
-            BlockPos pos = lookTarget.get().currentBlockPosition();
-            return level.isWaterAt(pos) == body.isInWater();
-        }
-        return false;
+  private static boolean canSetWalkTargetFromLookTarget(LivingEntity body) {
+    Level level = body.level();
+    Optional<PositionTracker> lookTarget = body.getBrain().getMemory(MemoryModuleType.LOOK_TARGET);
+    if (lookTarget.isPresent()) {
+      BlockPos pos = lookTarget.get().currentBlockPosition();
+      return level.isWaterAt(pos) == body.isInWater();
     }
+    return false;
+  }
 
-    public static void updateActivity(Axolotl body) {
-        Brain<Axolotl> brain = body.getBrain();
-        Activity oldActivity = brain.getActiveNonCoreActivity().orElse(null);
-        if (oldActivity != Activity.PLAY_DEAD) {
-            brain.setActiveActivityToFirstValid((List<Activity>)ImmutableList.of((Object)Activity.PLAY_DEAD, (Object)Activity.FIGHT, (Object)Activity.IDLE));
-            if (oldActivity == Activity.FIGHT && brain.getActiveNonCoreActivity().orElse(null) != Activity.FIGHT) {
-                brain.setMemoryWithExpiry(MemoryModuleType.HAS_HUNTING_COOLDOWN, true, 2400L);
-            }
-        }
+  public static void updateActivity(Axolotl body) {
+    Brain<Axolotl> brain = body.getBrain();
+    Activity oldActivity = brain.getActiveNonCoreActivity().orElse(null);
+    if (oldActivity != Activity.PLAY_DEAD) {
+      brain.setActiveActivityToFirstValid(
+          (List<Activity>)
+              ImmutableList.of(
+                  (Object) Activity.PLAY_DEAD, (Object) Activity.FIGHT, (Object) Activity.IDLE));
+      if (oldActivity == Activity.FIGHT
+          && brain.getActiveNonCoreActivity().orElse(null) != Activity.FIGHT) {
+        brain.setMemoryWithExpiry(MemoryModuleType.HAS_HUNTING_COOLDOWN, true, 2400L);
+      }
     }
+  }
 
-    private static float getSpeedModifierChasing(LivingEntity mob) {
-        return mob.isInWater() ? 0.6f : 0.15f;
-    }
+  private static float getSpeedModifierChasing(LivingEntity mob) {
+    return mob.isInWater() ? 0.6f : 0.15f;
+  }
 
-    private static float getSpeedModifierFollowingAdult(LivingEntity mob) {
-        return mob.isInWater() ? 0.6f : 0.15f;
-    }
+  private static float getSpeedModifierFollowingAdult(LivingEntity mob) {
+    return mob.isInWater() ? 0.6f : 0.15f;
+  }
 
-    private static float getSpeedModifier(LivingEntity mob) {
-        return mob.isInWater() ? 0.5f : 0.15f;
-    }
+  private static float getSpeedModifier(LivingEntity mob) {
+    return mob.isInWater() ? 0.5f : 0.15f;
+  }
 
-    private static Optional<? extends LivingEntity> findNearestValidAttackTarget(ServerLevel level, Axolotl body) {
-        if (BehaviorUtils.isBreeding(body)) {
-            return Optional.empty();
-        }
-        return body.getBrain().getMemory(MemoryModuleType.NEAREST_ATTACKABLE);
+  private static Optional<? extends LivingEntity> findNearestValidAttackTarget(
+      ServerLevel level, Axolotl body) {
+    if (BehaviorUtils.isBreeding(body)) {
+      return Optional.empty();
     }
+    return body.getBrain().getMemory(MemoryModuleType.NEAREST_ATTACKABLE);
+  }
 }
-

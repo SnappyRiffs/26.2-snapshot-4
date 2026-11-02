@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -24,22 +24,39 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public record UseCooldown(float seconds, Optional<Identifier> cooldownGroup) {
-    public static final Codec<UseCooldown> CODEC = RecordCodecBuilder.create(i -> i.group((App)ExtraCodecs.POSITIVE_FLOAT.fieldOf("seconds").forGetter(UseCooldown::seconds), (App)Identifier.CODEC.optionalFieldOf("cooldown_group").forGetter(UseCooldown::cooldownGroup)).apply((Applicative)i, UseCooldown::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, UseCooldown> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.FLOAT, UseCooldown::seconds, Identifier.STREAM_CODEC.apply(ByteBufCodecs::optional), UseCooldown::cooldownGroup, UseCooldown::new);
+  public static final Codec<UseCooldown> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ExtraCodecs.POSITIVE_FLOAT
+                              .fieldOf("seconds")
+                              .forGetter(UseCooldown::seconds),
+                      (App)
+                          Identifier.CODEC
+                              .optionalFieldOf("cooldown_group")
+                              .forGetter(UseCooldown::cooldownGroup))
+                  .apply((Applicative) i, UseCooldown::new));
+  public static final StreamCodec<RegistryFriendlyByteBuf, UseCooldown> STREAM_CODEC =
+      StreamCodec.composite(
+          ByteBufCodecs.FLOAT,
+          UseCooldown::seconds,
+          Identifier.STREAM_CODEC.apply(ByteBufCodecs::optional),
+          UseCooldown::cooldownGroup,
+          UseCooldown::new);
 
-    public UseCooldown(float seconds) {
-        this(seconds, Optional.empty());
-    }
+  public UseCooldown(float seconds) {
+    this(seconds, Optional.empty());
+  }
 
-    public int ticks() {
-        return (int)(this.seconds * 20.0f);
-    }
+  public int ticks() {
+    return (int) (this.seconds * 20.0f);
+  }
 
-    public void apply(ItemStack stack, LivingEntity user) {
-        if (user instanceof Player) {
-            Player player = (Player)user;
-            player.getCooldowns().addCooldown(stack, this.ticks());
-        }
+  public void apply(ItemStack stack, LivingEntity user) {
+    if (user instanceof Player) {
+      Player player = (Player) user;
+      player.getCooldowns().addCooldown(stack, this.ticks());
     }
+  }
 }
-

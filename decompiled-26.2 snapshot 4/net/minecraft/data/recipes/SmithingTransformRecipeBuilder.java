@@ -6,9 +6,6 @@ package net.minecraft.data.recipes;
 import java.util.Optional;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeUnlockAdvancementBuilder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -18,37 +15,54 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 
 public class SmithingTransformRecipeBuilder {
-    private final Ingredient template;
-    private final Ingredient base;
-    private final Ingredient addition;
-    private final RecipeCategory category;
-    private final ItemStackTemplate result;
-    private final RecipeUnlockAdvancementBuilder advancementBuilder = new RecipeUnlockAdvancementBuilder();
+  private final Ingredient template;
+  private final Ingredient base;
+  private final Ingredient addition;
+  private final RecipeCategory category;
+  private final ItemStackTemplate result;
+  private final RecipeUnlockAdvancementBuilder advancementBuilder =
+      new RecipeUnlockAdvancementBuilder();
 
-    public SmithingTransformRecipeBuilder(Ingredient template, Ingredient base, Ingredient addition, RecipeCategory category, ItemStackTemplate result) {
-        this.category = category;
-        this.template = template;
-        this.base = base;
-        this.addition = addition;
-        this.result = result;
-    }
+  public SmithingTransformRecipeBuilder(
+      Ingredient template,
+      Ingredient base,
+      Ingredient addition,
+      RecipeCategory category,
+      ItemStackTemplate result) {
+    this.category = category;
+    this.template = template;
+    this.base = base;
+    this.addition = addition;
+    this.result = result;
+  }
 
-    public static SmithingTransformRecipeBuilder smithing(Ingredient template, Ingredient base, Ingredient addition, RecipeCategory category, Item result) {
-        return new SmithingTransformRecipeBuilder(template, base, addition, category, new ItemStackTemplate(result));
-    }
+  public static SmithingTransformRecipeBuilder smithing(
+      Ingredient template,
+      Ingredient base,
+      Ingredient addition,
+      RecipeCategory category,
+      Item result) {
+    return new SmithingTransformRecipeBuilder(
+        template, base, addition, category, new ItemStackTemplate(result));
+  }
 
-    public SmithingTransformRecipeBuilder unlocks(String name, Criterion<?> criterion) {
-        this.advancementBuilder.unlockedBy(name, criterion);
-        return this;
-    }
+  public SmithingTransformRecipeBuilder unlocks(String name, Criterion<?> criterion) {
+    this.advancementBuilder.unlockedBy(name, criterion);
+    return this;
+  }
 
-    public void save(RecipeOutput output, String id) {
-        this.save(output, ResourceKey.create(Registries.RECIPE, Identifier.parse(id)));
-    }
+  public void save(RecipeOutput output, String id) {
+    this.save(output, ResourceKey.create(Registries.RECIPE, Identifier.parse(id)));
+  }
 
-    public void save(RecipeOutput output, ResourceKey<Recipe<?>> id) {
-        SmithingTransformRecipe recipe = new SmithingTransformRecipe(new Recipe.CommonInfo(true), Optional.of(this.template), this.base, Optional.of(this.addition), this.result);
-        output.accept(id, recipe, this.advancementBuilder.build(output, id, this.category));
-    }
+  public void save(RecipeOutput output, ResourceKey<Recipe<?>> id) {
+    SmithingTransformRecipe recipe =
+        new SmithingTransformRecipe(
+            new Recipe.CommonInfo(true),
+            Optional.of(this.template),
+            this.base,
+            Optional.of(this.addition),
+            this.result);
+    output.accept(id, recipe, this.advancementBuilder.build(output, id, this.category));
+  }
 }
-

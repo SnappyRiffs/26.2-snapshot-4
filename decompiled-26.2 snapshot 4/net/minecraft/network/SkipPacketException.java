@@ -3,6 +3,4 @@
  */
 package net.minecraft.network;
 
-public interface SkipPacketException {
-}
-
+public interface SkipPacketException {}

@@ -20,51 +20,63 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.GameType;
 
-public class TeleportToPlayerMenuCategory
-implements SpectatorMenuCategory,
-SpectatorMenuItem {
-    private static final Identifier TELEPORT_TO_PLAYER_SPRITE = Identifier.withDefaultNamespace("spectator/teleport_to_player");
-    private static final Comparator<PlayerInfo> PROFILE_ORDER = Comparator.comparing(p -> p.getProfile().id());
-    private static final Component TELEPORT_TEXT = Component.translatable("spectatorMenu.teleport");
-    private static final Component TELEPORT_PROMPT = Component.translatable("spectatorMenu.teleport.prompt");
-    private final List<SpectatorMenuItem> items;
+public class TeleportToPlayerMenuCategory implements SpectatorMenuCategory, SpectatorMenuItem {
+  private static final Identifier TELEPORT_TO_PLAYER_SPRITE =
+      Identifier.withDefaultNamespace("spectator/teleport_to_player");
+  private static final Comparator<PlayerInfo> PROFILE_ORDER =
+      Comparator.comparing(p -> p.getProfile().id());
+  private static final Component TELEPORT_TEXT = Component.translatable("spectatorMenu.teleport");
+  private static final Component TELEPORT_PROMPT =
+      Component.translatable("spectatorMenu.teleport.prompt");
+  private final List<SpectatorMenuItem> items;
 
-    public TeleportToPlayerMenuCategory() {
-        this(Minecraft.getInstance().getConnection().getListedOnlinePlayers());
-    }
+  public TeleportToPlayerMenuCategory() {
+    this(Minecraft.getInstance().getConnection().getListedOnlinePlayers());
+  }
 
-    public TeleportToPlayerMenuCategory(Collection<PlayerInfo> profiles) {
-        this.items = profiles.stream().filter(p -> p.getGameMode() != GameType.SPECTATOR).sorted(PROFILE_ORDER).map(PlayerMenuItem::new).collect(Collectors.toUnmodifiableList());
-    }
+  public TeleportToPlayerMenuCategory(Collection<PlayerInfo> profiles) {
+    this.items =
+        profiles.stream()
+            .filter(p -> p.getGameMode() != GameType.SPECTATOR)
+            .sorted(PROFILE_ORDER)
+            .map(PlayerMenuItem::new)
+            .collect(Collectors.toUnmodifiableList());
+  }
 
-    @Override
-    public List<SpectatorMenuItem> getItems() {
-        return this.items;
-    }
+  @Override
+  public List<SpectatorMenuItem> getItems() {
+    return this.items;
+  }
 
-    @Override
-    public Component getPrompt() {
-        return TELEPORT_PROMPT;
-    }
+  @Override
+  public Component getPrompt() {
+    return TELEPORT_PROMPT;
+  }
 
-    @Override
-    public void selectItem(SpectatorMenu menu) {
-        menu.selectCategory(this);
-    }
+  @Override
+  public void selectItem(SpectatorMenu menu) {
+    menu.selectCategory(this);
+  }
 
-    @Override
-    public Component getName() {
-        return TELEPORT_TEXT;
-    }
+  @Override
+  public Component getName() {
+    return TELEPORT_TEXT;
+  }
 
-    @Override
-    public void extractIcon(GuiGraphicsExtractor graphics, float brightness, float alpha) {
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TELEPORT_TO_PLAYER_SPRITE, 0, 0, 16, 16, ARGB.colorFromFloat(alpha, brightness, brightness, brightness));
-    }
+  @Override
+  public void extractIcon(GuiGraphicsExtractor graphics, float brightness, float alpha) {
+    graphics.blitSprite(
+        RenderPipelines.GUI_TEXTURED,
+        TELEPORT_TO_PLAYER_SPRITE,
+        0,
+        0,
+        16,
+        16,
+        ARGB.colorFromFloat(alpha, brightness, brightness, brightness));
+  }
 
-    @Override
-    public boolean isEnabled() {
-        return !this.items.isEmpty();
-    }
+  @Override
+  public boolean isEnabled() {
+    return !this.items.isEmpty();
+  }
 }
-

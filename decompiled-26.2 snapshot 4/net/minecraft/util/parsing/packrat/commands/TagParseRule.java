@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.serialization.Dynamic
@@ -17,25 +17,22 @@ import net.minecraft.util.parsing.packrat.ParseState;
 import net.minecraft.util.parsing.packrat.Rule;
 import org.jspecify.annotations.Nullable;
 
-public class TagParseRule<T>
-implements Rule<StringReader, Dynamic<?>> {
-    private final TagParser<T> parser;
+public class TagParseRule<T> implements Rule<StringReader, Dynamic<?>> {
+  private final TagParser<T> parser;
 
-    public TagParseRule(DynamicOps<T> ops) {
-        this.parser = TagParser.create(ops);
-    }
+  public TagParseRule(DynamicOps<T> ops) {
+    this.parser = TagParser.create(ops);
+  }
 
-    @Override
-    public @Nullable Dynamic<T> parse(ParseState<StringReader> state) {
-        state.input().skipWhitespace();
-        int mark = state.mark();
-        try {
-            return new Dynamic(this.parser.getOps(), this.parser.parseAsArgument(state.input()));
-        }
-        catch (Exception e) {
-            state.errorCollector().store(mark, e);
-            return null;
-        }
+  @Override
+  public @Nullable Dynamic<T> parse(ParseState<StringReader> state) {
+    state.input().skipWhitespace();
+    int mark = state.mark();
+    try {
+      return new Dynamic(this.parser.getOps(), this.parser.parseAsArgument(state.input()));
+    } catch (Exception e) {
+      state.errorCollector().store(mark, e);
+      return null;
     }
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  io.netty.channel.ChannelFutureListener
@@ -17,29 +17,31 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class PacketSendListener {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static ChannelFutureListener thenRun(Runnable runnable) {
-        return future -> {
-            runnable.run();
-            if (!future.isSuccess()) {
-                future.channel().pipeline().fireExceptionCaught(future.cause());
-            }
-        };
-    }
+  public static ChannelFutureListener thenRun(Runnable runnable) {
+    return future -> {
+      runnable.run();
+      if (!future.isSuccess()) {
+        future.channel().pipeline().fireExceptionCaught(future.cause());
+      }
+    };
+  }
 
-    public static ChannelFutureListener exceptionallySend(Supplier<@Nullable Packet<?>> handler) {
-        return future -> {
-            if (!future.isSuccess()) {
-                Packet newPacket = (Packet)handler.get();
-                if (newPacket != null) {
-                    LOGGER.warn("Failed to deliver packet, sending fallback {}", newPacket.type(), (Object)future.cause());
-                    future.channel().writeAndFlush((Object)newPacket, future.channel().voidPromise());
-                } else {
-                    future.channel().pipeline().fireExceptionCaught(future.cause());
-                }
-            }
-        };
-    }
+  public static ChannelFutureListener exceptionallySend(Supplier<@Nullable Packet<?>> handler) {
+    return future -> {
+      if (!future.isSuccess()) {
+        Packet newPacket = (Packet) handler.get();
+        if (newPacket != null) {
+          LOGGER.warn(
+              "Failed to deliver packet, sending fallback {}",
+              newPacket.type(),
+              (Object) future.cause());
+          future.channel().writeAndFlush((Object) newPacket, future.channel().voidPromise());
+        } else {
+          future.channel().pipeline().fireExceptionCaught(future.cause());
+        }
+      }
+    };
+  }
 }
-

@@ -3,9 +3,6 @@
  */
 package net.minecraft.client.telemetry;
 
-import net.minecraft.client.telemetry.TelemetryEventInstance;
-
 public interface TelemetryEventLogger {
-    public void log(TelemetryEventInstance var1);
+  public void log(TelemetryEventInstance var1);
 }
-

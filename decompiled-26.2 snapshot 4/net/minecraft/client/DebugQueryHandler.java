@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -15,36 +15,35 @@ import net.minecraft.network.protocol.game.ServerboundEntityTagQueryPacket;
 import org.jspecify.annotations.Nullable;
 
 public class DebugQueryHandler {
-    private final ClientPacketListener connection;
-    private int transactionId = -1;
-    private @Nullable Consumer<CompoundTag> callback;
+  private final ClientPacketListener connection;
+  private int transactionId = -1;
+  private @Nullable Consumer<CompoundTag> callback;
 
-    public DebugQueryHandler(ClientPacketListener connection) {
-        this.connection = connection;
-    }
+  public DebugQueryHandler(ClientPacketListener connection) {
+    this.connection = connection;
+  }
 
-    public boolean handleResponse(int transactionId, @Nullable CompoundTag tag) {
-        if (this.transactionId == transactionId && this.callback != null) {
-            this.callback.accept(tag);
-            this.callback = null;
-            return true;
-        }
-        return false;
+  public boolean handleResponse(int transactionId, @Nullable CompoundTag tag) {
+    if (this.transactionId == transactionId && this.callback != null) {
+      this.callback.accept(tag);
+      this.callback = null;
+      return true;
     }
+    return false;
+  }
 
-    private int startTransaction(Consumer<CompoundTag> callback) {
-        this.callback = callback;
-        return ++this.transactionId;
-    }
+  private int startTransaction(Consumer<CompoundTag> callback) {
+    this.callback = callback;
+    return ++this.transactionId;
+  }
 
-    public void queryEntityTag(int entityId, Consumer<CompoundTag> callback) {
-        int transactionId = this.startTransaction(callback);
-        this.connection.send(new ServerboundEntityTagQueryPacket(transactionId, entityId));
-    }
+  public void queryEntityTag(int entityId, Consumer<CompoundTag> callback) {
+    int transactionId = this.startTransaction(callback);
+    this.connection.send(new ServerboundEntityTagQueryPacket(transactionId, entityId));
+  }
 
-    public void queryBlockEntityTag(BlockPos blockPos, Consumer<CompoundTag> callback) {
-        int transactionId = this.startTransaction(callback);
-        this.connection.send(new ServerboundBlockEntityTagQueryPacket(transactionId, blockPos));
-    }
+  public void queryBlockEntityTag(BlockPos blockPos, Consumer<CompoundTag> callback) {
+    int transactionId = this.startTransaction(callback);
+    this.connection.send(new ServerboundBlockEntityTagQueryPacket(transactionId, blockPos));
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.mojang.brigadier.CommandDispatcher
@@ -26,39 +26,51 @@ import net.minecraft.world.level.storage.WorldData;
 import org.slf4j.Logger;
 
 public class ReloadCommand {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static void reloadPacks(Collection<String> selectedPacks, CommandSourceStack source) {
-        source.getServer().reloadResources(selectedPacks).exceptionally(throwable -> {
-            LOGGER.warn("Failed to execute reload", throwable);
-            source.sendFailure(Component.translatable("commands.reload.failure"));
-            return null;
-        });
-    }
+  public static void reloadPacks(Collection<String> selectedPacks, CommandSourceStack source) {
+    source
+        .getServer()
+        .reloadResources(selectedPacks)
+        .exceptionally(
+            throwable -> {
+              LOGGER.warn("Failed to execute reload", throwable);
+              source.sendFailure(Component.translatable("commands.reload.failure"));
+              return null;
+            });
+  }
 
-    private static Collection<String> discoverNewPacks(PackRepository packRepository, WorldData worldData, Collection<String> currentPacks) {
-        packRepository.reload();
-        ArrayList selected = Lists.newArrayList(currentPacks);
-        List<String> disabled = worldData.getDataConfiguration().dataPacks().getDisabled();
-        for (String pack : packRepository.getAvailableIds()) {
-            if (disabled.contains(pack) || selected.contains(pack)) continue;
-            selected.add(pack);
-        }
-        return selected;
+  private static Collection<String> discoverNewPacks(
+      PackRepository packRepository, WorldData worldData, Collection<String> currentPacks) {
+    packRepository.reload();
+    ArrayList selected = Lists.newArrayList(currentPacks);
+    List<String> disabled = worldData.getDataConfiguration().dataPacks().getDisabled();
+    for (String pack : packRepository.getAvailableIds()) {
+      if (disabled.contains(pack) || selected.contains(pack)) continue;
+      selected.add(pack);
     }
+    return selected;
+  }
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("reload").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).executes(s -> {
-            CommandSourceStack source = (CommandSourceStack)s.getSource();
-            MinecraftServer server = source.getServer();
-            PackRepository packRepository = server.getPackRepository();
-            WorldData worldData = server.getWorldData();
-            Collection<String> currentPacks = packRepository.getSelectedIds();
-            Collection<String> newSelectedPacks = ReloadCommand.discoverNewPacks(packRepository, worldData, currentPacks);
-            source.sendSuccess(() -> Component.translatable("commands.reload.success"), true);
-            ReloadCommand.reloadPacks(newSelectedPacks, source);
-            return 0;
-        }));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("reload")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                .executes(
+                    s -> {
+                      CommandSourceStack source = (CommandSourceStack) s.getSource();
+                      MinecraftServer server = source.getServer();
+                      PackRepository packRepository = server.getPackRepository();
+                      WorldData worldData = server.getWorldData();
+                      Collection<String> currentPacks = packRepository.getSelectedIds();
+                      Collection<String> newSelectedPacks =
+                          ReloadCommand.discoverNewPacks(packRepository, worldData, currentPacks);
+                      source.sendSuccess(
+                          () -> Component.translatable("commands.reload.success"), true);
+                      ReloadCommand.reloadPacks(newSelectedPacks, source);
+                      return 0;
+                    }));
+  }
 }
-

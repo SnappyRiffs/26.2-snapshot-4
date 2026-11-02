@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.apache.commons.lang3.ArrayUtils
  */
@@ -15,30 +15,36 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.apache.commons.lang3.ArrayUtils;
 
 public enum IconSet {
-    RELEASE("icons"),
-    SNAPSHOT("icons", "snapshot");
+  RELEASE("icons"),
+  SNAPSHOT("icons", "snapshot");
 
-    private final String[] path;
+  private final String[] path;
 
-    private IconSet(String ... path) {
-        this.path = path;
+  private IconSet(String... path) {
+    this.path = path;
+  }
+
+  public List<IoSupplier<InputStream>> getStandardIcons(PackResources resources)
+      throws IOException {
+    return List.of(
+        this.getFile(resources, "icon_16x16.png"),
+        this.getFile(resources, "icon_32x32.png"),
+        this.getFile(resources, "icon_48x48.png"),
+        this.getFile(resources, "icon_128x128.png"),
+        this.getFile(resources, "icon_256x256.png"));
+  }
+
+  public IoSupplier<InputStream> getMacIcon(PackResources resources) throws IOException {
+    return this.getFile(resources, "minecraft.icns");
+  }
+
+  private IoSupplier<InputStream> getFile(PackResources resources, String fileName)
+      throws IOException {
+    CharSequence[] fullPath = (String[]) ArrayUtils.add((Object[]) this.path, (Object) fileName);
+    IoSupplier<InputStream> resource = resources.getRootResource((String[]) fullPath);
+    if (resource == null) {
+      throw new FileNotFoundException(String.join((CharSequence) "/", fullPath));
     }
-
-    public List<IoSupplier<InputStream>> getStandardIcons(PackResources resources) throws IOException {
-        return List.of(this.getFile(resources, "icon_16x16.png"), this.getFile(resources, "icon_32x32.png"), this.getFile(resources, "icon_48x48.png"), this.getFile(resources, "icon_128x128.png"), this.getFile(resources, "icon_256x256.png"));
-    }
-
-    public IoSupplier<InputStream> getMacIcon(PackResources resources) throws IOException {
-        return this.getFile(resources, "minecraft.icns");
-    }
-
-    private IoSupplier<InputStream> getFile(PackResources resources, String fileName) throws IOException {
-        CharSequence[] fullPath = (String[])ArrayUtils.add((Object[])this.path, (Object)fileName);
-        IoSupplier<InputStream> resource = resources.getRootResource((String[])fullPath);
-        if (resource == null) {
-            throw new FileNotFoundException(String.join((CharSequence)"/", fullPath));
-        }
-        return resource;
-    }
+    return resource;
+  }
 }
-

@@ -7,24 +7,34 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import net.minecraft.client.input.InputWithModifiers;
 
-public record MouseButtonInfo(@MouseButton int button, @InputWithModifiers.Modifiers int modifiers) implements InputWithModifiers
-{
-    @Override
-    @MouseButton
-    public int input() {
-        return this.button;
-    }
+public record MouseButtonInfo(@MouseButton int button, @InputWithModifiers.Modifiers int modifiers)
+    implements InputWithModifiers {
+  @Override
+  @MouseButton
+  public int input() {
+    return this.button;
+  }
 
-    @Retention(value=RetentionPolicy.CLASS)
-    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
-    public static @interface MouseButton {
-    }
+  @Retention(value = RetentionPolicy.CLASS)
+  @Target(
+      value = {
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.METHOD,
+        ElementType.TYPE_USE
+      })
+  public static @interface MouseButton {}
 
-    @Retention(value=RetentionPolicy.CLASS)
-    @Target(value={ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.METHOD, ElementType.TYPE_USE})
-    public static @interface Action {
-    }
+  @Retention(value = RetentionPolicy.CLASS)
+  @Target(
+      value = {
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.LOCAL_VARIABLE,
+        ElementType.METHOD,
+        ElementType.TYPE_USE
+      })
+  public static @interface Action {}
 }
-

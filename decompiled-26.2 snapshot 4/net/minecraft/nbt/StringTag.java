@@ -161,8 +161,8 @@ public record StringTag(String value) implements PrimitiveTag
         block3: for (int i = 0; i < input.length(); ++i) {
             char c = input.charAt(i);
             switch (c) {
-                case '\"': 
-                case '\'': 
+                case '\"':
+                case '\'':
                 case '\\': {
                     result.append('\\');
                     result.append(c);
@@ -186,4 +186,3 @@ public record StringTag(String value) implements PrimitiveTag
         return visitor.visit(this.value);
     }
 }
-

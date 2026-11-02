@@ -9,19 +9,19 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 
 public enum ClientRegistryLayer {
-    STATIC,
-    REMOTE;
+  STATIC,
+  REMOTE;
 
-    private static final List<ClientRegistryLayer> VALUES;
-    private static final RegistryAccess.Frozen STATIC_ACCESS;
+  private static final List<ClientRegistryLayer> VALUES;
+  private static final RegistryAccess.Frozen STATIC_ACCESS;
 
-    public static LayeredRegistryAccess<ClientRegistryLayer> createRegistryAccess() {
-        return new LayeredRegistryAccess<ClientRegistryLayer>(VALUES).replaceFrom(STATIC, STATIC_ACCESS);
-    }
+  public static LayeredRegistryAccess<ClientRegistryLayer> createRegistryAccess() {
+    return new LayeredRegistryAccess<ClientRegistryLayer>(VALUES)
+        .replaceFrom(STATIC, STATIC_ACCESS);
+  }
 
-    static {
-        VALUES = List.of(ClientRegistryLayer.values());
-        STATIC_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
-    }
+  static {
+    VALUES = List.of(ClientRegistryLayer.values());
+    STATIC_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Iterables
  *  com.mojang.brigadier.CommandDispatcher
@@ -31,26 +31,54 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 
 public class HelpCommand {
-    private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType((Message)Component.translatable("commands.help.failed"));
+  private static final SimpleCommandExceptionType ERROR_FAILED =
+      new SimpleCommandExceptionType((Message) Component.translatable("commands.help.failed"));
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("help").executes(s -> {
-            Map usage = dispatcher.getSmartUsage((CommandNode)dispatcher.getRoot(), (Object)((CommandSourceStack)s.getSource()));
-            for (String line : usage.values()) {
-                ((CommandSourceStack)s.getSource()).sendSuccess(() -> Component.literal("/" + line), false);
-            }
-            return usage.size();
-        })).then(Commands.argument("command", StringArgumentType.greedyString()).executes(s -> {
-            ParseResults command = dispatcher.parse(StringArgumentType.getString((CommandContext)s, (String)"command"), (Object)((CommandSourceStack)s.getSource()));
-            if (command.getContext().getNodes().isEmpty()) {
-                throw ERROR_FAILED.create();
-            }
-            Map usage = dispatcher.getSmartUsage(((ParsedCommandNode)Iterables.getLast((Iterable)command.getContext().getNodes())).getNode(), (Object)((CommandSourceStack)s.getSource()));
-            for (String line : usage.values()) {
-                ((CommandSourceStack)s.getSource()).sendSuccess(() -> Component.literal("/" + command.getReader().getString() + " " + line), false);
-            }
-            return usage.size();
-        })));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("help")
+                        .executes(
+                            s -> {
+                              Map usage =
+                                  dispatcher.getSmartUsage(
+                                      (CommandNode) dispatcher.getRoot(),
+                                      (Object) ((CommandSourceStack) s.getSource()));
+                              for (String line : usage.values()) {
+                                ((CommandSourceStack) s.getSource())
+                                    .sendSuccess(() -> Component.literal("/" + line), false);
+                              }
+                              return usage.size();
+                            }))
+                .then(
+                    Commands.argument("command", StringArgumentType.greedyString())
+                        .executes(
+                            s -> {
+                              ParseResults command =
+                                  dispatcher.parse(
+                                      StringArgumentType.getString(
+                                          (CommandContext) s, (String) "command"),
+                                      (Object) ((CommandSourceStack) s.getSource()));
+                              if (command.getContext().getNodes().isEmpty()) {
+                                throw ERROR_FAILED.create();
+                              }
+                              Map usage =
+                                  dispatcher.getSmartUsage(
+                                      ((ParsedCommandNode)
+                                              Iterables.getLast(
+                                                  (Iterable) command.getContext().getNodes()))
+                                          .getNode(),
+                                      (Object) ((CommandSourceStack) s.getSource()));
+                              for (String line : usage.values()) {
+                                ((CommandSourceStack) s.getSource())
+                                    .sendSuccess(
+                                        () ->
+                                            Component.literal(
+                                                "/" + command.getReader().getString() + " " + line),
+                                        false);
+                              }
+                              return usage.size();
+                            })));
+  }
 }
-

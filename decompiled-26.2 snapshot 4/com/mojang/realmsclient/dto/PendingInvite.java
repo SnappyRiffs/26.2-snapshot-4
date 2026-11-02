@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonObject
  *  com.mojang.logging.LogUtils
@@ -18,17 +18,25 @@ import net.minecraft.util.Util;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public record PendingInvite(String invitationId, String realmName, String realmOwnerName, UUID realmOwnerUuid, Instant date) {
-    private static final Logger LOGGER = LogUtils.getLogger();
+public record PendingInvite(
+    String invitationId,
+    String realmName,
+    String realmOwnerName,
+    UUID realmOwnerUuid,
+    Instant date) {
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static @Nullable PendingInvite parse(JsonObject json) {
-        try {
-            return new PendingInvite(JsonUtils.getStringOr("invitationId", json, ""), JsonUtils.getStringOr("worldName", json, ""), JsonUtils.getStringOr("worldOwnerName", json, ""), JsonUtils.getUuidOr("worldOwnerUuid", json, Util.NIL_UUID), JsonUtils.getDateOr("date", json));
-        }
-        catch (Exception e) {
-            LOGGER.error("Could not parse PendingInvite", (Throwable)e);
-            return null;
-        }
+  public static @Nullable PendingInvite parse(JsonObject json) {
+    try {
+      return new PendingInvite(
+          JsonUtils.getStringOr("invitationId", json, ""),
+          JsonUtils.getStringOr("worldName", json, ""),
+          JsonUtils.getStringOr("worldOwnerName", json, ""),
+          JsonUtils.getUuidOr("worldOwnerUuid", json, Util.NIL_UUID),
+          JsonUtils.getDateOr("date", json));
+    } catch (Exception e) {
+      LOGGER.error("Could not parse PendingInvite", (Throwable) e);
+      return null;
     }
+  }
 }
-

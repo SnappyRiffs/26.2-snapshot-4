@@ -13,47 +13,45 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
-public class PlacementContext
-extends WorldGenerationContext {
-    private final WorldGenLevel level;
-    private final ChunkGenerator generator;
-    private final Optional<PlacedFeature> topFeature;
+public class PlacementContext extends WorldGenerationContext {
+  private final WorldGenLevel level;
+  private final ChunkGenerator generator;
+  private final Optional<PlacedFeature> topFeature;
 
-    public PlacementContext(WorldGenLevel level, ChunkGenerator generator, Optional<PlacedFeature> topFeature) {
-        super(generator, level);
-        this.level = level;
-        this.generator = generator;
-        this.topFeature = topFeature;
-    }
+  public PlacementContext(
+      WorldGenLevel level, ChunkGenerator generator, Optional<PlacedFeature> topFeature) {
+    super(generator, level);
+    this.level = level;
+    this.generator = generator;
+    this.topFeature = topFeature;
+  }
 
-    public int getHeight(Heightmap.Types type, int x, int z) {
-        return this.level.getHeight(type, x, z);
-    }
+  public int getHeight(Heightmap.Types type, int x, int z) {
+    return this.level.getHeight(type, x, z);
+  }
 
-    public CarvingMask getCarvingMask(ChunkPos pos) {
-        return ((ProtoChunk)this.level.getChunk(pos.x(), pos.z())).getOrCreateCarvingMask();
-    }
+  public CarvingMask getCarvingMask(ChunkPos pos) {
+    return ((ProtoChunk) this.level.getChunk(pos.x(), pos.z())).getOrCreateCarvingMask();
+  }
 
-    public BlockState getBlockState(BlockPos pos) {
-        return this.level.getBlockState(pos);
-    }
+  public BlockState getBlockState(BlockPos pos) {
+    return this.level.getBlockState(pos);
+  }
 
-    public int getMinY() {
-        return this.level.getMinY();
-    }
+  public int getMinY() {
+    return this.level.getMinY();
+  }
 
-    public WorldGenLevel getLevel() {
-        return this.level;
-    }
+  public WorldGenLevel getLevel() {
+    return this.level;
+  }
 
-    public Optional<PlacedFeature> topFeature() {
-        return this.topFeature;
-    }
+  public Optional<PlacedFeature> topFeature() {
+    return this.topFeature;
+  }
 
-    public ChunkGenerator generator() {
-        return this.generator;
-    }
+  public ChunkGenerator generator() {
+    return this.generator;
+  }
 }
-

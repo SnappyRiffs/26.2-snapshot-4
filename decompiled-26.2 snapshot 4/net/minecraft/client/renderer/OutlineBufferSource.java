@@ -5,93 +5,89 @@ package net.minecraft.client.renderer;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.Optional;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 
-public class OutlineBufferSource
-implements MultiBufferSource,
-AutoCloseable {
-    private final MultiBufferSource.BufferSource outlineBufferSource;
-    private int outlineColor = -1;
+public class OutlineBufferSource implements MultiBufferSource, AutoCloseable {
+  private final MultiBufferSource.BufferSource outlineBufferSource;
+  private int outlineColor = -1;
 
-    public OutlineBufferSource(MultiBufferSource.BufferSource outlineBufferSource) {
-        this.outlineBufferSource = outlineBufferSource;
+  public OutlineBufferSource(MultiBufferSource.BufferSource outlineBufferSource) {
+    this.outlineBufferSource = outlineBufferSource;
+  }
+
+  @Override
+  public VertexConsumer getBuffer(RenderType renderType) {
+    if (renderType.isOutline()) {
+      VertexConsumer delegate = this.outlineBufferSource.getBuffer(renderType);
+      return new EntityOutlineGenerator(delegate, this.outlineColor);
+    }
+    Optional<RenderType> outline = renderType.outline();
+    if (outline.isPresent()) {
+      VertexConsumer delegate = this.outlineBufferSource.getBuffer(outline.get());
+      return new EntityOutlineGenerator(delegate, this.outlineColor);
+    }
+    throw new IllegalStateException("Can't render an outline for this rendertype!");
+  }
+
+  public void setColor(int color) {
+    this.outlineColor = color;
+  }
+
+  public void endOutlineBatch() {
+    this.outlineBufferSource.uploadAndDraw();
+  }
+
+  public void endFrame() {
+    this.outlineBufferSource.endFrame();
+  }
+
+  @Override
+  public void close() {
+    this.outlineBufferSource.close();
+  }
+
+  private record EntityOutlineGenerator(VertexConsumer delegate, int color)
+      implements VertexConsumer {
+    @Override
+    public VertexConsumer addVertex(float x, float y, float z) {
+      this.delegate.addVertex(x, y, z).setColor(this.color);
+      return this;
     }
 
     @Override
-    public VertexConsumer getBuffer(RenderType renderType) {
-        if (renderType.isOutline()) {
-            VertexConsumer delegate = this.outlineBufferSource.getBuffer(renderType);
-            return new EntityOutlineGenerator(delegate, this.outlineColor);
-        }
-        Optional<RenderType> outline = renderType.outline();
-        if (outline.isPresent()) {
-            VertexConsumer delegate = this.outlineBufferSource.getBuffer(outline.get());
-            return new EntityOutlineGenerator(delegate, this.outlineColor);
-        }
-        throw new IllegalStateException("Can't render an outline for this rendertype!");
-    }
-
-    public void setColor(int color) {
-        this.outlineColor = color;
-    }
-
-    public void endOutlineBatch() {
-        this.outlineBufferSource.uploadAndDraw();
-    }
-
-    public void endFrame() {
-        this.outlineBufferSource.endFrame();
+    public VertexConsumer setColor(int r, int g, int b, int a) {
+      return this;
     }
 
     @Override
-    public void close() {
-        this.outlineBufferSource.close();
+    public VertexConsumer setColor(int color) {
+      return this;
     }
 
-    private record EntityOutlineGenerator(VertexConsumer delegate, int color) implements VertexConsumer
-    {
-        @Override
-        public VertexConsumer addVertex(float x, float y, float z) {
-            this.delegate.addVertex(x, y, z).setColor(this.color);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setColor(int r, int g, int b, int a) {
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setColor(int color) {
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setUv(float u, float v) {
-            this.delegate.setUv(u, v);
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setUv1(int u, int v) {
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setUv2(int u, int v) {
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setNormal(float x, float y, float z) {
-            return this;
-        }
-
-        @Override
-        public VertexConsumer setLineWidth(float width) {
-            return this;
-        }
+    @Override
+    public VertexConsumer setUv(float u, float v) {
+      this.delegate.setUv(u, v);
+      return this;
     }
+
+    @Override
+    public VertexConsumer setUv1(int u, int v) {
+      return this;
+    }
+
+    @Override
+    public VertexConsumer setUv2(int u, int v) {
+      return this;
+    }
+
+    @Override
+    public VertexConsumer setNormal(float x, float y, float z) {
+      return this;
+    }
+
+    @Override
+    public VertexConsumer setLineWidth(float width) {
+      return this;
+    }
+  }
 }
-

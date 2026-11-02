@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableSet
  */
@@ -16,27 +16,31 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.item.ItemEntity;
 
-public class NearestItemSensor
-extends Sensor<Mob> {
-    private static final long XZ_RANGE = 32L;
-    private static final long Y_RANGE = 16L;
-    public static final int MAX_DISTANCE_TO_WANTED_ITEM = 32;
+public class NearestItemSensor extends Sensor<Mob> {
+  private static final long XZ_RANGE = 32L;
+  private static final long Y_RANGE = 16L;
+  public static final int MAX_DISTANCE_TO_WANTED_ITEM = 32;
 
-    @Override
-    public Set<MemoryModuleType<?>> requires() {
-        return ImmutableSet.of(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM);
-    }
+  @Override
+  public Set<MemoryModuleType<?>> requires() {
+    return ImmutableSet.of(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM);
+  }
 
-    @Override
-    protected void doTick(ServerLevel level, Mob body) {
-        Brain<? extends LivingEntity> brain = body.getBrain();
-        List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, body.getBoundingBox().inflate(32.0, 16.0, 32.0), item -> true);
-        items.sort(Comparator.comparingDouble(body::distanceToSqr));
-        Optional<ItemEntity> nearestVisibleLovedItem = items.stream().filter(itemEntity -> body.wantsToPickUp(level, itemEntity.getItem())).filter(itemEntity -> itemEntity.closerThan(body, 32.0)).filter(body::hasLineOfSight).findFirst();
-        brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, nearestVisibleLovedItem);
-    }
+  @Override
+  protected void doTick(ServerLevel level, Mob body) {
+    Brain<? extends LivingEntity> brain = body.getBrain();
+    List<ItemEntity> items =
+        level.getEntitiesOfClass(
+            ItemEntity.class, body.getBoundingBox().inflate(32.0, 16.0, 32.0), item -> true);
+    items.sort(Comparator.comparingDouble(body::distanceToSqr));
+    Optional<ItemEntity> nearestVisibleLovedItem =
+        items.stream()
+            .filter(itemEntity -> body.wantsToPickUp(level, itemEntity.getItem()))
+            .filter(itemEntity -> itemEntity.closerThan(body, 32.0))
+            .filter(body::hasLineOfSight)
+            .findFirst();
+    brain.setMemory(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, nearestVisibleLovedItem);
+  }
 }
-

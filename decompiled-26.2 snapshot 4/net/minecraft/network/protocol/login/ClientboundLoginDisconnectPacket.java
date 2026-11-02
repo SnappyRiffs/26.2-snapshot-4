@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.mojang.serialization.JsonOps
@@ -18,23 +18,26 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.login.ClientLoginPacketListener;
-import net.minecraft.network.protocol.login.LoginPacketTypes;
 import net.minecraft.resources.RegistryOps;
 
-public record ClientboundLoginDisconnectPacket(Component reason) implements Packet<ClientLoginPacketListener>
-{
-    private static final RegistryOps<JsonElement> OPS = RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE);
-    public static final StreamCodec<ByteBuf, ClientboundLoginDisconnectPacket> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.lenientJson(262144).apply(ByteBufCodecs.fromCodec(OPS, ComponentSerialization.CODEC)), ClientboundLoginDisconnectPacket::reason, ClientboundLoginDisconnectPacket::new);
+public record ClientboundLoginDisconnectPacket(Component reason)
+    implements Packet<ClientLoginPacketListener> {
+  private static final RegistryOps<JsonElement> OPS =
+      RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE);
+  public static final StreamCodec<ByteBuf, ClientboundLoginDisconnectPacket> STREAM_CODEC =
+      StreamCodec.composite(
+          ByteBufCodecs.lenientJson(262144)
+              .apply(ByteBufCodecs.fromCodec(OPS, ComponentSerialization.CODEC)),
+          ClientboundLoginDisconnectPacket::reason,
+          ClientboundLoginDisconnectPacket::new);
 
-    @Override
-    public PacketType<ClientboundLoginDisconnectPacket> type() {
-        return LoginPacketTypes.CLIENTBOUND_LOGIN_DISCONNECT;
-    }
+  @Override
+  public PacketType<ClientboundLoginDisconnectPacket> type() {
+    return LoginPacketTypes.CLIENTBOUND_LOGIN_DISCONNECT;
+  }
 
-    @Override
-    public void handle(ClientLoginPacketListener listener) {
-        listener.handleDisconnect(this);
-    }
+  @Override
+  public void handle(ClientLoginPacketListener listener) {
+    listener.handleDisconnect(this);
+  }
 }
-

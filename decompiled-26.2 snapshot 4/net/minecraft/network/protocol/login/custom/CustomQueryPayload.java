@@ -7,8 +7,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 
 public interface CustomQueryPayload {
-    public Identifier id();
+  public Identifier id();
 
-    public void write(FriendlyByteBuf var1);
+  public void write(FriendlyByteBuf var1);
 }
-

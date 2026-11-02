@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonObject
@@ -10,22 +10,20 @@ package net.minecraft.server.jsonrpc.methods;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class RemoteRpcErrorException
-extends RuntimeException {
-    private final JsonElement id;
-    private final JsonObject error;
+public class RemoteRpcErrorException extends RuntimeException {
+  private final JsonElement id;
+  private final JsonObject error;
 
-    public RemoteRpcErrorException(JsonElement id, JsonObject error) {
-        this.id = id;
-        this.error = error;
-    }
+  public RemoteRpcErrorException(JsonElement id, JsonObject error) {
+    this.id = id;
+    this.error = error;
+  }
 
-    private JsonObject getError() {
-        return this.error;
-    }
+  private JsonObject getError() {
+    return this.error;
+  }
 
-    private JsonElement getId() {
-        return this.id;
-    }
+  private JsonElement getId() {
+    return this.id;
+  }
 }
-

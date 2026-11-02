@@ -4,6 +4,5 @@
 package net.minecraft.client.renderer.texture;
 
 public interface TickableTexture {
-    public void tick();
+  public void tick();
 }
-

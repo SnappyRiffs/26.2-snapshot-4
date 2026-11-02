@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix4f
  *  org.joml.Matrix4fc
@@ -15,53 +15,60 @@ import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import java.nio.ByteBuffer;
-import net.minecraft.client.renderer.Projection;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.system.MemoryStack;
 
-public class ProjectionMatrixBuffer
-implements AutoCloseable {
-    GpuBuffer buffer;
-    GpuBufferSlice bufferSlice;
-    private @Nullable Projection lastUploadedProjection = null;
-    private long projectionMatrixVersion = -1L;
-    private final Matrix4f tempMatrix = new Matrix4f();
+public class ProjectionMatrixBuffer implements AutoCloseable {
+  GpuBuffer buffer;
+  GpuBufferSlice bufferSlice;
+  private @Nullable Projection lastUploadedProjection = null;
+  private long projectionMatrixVersion = -1L;
+  private final Matrix4f tempMatrix = new Matrix4f();
 
-    public ProjectionMatrixBuffer(String name) {
-        GpuDevice device = RenderSystem.getDevice();
-        this.buffer = device.createBuffer(() -> "Camera projection matrix UBO " + name, 136, RenderSystem.PROJECTION_MATRIX_UBO_SIZE);
-        this.bufferSlice = this.buffer.slice(0L, RenderSystem.PROJECTION_MATRIX_UBO_SIZE);
-    }
+  public ProjectionMatrixBuffer(String name) {
+    GpuDevice device = RenderSystem.getDevice();
+    this.buffer =
+        device.createBuffer(
+            () -> "Camera projection matrix UBO " + name,
+            136,
+            RenderSystem.PROJECTION_MATRIX_UBO_SIZE);
+    this.bufferSlice = this.buffer.slice(0L, RenderSystem.PROJECTION_MATRIX_UBO_SIZE);
+  }
 
-    public GpuBufferSlice getBuffer(Projection projection) {
-        assert (projection.getMatrixVersion() != -1L);
-        if (this.lastUploadedProjection != projection || projection.getMatrixVersion() != this.projectionMatrixVersion) {
-            this.lastUploadedProjection = projection;
-            this.projectionMatrixVersion = projection.getMatrixVersion();
-            return this.writeBuffer(projection.getMatrix(this.tempMatrix));
-        }
-        return this.bufferSlice;
+  public GpuBufferSlice getBuffer(Projection projection) {
+    assert (projection.getMatrixVersion() != -1L);
+    if (this.lastUploadedProjection != projection
+        || projection.getMatrixVersion() != this.projectionMatrixVersion) {
+      this.lastUploadedProjection = projection;
+      this.projectionMatrixVersion = projection.getMatrixVersion();
+      return this.writeBuffer(projection.getMatrix(this.tempMatrix));
     }
+    return this.bufferSlice;
+  }
 
-    public GpuBufferSlice getBuffer(Matrix4f projectionMatrix) {
-        this.lastUploadedProjection = null;
-        this.projectionMatrixVersion = -1L;
-        return this.writeBuffer(projectionMatrix);
-    }
+  public GpuBufferSlice getBuffer(Matrix4f projectionMatrix) {
+    this.lastUploadedProjection = null;
+    this.projectionMatrixVersion = -1L;
+    return this.writeBuffer(projectionMatrix);
+  }
 
-    private GpuBufferSlice writeBuffer(Matrix4f projectionMatrix) {
-        try (MemoryStack stack = MemoryStack.stackPush();){
-            ByteBuffer byteBuffer = Std140Builder.onStack(stack, RenderSystem.PROJECTION_MATRIX_UBO_SIZE).putMat4f((Matrix4fc)projectionMatrix).get();
-            RenderSystem.getDevice().createCommandEncoder().writeToBuffer(this.buffer.slice(), byteBuffer);
-        }
-        return this.bufferSlice;
+  private GpuBufferSlice writeBuffer(Matrix4f projectionMatrix) {
+    try (MemoryStack stack = MemoryStack.stackPush(); ) {
+      ByteBuffer byteBuffer =
+          Std140Builder.onStack(stack, RenderSystem.PROJECTION_MATRIX_UBO_SIZE)
+              .putMat4f((Matrix4fc) projectionMatrix)
+              .get();
+      RenderSystem.getDevice()
+          .createCommandEncoder()
+          .writeToBuffer(this.buffer.slice(), byteBuffer);
     }
+    return this.bufferSlice;
+  }
 
-    @Override
-    public void close() {
-        this.buffer.close();
-    }
+  @Override
+  public void close() {
+    this.buffer.close();
+  }
 }
-

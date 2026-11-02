@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.ints.IntSet
  *  it.unimi.dsi.fastutil.ints.IntSets
@@ -17,29 +17,28 @@ import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.client.gui.font.glyphs.SpecialGlyphs;
 import org.jspecify.annotations.Nullable;
 
-public class AllMissingGlyphProvider
-implements GlyphProvider {
-    private static final UnbakedGlyph MISSING_INSTANCE = new UnbakedGlyph(){
+public class AllMissingGlyphProvider implements GlyphProvider {
+  private static final UnbakedGlyph MISSING_INSTANCE =
+      new UnbakedGlyph() {
 
         @Override
         public GlyphInfo info() {
-            return SpecialGlyphs.MISSING;
+          return SpecialGlyphs.MISSING;
         }
 
         @Override
         public BakedGlyph bake(UnbakedGlyph.Stitcher stitcher) {
-            return stitcher.getMissing();
+          return stitcher.getMissing();
         }
-    };
+      };
 
-    @Override
-    public @Nullable UnbakedGlyph getGlyph(int codepoint) {
-        return MISSING_INSTANCE;
-    }
+  @Override
+  public @Nullable UnbakedGlyph getGlyph(int codepoint) {
+    return MISSING_INSTANCE;
+  }
 
-    @Override
-    public IntSet getSupportedGlyphs() {
-        return IntSets.EMPTY_SET;
-    }
+  @Override
+  public IntSet getSupportedGlyphs() {
+    return IntSets.EMPTY_SET;
+  }
 }
-

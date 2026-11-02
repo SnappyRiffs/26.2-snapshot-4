@@ -8,15 +8,12 @@ import java.util.function.LongSupplier;
 
 @FunctionalInterface
 public interface TimeSource {
-    public long get(TimeUnit var1);
+  public long get(TimeUnit var1);
 
-    public static interface NanoTimeSource
-    extends LongSupplier,
-    TimeSource {
-        @Override
-        default public long get(TimeUnit timeUnit) {
-            return timeUnit.convert(this.getAsLong(), TimeUnit.NANOSECONDS);
-        }
+  public static interface NanoTimeSource extends LongSupplier, TimeSource {
+    @Override
+    public default long get(TimeUnit timeUnit) {
+      return timeUnit.convert(this.getAsLong(), TimeUnit.NANOSECONDS);
     }
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -19,15 +19,26 @@ import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.players.PlayerList;
 
 public class EmoteCommands {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)Commands.literal("me").then(Commands.argument("action", MessageArgument.message()).executes(c -> {
-            MessageArgument.resolveChatMessage((CommandContext<CommandSourceStack>)c, "action", message -> {
-                CommandSourceStack source = (CommandSourceStack)c.getSource();
-                PlayerList playerList = source.getServer().getPlayerList();
-                playerList.broadcastChatMessage((PlayerChatMessage)message, source, ChatType.bind(ChatType.EMOTE_COMMAND, source));
-            });
-            return 1;
-        })));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            Commands.literal("me")
+                .then(
+                    Commands.argument("action", MessageArgument.message())
+                        .executes(
+                            c -> {
+                              MessageArgument.resolveChatMessage(
+                                  (CommandContext<CommandSourceStack>) c,
+                                  "action",
+                                  message -> {
+                                    CommandSourceStack source = (CommandSourceStack) c.getSource();
+                                    PlayerList playerList = source.getServer().getPlayerList();
+                                    playerList.broadcastChatMessage(
+                                        (PlayerChatMessage) message,
+                                        source,
+                                        ChatType.bind(ChatType.EMOTE_COMMAND, source));
+                                  });
+                              return 1;
+                            })));
+  }
 }
-

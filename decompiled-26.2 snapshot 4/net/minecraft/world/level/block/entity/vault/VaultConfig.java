@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -49,4 +49,3 @@ public record VaultConfig(ResourceKey<LootTable> lootTable, double activationRan
         return DataResult.success((Object)this);
     }
 }
-

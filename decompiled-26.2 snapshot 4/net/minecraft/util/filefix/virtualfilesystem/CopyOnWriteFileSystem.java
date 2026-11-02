@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.annotations.VisibleForTesting
  *  com.mojang.logging.LogUtils
@@ -322,4 +322,3 @@ extends FileSystem {
     public record Moves(List<Path> directories, List<FileMove> copiedFiles, List<FileMove> preexistingFiles) {
     }
 }
-

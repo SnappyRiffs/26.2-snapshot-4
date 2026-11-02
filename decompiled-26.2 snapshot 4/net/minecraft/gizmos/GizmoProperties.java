@@ -4,10 +4,9 @@
 package net.minecraft.gizmos;
 
 public interface GizmoProperties {
-    public GizmoProperties setAlwaysOnTop();
+  public GizmoProperties setAlwaysOnTop();
 
-    public GizmoProperties persistForMillis(int var1);
+  public GizmoProperties persistForMillis(int var1);
 
-    public GizmoProperties fadeOut();
+  public GizmoProperties fadeOut();
 }
-

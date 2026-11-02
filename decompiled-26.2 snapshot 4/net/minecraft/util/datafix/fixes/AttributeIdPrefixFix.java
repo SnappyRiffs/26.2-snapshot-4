@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.schemas.Schema
  */
@@ -8,25 +8,22 @@ package net.minecraft.util.datafix.fixes;
 
 import com.mojang.datafixers.schemas.Schema;
 import java.util.List;
-import net.minecraft.util.datafix.fixes.AttributesRenameFix;
 import net.minecraft.util.datafix.schemas.NamespacedSchema;
 
-public class AttributeIdPrefixFix
-extends AttributesRenameFix {
-    private static final List<String> PREFIXES = List.of("generic.", "horse.", "player.", "zombie.");
+public class AttributeIdPrefixFix extends AttributesRenameFix {
+  private static final List<String> PREFIXES = List.of("generic.", "horse.", "player.", "zombie.");
 
-    public AttributeIdPrefixFix(Schema outputSchema) {
-        super(outputSchema, "AttributeIdPrefixFix", AttributeIdPrefixFix::replaceId);
-    }
+  public AttributeIdPrefixFix(Schema outputSchema) {
+    super(outputSchema, "AttributeIdPrefixFix", AttributeIdPrefixFix::replaceId);
+  }
 
-    private static String replaceId(String id) {
-        String namespacedId = NamespacedSchema.ensureNamespaced(id);
-        for (String prefix : PREFIXES) {
-            String namespacedPrefix = NamespacedSchema.ensureNamespaced(prefix);
-            if (!namespacedId.startsWith(namespacedPrefix)) continue;
-            return "minecraft:" + namespacedId.substring(namespacedPrefix.length());
-        }
-        return id;
+  private static String replaceId(String id) {
+    String namespacedId = NamespacedSchema.ensureNamespaced(id);
+    for (String prefix : PREFIXES) {
+      String namespacedPrefix = NamespacedSchema.ensureNamespaced(prefix);
+      if (!namespacedId.startsWith(namespacedPrefix)) continue;
+      return "minecraft:" + namespacedId.substring(namespacedPrefix.length());
     }
+    return id;
+  }
 }
-

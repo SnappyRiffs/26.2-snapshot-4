@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  *  org.joml.Vector3fc
@@ -20,24 +20,30 @@ import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 public interface SpecialModelRenderer<T> {
-    public void submit(@Nullable T var1, PoseStack var2, SubmitNodeCollector var3, int var4, int var5, boolean var6, int var7);
+  public void submit(
+      @Nullable T var1,
+      PoseStack var2,
+      SubmitNodeCollector var3,
+      int var4,
+      int var5,
+      boolean var6,
+      int var7);
 
-    public void getExtents(Consumer<Vector3fc> var1);
+  public void getExtents(Consumer<Vector3fc> var1);
 
-    public @Nullable T extractArgument(ItemStack var1);
+  public @Nullable T extractArgument(ItemStack var1);
 
-    public static interface BakingContext {
-        public EntityModelSet entityModelSet();
+  public static interface BakingContext {
+    public EntityModelSet entityModelSet();
 
-        public SpriteGetter sprites();
+    public SpriteGetter sprites();
 
-        public PlayerSkinRenderCache playerSkinRenderCache();
-    }
+    public PlayerSkinRenderCache playerSkinRenderCache();
+  }
 
-    public static interface Unbaked<T> {
-        public @Nullable SpecialModelRenderer<T> bake(BakingContext var1);
+  public static interface Unbaked<T> {
+    public @Nullable SpecialModelRenderer<T> bake(BakingContext var1);
 
-        public MapCodec<? extends Unbaked<T>> type();
-    }
+    public MapCodec<? extends Unbaked<T>> type();
+  }
 }
-

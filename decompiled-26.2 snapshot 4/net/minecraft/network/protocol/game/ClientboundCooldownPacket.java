@@ -8,22 +8,25 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.GamePacketTypes;
 import net.minecraft.resources.Identifier;
 
-public record ClientboundCooldownPacket(Identifier cooldownGroup, int duration) implements Packet<ClientGamePacketListener>
-{
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundCooldownPacket> STREAM_CODEC = StreamCodec.composite(Identifier.STREAM_CODEC, ClientboundCooldownPacket::cooldownGroup, ByteBufCodecs.VAR_INT, ClientboundCooldownPacket::duration, ClientboundCooldownPacket::new);
+public record ClientboundCooldownPacket(Identifier cooldownGroup, int duration)
+    implements Packet<ClientGamePacketListener> {
+  public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundCooldownPacket> STREAM_CODEC =
+      StreamCodec.composite(
+          Identifier.STREAM_CODEC,
+          ClientboundCooldownPacket::cooldownGroup,
+          ByteBufCodecs.VAR_INT,
+          ClientboundCooldownPacket::duration,
+          ClientboundCooldownPacket::new);
 
-    @Override
-    public PacketType<ClientboundCooldownPacket> type() {
-        return GamePacketTypes.CLIENTBOUND_COOLDOWN;
-    }
+  @Override
+  public PacketType<ClientboundCooldownPacket> type() {
+    return GamePacketTypes.CLIENTBOUND_COOLDOWN;
+  }
 
-    @Override
-    public void handle(ClientGamePacketListener listener) {
-        listener.handleItemCooldown(this);
-    }
+  @Override
+  public void handle(ClientGamePacketListener listener) {
+    listener.handleItemCooldown(this);
+  }
 }
-

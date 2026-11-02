@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -22,7 +22,50 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
-public record GeodeBlockSettings(BlockStateProvider fillingProvider, BlockStateProvider innerLayerProvider, BlockStateProvider alternateInnerLayerProvider, BlockStateProvider middleLayerProvider, BlockStateProvider outerLayerProvider, List<BlockState> innerPlacements, HolderSet<Block> cannotReplace, HolderSet<Block> invalidBlocks) {
-    public static final Codec<GeodeBlockSettings> CODEC = RecordCodecBuilder.create(i -> i.group((App)BlockStateProvider.CODEC.fieldOf("filling_provider").forGetter(GeodeBlockSettings::fillingProvider), (App)BlockStateProvider.CODEC.fieldOf("inner_layer_provider").forGetter(GeodeBlockSettings::innerLayerProvider), (App)BlockStateProvider.CODEC.fieldOf("alternate_inner_layer_provider").forGetter(GeodeBlockSettings::alternateInnerLayerProvider), (App)BlockStateProvider.CODEC.fieldOf("middle_layer_provider").forGetter(GeodeBlockSettings::middleLayerProvider), (App)BlockStateProvider.CODEC.fieldOf("outer_layer_provider").forGetter(GeodeBlockSettings::outerLayerProvider), (App)ExtraCodecs.nonEmptyList(BlockState.CODEC.listOf()).fieldOf("inner_placements").forGetter(GeodeBlockSettings::innerPlacements), (App)RegistryCodecs.homogeneousList(Registries.BLOCK).fieldOf("cannot_replace").forGetter(GeodeBlockSettings::cannotReplace), (App)RegistryCodecs.homogeneousList(Registries.BLOCK).fieldOf("invalid_blocks").forGetter(GeodeBlockSettings::invalidBlocks)).apply((Applicative)i, GeodeBlockSettings::new));
+public record GeodeBlockSettings(
+    BlockStateProvider fillingProvider,
+    BlockStateProvider innerLayerProvider,
+    BlockStateProvider alternateInnerLayerProvider,
+    BlockStateProvider middleLayerProvider,
+    BlockStateProvider outerLayerProvider,
+    List<BlockState> innerPlacements,
+    HolderSet<Block> cannotReplace,
+    HolderSet<Block> invalidBlocks) {
+  public static final Codec<GeodeBlockSettings> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          BlockStateProvider.CODEC
+                              .fieldOf("filling_provider")
+                              .forGetter(GeodeBlockSettings::fillingProvider),
+                      (App)
+                          BlockStateProvider.CODEC
+                              .fieldOf("inner_layer_provider")
+                              .forGetter(GeodeBlockSettings::innerLayerProvider),
+                      (App)
+                          BlockStateProvider.CODEC
+                              .fieldOf("alternate_inner_layer_provider")
+                              .forGetter(GeodeBlockSettings::alternateInnerLayerProvider),
+                      (App)
+                          BlockStateProvider.CODEC
+                              .fieldOf("middle_layer_provider")
+                              .forGetter(GeodeBlockSettings::middleLayerProvider),
+                      (App)
+                          BlockStateProvider.CODEC
+                              .fieldOf("outer_layer_provider")
+                              .forGetter(GeodeBlockSettings::outerLayerProvider),
+                      (App)
+                          ExtraCodecs.nonEmptyList(BlockState.CODEC.listOf())
+                              .fieldOf("inner_placements")
+                              .forGetter(GeodeBlockSettings::innerPlacements),
+                      (App)
+                          RegistryCodecs.homogeneousList(Registries.BLOCK)
+                              .fieldOf("cannot_replace")
+                              .forGetter(GeodeBlockSettings::cannotReplace),
+                      (App)
+                          RegistryCodecs.homogeneousList(Registries.BLOCK)
+                              .fieldOf("invalid_blocks")
+                              .forGetter(GeodeBlockSettings::invalidBlocks))
+                  .apply((Applicative) i, GeodeBlockSettings::new));
 }
-

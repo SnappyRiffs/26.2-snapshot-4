@@ -7,8 +7,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 
 public interface ServerPlayerConnection {
-    public ServerPlayer getPlayer();
+  public ServerPlayer getPlayer();
 
-    public void send(Packet<?> var1);
+  public void send(Packet<?> var1);
 }
-

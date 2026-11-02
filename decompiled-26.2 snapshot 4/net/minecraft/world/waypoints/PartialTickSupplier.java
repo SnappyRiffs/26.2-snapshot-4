@@ -7,6 +7,5 @@ import net.minecraft.world.entity.Entity;
 
 @FunctionalInterface
 public interface PartialTickSupplier {
-    public float apply(Entity var1);
+  public float apply(Entity var1);
 }
-

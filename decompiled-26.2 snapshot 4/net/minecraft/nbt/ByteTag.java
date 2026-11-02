@@ -148,4 +148,3 @@ public record ByteTag(byte value) implements NumericTag
         }
     }
 }
-

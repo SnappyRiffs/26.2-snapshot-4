@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  */
@@ -19,16 +19,21 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipProvider;
 
-public record InstrumentComponent(Holder<Instrument> instrument) implements TooltipProvider
-{
-    public static final Codec<InstrumentComponent> CODEC = Instrument.CODEC.xmap(InstrumentComponent::new, InstrumentComponent::instrument);
-    public static final StreamCodec<RegistryFriendlyByteBuf, InstrumentComponent> STREAM_CODEC = Instrument.STREAM_CODEC.map(InstrumentComponent::new, InstrumentComponent::instrument);
+public record InstrumentComponent(Holder<Instrument> instrument) implements TooltipProvider {
+  public static final Codec<InstrumentComponent> CODEC =
+      Instrument.CODEC.xmap(InstrumentComponent::new, InstrumentComponent::instrument);
+  public static final StreamCodec<RegistryFriendlyByteBuf, InstrumentComponent> STREAM_CODEC =
+      Instrument.STREAM_CODEC.map(InstrumentComponent::new, InstrumentComponent::instrument);
 
-    @Override
-    public void addToTooltip(Item.TooltipContext context, Consumer<Component> consumer, TooltipFlag flag, DataComponentGetter components) {
-        consumer.accept(ComponentUtils.mergeStyles(this.instrument.value().description(), Style.EMPTY.withColor(ChatFormatting.GRAY)));
-    }
+  @Override
+  public void addToTooltip(
+      Item.TooltipContext context,
+      Consumer<Component> consumer,
+      TooltipFlag flag,
+      DataComponentGetter components) {
+    consumer.accept(
+        ComponentUtils.mergeStyles(
+            this.instrument.value().description(), Style.EMPTY.withColor(ChatFormatting.GRAY)));
+  }
 }
-

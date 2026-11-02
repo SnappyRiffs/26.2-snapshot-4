@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.annotations.JsonAdapter
  *  com.google.gson.annotations.SerializedName
@@ -11,17 +11,15 @@ package com.mojang.realmsclient.dto;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.mojang.realmsclient.dto.ReflectionBasedSerialization;
 import com.mojang.util.UUIDTypeAdapter;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
-public class OutboundPlayer
-implements ReflectionBasedSerialization {
-    @SerializedName(value="name")
-    public @Nullable String name;
-    @SerializedName(value="uuid")
-    @JsonAdapter(value=UUIDTypeAdapter.class)
-    public @Nullable UUID uuid;
-}
+public class OutboundPlayer implements ReflectionBasedSerialization {
+  @SerializedName(value = "name")
+  public @Nullable String name;
 
+  @SerializedName(value = "uuid")
+  @JsonAdapter(value = UUIDTypeAdapter.class)
+  public @Nullable UUID uuid;
+}

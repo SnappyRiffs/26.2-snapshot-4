@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.Gson
  *  com.google.gson.GsonBuilder
@@ -43,90 +43,119 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class QuickPlayLog {
-    private static final QuickPlayLog INACTIVE = new QuickPlayLog(""){
+  private static final QuickPlayLog INACTIVE =
+      new QuickPlayLog("") {
 
         @Override
-        public void log(Minecraft minecraft) {
-        }
+        public void log(Minecraft minecraft) {}
 
         @Override
-        public void setWorldData(Type type, String id, String name) {
-        }
-    };
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Gson GSON = new GsonBuilder().create();
-    private final Path path;
-    private @Nullable QuickPlayWorld worldData;
+        public void setWorldData(Type type, String id, String name) {}
+      };
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Gson GSON = new GsonBuilder().create();
+  private final Path path;
+  private @Nullable QuickPlayWorld worldData;
 
-    private QuickPlayLog(String quickPlayPath) {
-        this.path = Minecraft.getInstance().gameDirectory.toPath().resolve(quickPlayPath);
+  private QuickPlayLog(String quickPlayPath) {
+    this.path = Minecraft.getInstance().gameDirectory.toPath().resolve(quickPlayPath);
+  }
+
+  public static QuickPlayLog of(@Nullable String path) {
+    if (path == null) {
+      return INACTIVE;
     }
+    return new QuickPlayLog(path);
+  }
 
-    public static QuickPlayLog of(@Nullable String path) {
-        if (path == null) {
-            return INACTIVE;
-        }
-        return new QuickPlayLog(path);
+  public void setWorldData(Type type, String id, String name) {
+    this.worldData = new QuickPlayWorld(type, id, name);
+  }
+
+  public void log(Minecraft minecraft) {
+    if (minecraft.gameMode == null || this.worldData == null) {
+      LOGGER.error("Failed to log session for quickplay. Missing world data or gamemode");
+      return;
     }
-
-    public void setWorldData(Type type, String id, String name) {
-        this.worldData = new QuickPlayWorld(type, id, name);
-    }
-
-    public void log(Minecraft minecraft) {
-        if (minecraft.gameMode == null || this.worldData == null) {
-            LOGGER.error("Failed to log session for quickplay. Missing world data or gamemode");
-            return;
-        }
-        Util.ioPool().execute(() -> {
-            try {
+    Util.ioPool()
+        .execute(
+            () -> {
+              try {
                 Files.deleteIfExists(this.path);
-            }
-            catch (IOException e) {
-                LOGGER.error("Failed to delete quickplay log file {}", (Object)this.path, (Object)e);
-            }
-            QuickPlayEntry quickPlayEntry = new QuickPlayEntry(this.worldData, Instant.now(), minecraft.gameMode.getPlayerMode());
-            Codec.list(QuickPlayEntry.CODEC).encodeStart((DynamicOps)JsonOps.INSTANCE, List.of(quickPlayEntry)).resultOrPartial(Util.prefix("Quick Play: ", arg_0 -> ((Logger)LOGGER).error(arg_0))).ifPresent(json -> {
-                try {
-                    Files.createDirectories(this.path.getParent(), new FileAttribute[0]);
-                    Files.writeString(this.path, (CharSequence)GSON.toJson(json), new OpenOption[0]);
-                }
-                catch (IOException e) {
-                    LOGGER.error("Failed to write to quickplay log file {}", (Object)this.path, (Object)e);
-                }
+              } catch (IOException e) {
+                LOGGER.error(
+                    "Failed to delete quickplay log file {}", (Object) this.path, (Object) e);
+              }
+              QuickPlayEntry quickPlayEntry =
+                  new QuickPlayEntry(
+                      this.worldData, Instant.now(), minecraft.gameMode.getPlayerMode());
+              Codec.list(QuickPlayEntry.CODEC)
+                  .encodeStart((DynamicOps) JsonOps.INSTANCE, List.of(quickPlayEntry))
+                  .resultOrPartial(
+                      Util.prefix("Quick Play: ", arg_0 -> ((Logger) LOGGER).error(arg_0)))
+                  .ifPresent(
+                      json -> {
+                        try {
+                          Files.createDirectories(this.path.getParent(), new FileAttribute[0]);
+                          Files.writeString(
+                              this.path, (CharSequence) GSON.toJson(json), new OpenOption[0]);
+                        } catch (IOException e) {
+                          LOGGER.error(
+                              "Failed to write to quickplay log file {}",
+                              (Object) this.path,
+                              (Object) e);
+                        }
+                      });
             });
-        });
+  }
+
+  private record QuickPlayWorld(Type type, String id, String name) {
+    public static final MapCodec<QuickPlayWorld> MAP_CODEC =
+        RecordCodecBuilder.mapCodec(
+            i ->
+                i.group(
+                        (App) Type.CODEC.fieldOf("type").forGetter(QuickPlayWorld::type),
+                        (App)
+                            ExtraCodecs.ESCAPED_STRING.fieldOf("id").forGetter(QuickPlayWorld::id),
+                        (App) Codec.STRING.fieldOf("name").forGetter(QuickPlayWorld::name))
+                    .apply((Applicative) i, QuickPlayWorld::new));
+  }
+
+  public static enum Type implements StringRepresentable {
+    SINGLEPLAYER("singleplayer"),
+    MULTIPLAYER("multiplayer"),
+    REALMS("realms");
+
+    private static final Codec<Type> CODEC;
+    private final String name;
+
+    private Type(String name) {
+      this.name = name;
     }
 
-    private record QuickPlayWorld(Type type, String id, String name) {
-        public static final MapCodec<QuickPlayWorld> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Type.CODEC.fieldOf("type").forGetter(QuickPlayWorld::type), (App)ExtraCodecs.ESCAPED_STRING.fieldOf("id").forGetter(QuickPlayWorld::id), (App)Codec.STRING.fieldOf("name").forGetter(QuickPlayWorld::name)).apply((Applicative)i, QuickPlayWorld::new));
+    @Override
+    public String getSerializedName() {
+      return this.name;
     }
 
-    public static enum Type implements StringRepresentable
-    {
-        SINGLEPLAYER("singleplayer"),
-        MULTIPLAYER("multiplayer"),
-        REALMS("realms");
-
-        private static final Codec<Type> CODEC;
-        private final String name;
-
-        private Type(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getSerializedName() {
-            return this.name;
-        }
-
-        static {
-            CODEC = StringRepresentable.fromEnum(Type::values);
-        }
+    static {
+      CODEC = StringRepresentable.fromEnum(Type::values);
     }
+  }
 
-    private record QuickPlayEntry(QuickPlayWorld quickPlayWorld, Instant lastPlayedTime, GameType gamemode) {
-        public static final Codec<QuickPlayEntry> CODEC = RecordCodecBuilder.create(i -> i.group((App)QuickPlayWorld.MAP_CODEC.forGetter(QuickPlayEntry::quickPlayWorld), (App)ExtraCodecs.INSTANT_ISO8601.fieldOf("lastPlayedTime").forGetter(QuickPlayEntry::lastPlayedTime), (App)GameType.CODEC.fieldOf("gamemode").forGetter(QuickPlayEntry::gamemode)).apply((Applicative)i, QuickPlayEntry::new));
-    }
+  private record QuickPlayEntry(
+      QuickPlayWorld quickPlayWorld, Instant lastPlayedTime, GameType gamemode) {
+    public static final Codec<QuickPlayEntry> CODEC =
+        RecordCodecBuilder.create(
+            i ->
+                i.group(
+                        (App) QuickPlayWorld.MAP_CODEC.forGetter(QuickPlayEntry::quickPlayWorld),
+                        (App)
+                            ExtraCodecs.INSTANT_ISO8601
+                                .fieldOf("lastPlayedTime")
+                                .forGetter(QuickPlayEntry::lastPlayedTime),
+                        (App)
+                            GameType.CODEC.fieldOf("gamemode").forGetter(QuickPlayEntry::gamemode))
+                    .apply((Applicative) i, QuickPlayEntry::new));
+  }
 }
-

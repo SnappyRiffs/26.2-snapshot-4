@@ -7,16 +7,15 @@ import net.minecraft.util.debug.DebugSubscription;
 import net.minecraft.util.debug.DebugSubscriptions;
 
 public enum RemoteDebugSampleType {
-    TICK_TIME(DebugSubscriptions.DEDICATED_SERVER_TICK_TIME);
+  TICK_TIME(DebugSubscriptions.DEDICATED_SERVER_TICK_TIME);
 
-    private final DebugSubscription<?> subscription;
+  private final DebugSubscription<?> subscription;
 
-    private RemoteDebugSampleType(DebugSubscription<?> subscription) {
-        this.subscription = subscription;
-    }
+  private RemoteDebugSampleType(DebugSubscription<?> subscription) {
+    this.subscription = subscription;
+  }
 
-    public DebugSubscription<?> subscription() {
-        return this.subscription;
-    }
+  public DebugSubscription<?> subscription() {
+    return this.subscription;
+  }
 }
-

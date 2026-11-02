@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.Message
  *  com.mojang.brigadier.context.CommandContext
@@ -20,15 +20,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.waypoints.WaypointTransmitter;
 
 public class WaypointArgument {
-    public static final SimpleCommandExceptionType ERROR_NOT_A_WAYPOINT = new SimpleCommandExceptionType((Message)Component.translatable("argument.waypoint.invalid"));
+  public static final SimpleCommandExceptionType ERROR_NOT_A_WAYPOINT =
+      new SimpleCommandExceptionType((Message) Component.translatable("argument.waypoint.invalid"));
 
-    public static WaypointTransmitter getWaypoint(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
-        Entity singleEntity = ((EntitySelector)context.getArgument(name, EntitySelector.class)).findSingleEntity((CommandSourceStack)context.getSource());
-        if (singleEntity instanceof WaypointTransmitter) {
-            WaypointTransmitter waypointTransmitter = (WaypointTransmitter)((Object)singleEntity);
-            return waypointTransmitter;
-        }
-        throw ERROR_NOT_A_WAYPOINT.create();
+  public static WaypointTransmitter getWaypoint(
+      CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
+    Entity singleEntity =
+        ((EntitySelector) context.getArgument(name, EntitySelector.class))
+            .findSingleEntity((CommandSourceStack) context.getSource());
+    if (singleEntity instanceof WaypointTransmitter) {
+      WaypointTransmitter waypointTransmitter = (WaypointTransmitter) ((Object) singleEntity);
+      return waypointTransmitter;
     }
+    throw ERROR_NOT_A_WAYPOINT.create();
+  }
 }
-

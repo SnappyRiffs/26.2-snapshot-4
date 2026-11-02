@@ -6,30 +6,25 @@ package net.minecraft.client.gui.narration;
 import java.util.Collection;
 import java.util.List;
 import net.minecraft.client.gui.components.TabOrderedElement;
-import net.minecraft.client.gui.narration.NarrationSupplier;
 
-public interface NarratableEntry
-extends NarrationSupplier,
-TabOrderedElement {
-    public NarrationPriority narrationPriority();
+public interface NarratableEntry extends NarrationSupplier, TabOrderedElement {
+  public NarrationPriority narrationPriority();
 
-    default public boolean isActive() {
-        return true;
+  public default boolean isActive() {
+    return true;
+  }
+
+  public default Collection<? extends NarratableEntry> getNarratables() {
+    return List.of(this);
+  }
+
+  public static enum NarrationPriority {
+    NONE,
+    HOVERED,
+    FOCUSED;
+
+    public boolean isTerminal() {
+      return this == FOCUSED;
     }
-
-    default public Collection<? extends NarratableEntry> getNarratables() {
-        return List.of(this);
-    }
-
-    public static enum NarrationPriority {
-        NONE,
-        HOVERED,
-        FOCUSED;
-
-
-        public boolean isTerminal() {
-            return this == FOCUSED;
-        }
-    }
+  }
 }
-

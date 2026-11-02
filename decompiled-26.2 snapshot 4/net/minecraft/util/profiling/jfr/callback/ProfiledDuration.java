@@ -5,6 +5,5 @@ package net.minecraft.util.profiling.jfr.callback;
 
 @FunctionalInterface
 public interface ProfiledDuration {
-    public void finish(boolean var1);
+  public void finish(boolean var1);
 }
-

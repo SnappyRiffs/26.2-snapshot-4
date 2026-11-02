@@ -8,54 +8,51 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.GamePacketTypes;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 
-public class ServerboundJigsawGeneratePacket
-implements Packet<ServerGamePacketListener> {
-    public static final StreamCodec<FriendlyByteBuf, ServerboundJigsawGeneratePacket> STREAM_CODEC = Packet.codec(ServerboundJigsawGeneratePacket::write, ServerboundJigsawGeneratePacket::new);
-    private final BlockPos pos;
-    private final int levels;
-    private final boolean keepJigsaws;
+public class ServerboundJigsawGeneratePacket implements Packet<ServerGamePacketListener> {
+  public static final StreamCodec<FriendlyByteBuf, ServerboundJigsawGeneratePacket> STREAM_CODEC =
+      Packet.codec(ServerboundJigsawGeneratePacket::write, ServerboundJigsawGeneratePacket::new);
+  private final BlockPos pos;
+  private final int levels;
+  private final boolean keepJigsaws;
 
-    public ServerboundJigsawGeneratePacket(BlockPos blockPos, int levels, boolean keepJigsaws) {
-        this.pos = blockPos;
-        this.levels = levels;
-        this.keepJigsaws = keepJigsaws;
-    }
+  public ServerboundJigsawGeneratePacket(BlockPos blockPos, int levels, boolean keepJigsaws) {
+    this.pos = blockPos;
+    this.levels = levels;
+    this.keepJigsaws = keepJigsaws;
+  }
 
-    private ServerboundJigsawGeneratePacket(FriendlyByteBuf input) {
-        this.pos = input.readBlockPos();
-        this.levels = input.readVarInt();
-        this.keepJigsaws = input.readBoolean();
-    }
+  private ServerboundJigsawGeneratePacket(FriendlyByteBuf input) {
+    this.pos = input.readBlockPos();
+    this.levels = input.readVarInt();
+    this.keepJigsaws = input.readBoolean();
+  }
 
-    private void write(FriendlyByteBuf output) {
-        output.writeBlockPos(this.pos);
-        output.writeVarInt(this.levels);
-        output.writeBoolean(this.keepJigsaws);
-    }
+  private void write(FriendlyByteBuf output) {
+    output.writeBlockPos(this.pos);
+    output.writeVarInt(this.levels);
+    output.writeBoolean(this.keepJigsaws);
+  }
 
-    @Override
-    public PacketType<ServerboundJigsawGeneratePacket> type() {
-        return GamePacketTypes.SERVERBOUND_JIGSAW_GENERATE;
-    }
+  @Override
+  public PacketType<ServerboundJigsawGeneratePacket> type() {
+    return GamePacketTypes.SERVERBOUND_JIGSAW_GENERATE;
+  }
 
-    @Override
-    public void handle(ServerGamePacketListener listener) {
-        listener.handleJigsawGenerate(this);
-    }
+  @Override
+  public void handle(ServerGamePacketListener listener) {
+    listener.handleJigsawGenerate(this);
+  }
 
-    public BlockPos getPos() {
-        return this.pos;
-    }
+  public BlockPos getPos() {
+    return this.pos;
+  }
 
-    public int levels() {
-        return this.levels;
-    }
+  public int levels() {
+    return this.levels;
+  }
 
-    public boolean keepJigsaws() {
-        return this.keepJigsaws;
-    }
+  public boolean keepJigsaws() {
+    return this.keepJigsaws;
+  }
 }
-

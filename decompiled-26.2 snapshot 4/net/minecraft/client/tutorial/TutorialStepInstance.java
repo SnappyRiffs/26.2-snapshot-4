@@ -11,28 +11,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 
 public interface TutorialStepInstance {
-    default public void clear() {
-    }
+  public default void clear() {}
 
-    default public void tick() {
-    }
+  public default void tick() {}
 
-    default public void onInput(ClientInput input) {
-    }
+  public default void onInput(ClientInput input) {}
 
-    default public void onMouse(double xd, double yd) {
-    }
+  public default void onMouse(double xd, double yd) {}
 
-    default public void onLookAt(ClientLevel level, HitResult hit) {
-    }
+  public default void onLookAt(ClientLevel level, HitResult hit) {}
 
-    default public void onDestroyBlock(ClientLevel level, BlockPos pos, BlockState state, float percent) {
-    }
+  public default void onDestroyBlock(
+      ClientLevel level, BlockPos pos, BlockState state, float percent) {}
 
-    default public void onOpenInventory() {
-    }
+  public default void onOpenInventory() {}
 
-    default public void onGetItem(ItemStack itemStack) {
-    }
+  public default void onGetItem(ItemStack itemStack) {}
 }
-

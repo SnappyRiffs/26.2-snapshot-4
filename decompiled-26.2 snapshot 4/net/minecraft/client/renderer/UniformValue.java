@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  *  com.mojang.serialization.MapCodec
@@ -25,181 +25,180 @@ import org.joml.Vector3ic;
 import org.joml.Vector4fc;
 
 public interface UniformValue {
-    public static final Codec<UniformValue> CODEC = Type.CODEC.dispatch(UniformValue::type, t -> t.valueCodec);
+  public static final Codec<UniformValue> CODEC =
+      Type.CODEC.dispatch(UniformValue::type, t -> t.valueCodec);
 
-    public void writeTo(Std140Builder var1);
+  public void writeTo(Std140Builder var1);
 
-    public void addSize(Std140SizeCalculator var1);
+  public void addSize(Std140SizeCalculator var1);
 
-    public Type type();
+  public Type type();
 
-    public static enum Type implements StringRepresentable
-    {
-        INT("int", IntUniform.CODEC),
-        IVEC3("ivec3", IVec3Uniform.CODEC),
-        FLOAT("float", FloatUniform.CODEC),
-        VEC2("vec2", Vec2Uniform.CODEC),
-        VEC3("vec3", Vec3Uniform.CODEC),
-        VEC4("vec4", Vec4Uniform.CODEC),
-        MATRIX4X4("matrix4x4", Matrix4x4Uniform.CODEC);
+  public static enum Type implements StringRepresentable {
+    INT("int", IntUniform.CODEC),
+    IVEC3("ivec3", IVec3Uniform.CODEC),
+    FLOAT("float", FloatUniform.CODEC),
+    VEC2("vec2", Vec2Uniform.CODEC),
+    VEC3("vec3", Vec3Uniform.CODEC),
+    VEC4("vec4", Vec4Uniform.CODEC),
+    MATRIX4X4("matrix4x4", Matrix4x4Uniform.CODEC);
 
-        public static final Codec<Type> CODEC;
-        private final String name;
-        private final MapCodec<? extends UniformValue> valueCodec;
+    public static final Codec<Type> CODEC;
+    private final String name;
+    private final MapCodec<? extends UniformValue> valueCodec;
 
-        private Type(String name, Codec<? extends UniformValue> valueCodec) {
-            this.name = name;
-            this.valueCodec = valueCodec.fieldOf("value");
-        }
-
-        @Override
-        public String getSerializedName() {
-            return this.name;
-        }
-
-        static {
-            CODEC = StringRepresentable.fromEnum(Type::values);
-        }
+    private Type(String name, Codec<? extends UniformValue> valueCodec) {
+      this.name = name;
+      this.valueCodec = valueCodec.fieldOf("value");
     }
 
-    public record Matrix4x4Uniform(Matrix4fc value) implements UniformValue
-    {
-        public static final Codec<Matrix4x4Uniform> CODEC = ExtraCodecs.MATRIX4F.xmap(Matrix4x4Uniform::new, Matrix4x4Uniform::value);
-
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putMat4f(this.value);
-        }
-
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putMat4f();
-        }
-
-        @Override
-        public Type type() {
-            return Type.MATRIX4X4;
-        }
+    @Override
+    public String getSerializedName() {
+      return this.name;
     }
 
-    public record Vec4Uniform(Vector4fc value) implements UniformValue
-    {
-        public static final Codec<Vec4Uniform> CODEC = ExtraCodecs.VECTOR4F.xmap(Vec4Uniform::new, Vec4Uniform::value);
+    static {
+      CODEC = StringRepresentable.fromEnum(Type::values);
+    }
+  }
 
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putVec4(this.value);
-        }
+  public record Matrix4x4Uniform(Matrix4fc value) implements UniformValue {
+    public static final Codec<Matrix4x4Uniform> CODEC =
+        ExtraCodecs.MATRIX4F.xmap(Matrix4x4Uniform::new, Matrix4x4Uniform::value);
 
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putVec4();
-        }
-
-        @Override
-        public Type type() {
-            return Type.VEC4;
-        }
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putMat4f(this.value);
     }
 
-    public record Vec3Uniform(Vector3fc value) implements UniformValue
-    {
-        public static final Codec<Vec3Uniform> CODEC = ExtraCodecs.VECTOR3F.xmap(Vec3Uniform::new, Vec3Uniform::value);
-
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putVec3(this.value);
-        }
-
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putVec3();
-        }
-
-        @Override
-        public Type type() {
-            return Type.VEC3;
-        }
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putMat4f();
     }
 
-    public record Vec2Uniform(Vector2fc value) implements UniformValue
-    {
-        public static final Codec<Vec2Uniform> CODEC = ExtraCodecs.VECTOR2F.xmap(Vec2Uniform::new, Vec2Uniform::value);
+    @Override
+    public Type type() {
+      return Type.MATRIX4X4;
+    }
+  }
 
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putVec2(this.value);
-        }
+  public record Vec4Uniform(Vector4fc value) implements UniformValue {
+    public static final Codec<Vec4Uniform> CODEC =
+        ExtraCodecs.VECTOR4F.xmap(Vec4Uniform::new, Vec4Uniform::value);
 
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putVec2();
-        }
-
-        @Override
-        public Type type() {
-            return Type.VEC2;
-        }
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putVec4(this.value);
     }
 
-    public record FloatUniform(float value) implements UniformValue
-    {
-        public static final Codec<FloatUniform> CODEC = Codec.FLOAT.xmap(FloatUniform::new, FloatUniform::value);
-
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putFloat(this.value);
-        }
-
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putFloat();
-        }
-
-        @Override
-        public Type type() {
-            return Type.FLOAT;
-        }
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putVec4();
     }
 
-    public record IVec3Uniform(Vector3ic value) implements UniformValue
-    {
-        public static final Codec<IVec3Uniform> CODEC = ExtraCodecs.VECTOR3I.xmap(IVec3Uniform::new, IVec3Uniform::value);
+    @Override
+    public Type type() {
+      return Type.VEC4;
+    }
+  }
 
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putIVec3(this.value);
-        }
+  public record Vec3Uniform(Vector3fc value) implements UniformValue {
+    public static final Codec<Vec3Uniform> CODEC =
+        ExtraCodecs.VECTOR3F.xmap(Vec3Uniform::new, Vec3Uniform::value);
 
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putIVec3();
-        }
-
-        @Override
-        public Type type() {
-            return Type.IVEC3;
-        }
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putVec3(this.value);
     }
 
-    public record IntUniform(int value) implements UniformValue
-    {
-        public static final Codec<IntUniform> CODEC = Codec.INT.xmap(IntUniform::new, IntUniform::value);
-
-        @Override
-        public void writeTo(Std140Builder builder) {
-            builder.putInt(this.value);
-        }
-
-        @Override
-        public void addSize(Std140SizeCalculator calculator) {
-            calculator.putInt();
-        }
-
-        @Override
-        public Type type() {
-            return Type.INT;
-        }
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putVec3();
     }
+
+    @Override
+    public Type type() {
+      return Type.VEC3;
+    }
+  }
+
+  public record Vec2Uniform(Vector2fc value) implements UniformValue {
+    public static final Codec<Vec2Uniform> CODEC =
+        ExtraCodecs.VECTOR2F.xmap(Vec2Uniform::new, Vec2Uniform::value);
+
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putVec2(this.value);
+    }
+
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putVec2();
+    }
+
+    @Override
+    public Type type() {
+      return Type.VEC2;
+    }
+  }
+
+  public record FloatUniform(float value) implements UniformValue {
+    public static final Codec<FloatUniform> CODEC =
+        Codec.FLOAT.xmap(FloatUniform::new, FloatUniform::value);
+
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putFloat(this.value);
+    }
+
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putFloat();
+    }
+
+    @Override
+    public Type type() {
+      return Type.FLOAT;
+    }
+  }
+
+  public record IVec3Uniform(Vector3ic value) implements UniformValue {
+    public static final Codec<IVec3Uniform> CODEC =
+        ExtraCodecs.VECTOR3I.xmap(IVec3Uniform::new, IVec3Uniform::value);
+
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putIVec3(this.value);
+    }
+
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putIVec3();
+    }
+
+    @Override
+    public Type type() {
+      return Type.IVEC3;
+    }
+  }
+
+  public record IntUniform(int value) implements UniformValue {
+    public static final Codec<IntUniform> CODEC =
+        Codec.INT.xmap(IntUniform::new, IntUniform::value);
+
+    @Override
+    public void writeTo(Std140Builder builder) {
+      builder.putInt(this.value);
+    }
+
+    @Override
+    public void addSize(Std140SizeCalculator calculator) {
+      calculator.putInt();
+    }
+
+    @Override
+    public Type type() {
+      return Type.INT;
+    }
+  }
 }
-

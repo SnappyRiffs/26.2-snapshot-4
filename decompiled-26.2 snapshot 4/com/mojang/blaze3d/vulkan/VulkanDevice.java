@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  it.unimi.dsi.fastutil.ints.IntIntPair
@@ -31,18 +31,6 @@ import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vulkan.VulkanBindGroupLayout;
-import com.mojang.blaze3d.vulkan.VulkanCommandEncoder;
-import com.mojang.blaze3d.vulkan.VulkanGpuBuffer;
-import com.mojang.blaze3d.vulkan.VulkanGpuSampler;
-import com.mojang.blaze3d.vulkan.VulkanGpuSurface;
-import com.mojang.blaze3d.vulkan.VulkanGpuTexture;
-import com.mojang.blaze3d.vulkan.VulkanGpuTextureView;
-import com.mojang.blaze3d.vulkan.VulkanInstance;
-import com.mojang.blaze3d.vulkan.VulkanPhysicalDevice;
-import com.mojang.blaze3d.vulkan.VulkanQueryPool;
-import com.mojang.blaze3d.vulkan.VulkanQueue;
-import com.mojang.blaze3d.vulkan.VulkanRenderPipeline;
 import com.mojang.blaze3d.vulkan.glsl.GlslCompiler;
 import com.mojang.blaze3d.vulkan.glsl.IntermediaryShaderModule;
 import com.mojang.blaze3d.vulkan.glsl.ShaderCompileException;
@@ -68,225 +56,327 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDeviceLimits;
 import org.slf4j.Logger;
 
-public class VulkanDevice
-implements GpuDeviceBackend {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private final ShaderSource defaultShaderSource;
-    private final Map<RenderPipeline, VulkanRenderPipeline> pipelineCache = new IdentityHashMap<RenderPipeline, VulkanRenderPipeline>();
-    private final Map<ShaderCompilationKey, IntermediaryShaderModule> shaderCache = new HashMap<ShaderCompilationKey, IntermediaryShaderModule>();
-    private final VulkanInstance instance;
-    private final VkDevice vkDevice;
-    private final long vma;
-    private final GlslCompiler glslCompiler = new GlslCompiler();
-    private final DeviceInfo deviceInfo;
-    private final VulkanQueue graphicsQueue;
-    private final VulkanQueue computeQueue;
-    private final VulkanQueue transferQueue;
-    private final boolean isIntegratedIntelMoltenVK;
-    private final VulkanCommandEncoder commandEncoder;
+public class VulkanDevice implements GpuDeviceBackend {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private final ShaderSource defaultShaderSource;
+  private final Map<RenderPipeline, VulkanRenderPipeline> pipelineCache =
+      new IdentityHashMap<RenderPipeline, VulkanRenderPipeline>();
+  private final Map<ShaderCompilationKey, IntermediaryShaderModule> shaderCache =
+      new HashMap<ShaderCompilationKey, IntermediaryShaderModule>();
+  private final VulkanInstance instance;
+  private final VkDevice vkDevice;
+  private final long vma;
+  private final GlslCompiler glslCompiler = new GlslCompiler();
+  private final DeviceInfo deviceInfo;
+  private final VulkanQueue graphicsQueue;
+  private final VulkanQueue computeQueue;
+  private final VulkanQueue transferQueue;
+  private final boolean isIntegratedIntelMoltenVK;
+  private final VulkanCommandEncoder commandEncoder;
 
-    public VulkanDevice(ShaderSource defaultShaderSource, VulkanInstance instance, VulkanPhysicalDevice physicalDevice, Set<String> enabledDeviceExtensions, VkDevice vkDevice, long vma) {
-        this.defaultShaderSource = defaultShaderSource;
-        this.instance = instance;
-        this.vkDevice = vkDevice;
-        this.vma = vma;
-        HashSet<CallSite> extensionNames = new HashSet<CallSite>();
-        for (String name : instance.getEnabledExtensions()) {
-            extensionNames.add((CallSite)((Object)(name + " (I)")));
-        }
-        for (String name : enabledDeviceExtensions) {
-            extensionNames.add((CallSite)((Object)(name + " (D)")));
-        }
-        VkPhysicalDeviceLimits limits = physicalDevice.vkPhysicalDeviceProperties().limits();
-        this.deviceInfo = new DeviceInfo(physicalDevice.deviceName(), physicalDevice.vendorName(), physicalDevice.driverInfo(), true, "Vulkan", limits.timestampPeriod(), new DeviceLimits((int)limits.maxSamplerAnisotropy(), (int)limits.minUniformBufferOffsetAlignment(), limits.maxImageDimension2D()), Collections.unmodifiableSet(extensionNames), new HintsAndWorkarounds(false, false), physicalDevice.deviceType());
-        IntIntPair graphicsQueueFamily = physicalDevice.graphicsQueueFamilyAndIndex();
-        assert (graphicsQueueFamily != null);
-        IntIntPair computeQueueFamily = physicalDevice.computeQueueFamilyAndIndex();
-        IntIntPair transferQueueFamily = physicalDevice.transferQueueFamilyAndIndex();
-        this.graphicsQueue = new VulkanQueue(this, graphicsQueueFamily.leftInt(), graphicsQueueFamily.rightInt());
-        this.computeQueue = computeQueueFamily != null ? new VulkanQueue(this, computeQueueFamily.leftInt(), computeQueueFamily.rightInt()) : this.graphicsQueue;
-        this.transferQueue = transferQueueFamily != null ? new VulkanQueue(this, transferQueueFamily.leftInt(), transferQueueFamily.rightInt()) : this.computeQueue;
-        this.isIntegratedIntelMoltenVK = physicalDevice.vkPhysicalDeviceProperties().deviceType() == 1 && physicalDevice.vkPhysicalDeviceProperties().vendorID() == 32902 && physicalDevice.vkPhysicalDeviceDriverProperties().driverID() == 14;
-        physicalDevice.close();
-        this.commandEncoder = new VulkanCommandEncoder(this);
+  public VulkanDevice(
+      ShaderSource defaultShaderSource,
+      VulkanInstance instance,
+      VulkanPhysicalDevice physicalDevice,
+      Set<String> enabledDeviceExtensions,
+      VkDevice vkDevice,
+      long vma) {
+    this.defaultShaderSource = defaultShaderSource;
+    this.instance = instance;
+    this.vkDevice = vkDevice;
+    this.vma = vma;
+    HashSet<CallSite> extensionNames = new HashSet<CallSite>();
+    for (String name : instance.getEnabledExtensions()) {
+      extensionNames.add((CallSite) ((Object) (name + " (I)")));
     }
+    for (String name : enabledDeviceExtensions) {
+      extensionNames.add((CallSite) ((Object) (name + " (D)")));
+    }
+    VkPhysicalDeviceLimits limits = physicalDevice.vkPhysicalDeviceProperties().limits();
+    this.deviceInfo =
+        new DeviceInfo(
+            physicalDevice.deviceName(),
+            physicalDevice.vendorName(),
+            physicalDevice.driverInfo(),
+            true,
+            "Vulkan",
+            limits.timestampPeriod(),
+            new DeviceLimits(
+                (int) limits.maxSamplerAnisotropy(),
+                (int) limits.minUniformBufferOffsetAlignment(),
+                limits.maxImageDimension2D()),
+            Collections.unmodifiableSet(extensionNames),
+            new HintsAndWorkarounds(false, false),
+            physicalDevice.deviceType());
+    IntIntPair graphicsQueueFamily = physicalDevice.graphicsQueueFamilyAndIndex();
+    assert (graphicsQueueFamily != null);
+    IntIntPair computeQueueFamily = physicalDevice.computeQueueFamilyAndIndex();
+    IntIntPair transferQueueFamily = physicalDevice.transferQueueFamilyAndIndex();
+    this.graphicsQueue =
+        new VulkanQueue(this, graphicsQueueFamily.leftInt(), graphicsQueueFamily.rightInt());
+    this.computeQueue =
+        computeQueueFamily != null
+            ? new VulkanQueue(this, computeQueueFamily.leftInt(), computeQueueFamily.rightInt())
+            : this.graphicsQueue;
+    this.transferQueue =
+        transferQueueFamily != null
+            ? new VulkanQueue(this, transferQueueFamily.leftInt(), transferQueueFamily.rightInt())
+            : this.computeQueue;
+    this.isIntegratedIntelMoltenVK =
+        physicalDevice.vkPhysicalDeviceProperties().deviceType() == 1
+            && physicalDevice.vkPhysicalDeviceProperties().vendorID() == 32902
+            && physicalDevice.vkPhysicalDeviceDriverProperties().driverID() == 14;
+    physicalDevice.close();
+    this.commandEncoder = new VulkanCommandEncoder(this);
+  }
 
+  @Override
+  public void close() {
+    this.commandEncoder.destroy();
+    this.clearPipelineCache();
+    Vma.vmaDestroyAllocator((long) this.vma);
+    VK12.vkDestroyDevice((VkDevice) this.vkDevice, null);
+    this.instance.close();
+    this.glslCompiler.close();
+  }
+
+  @Override
+  public DeviceInfo getDeviceInfo() {
+    return this.deviceInfo;
+  }
+
+  public VulkanInstance instance() {
+    return this.instance;
+  }
+
+  public VkDevice vkDevice() {
+    return this.vkDevice;
+  }
+
+  public VulkanQueue graphicsQueue() {
+    return this.graphicsQueue;
+  }
+
+  public VulkanQueue computeQueue() {
+    return this.computeQueue;
+  }
+
+  public VulkanQueue transferQueue() {
+    return this.transferQueue;
+  }
+
+  public long vma() {
+    return this.vma;
+  }
+
+  @Override
+  public GpuSurfaceBackend createSurface(long windowHandle) {
+    return new VulkanGpuSurface(this, windowHandle);
+  }
+
+  @Override
+  public VulkanCommandEncoder createCommandEncoder() {
+    return this.commandEncoder;
+  }
+
+  @Override
+  public GpuSampler createSampler(
+      AddressMode addressModeU,
+      AddressMode addressModeV,
+      FilterMode minFilter,
+      FilterMode magFilter,
+      int maxAnisotropy,
+      OptionalDouble maxLod) {
+    return new VulkanGpuSampler(
+        this, addressModeU, addressModeV, minFilter, magFilter, maxAnisotropy, maxLod);
+  }
+
+  @Override
+  public GpuTexture createTexture(
+      @Nullable Supplier<String> label,
+      int usage,
+      GpuFormat format,
+      int width,
+      int height,
+      int depthOrLayers,
+      int mipLevels) {
+    return new VulkanGpuTexture(
+        this,
+        usage,
+        this.isDebuggingEnabled() && label != null ? label.get() : "",
+        format,
+        width,
+        height,
+        depthOrLayers,
+        mipLevels);
+  }
+
+  @Override
+  public GpuTexture createTexture(
+      @Nullable String label,
+      int usage,
+      GpuFormat format,
+      int width,
+      int height,
+      int depthOrLayers,
+      int mipLevels) {
+    return new VulkanGpuTexture(
+        this,
+        usage,
+        this.isDebuggingEnabled() && label != null ? label : "",
+        format,
+        width,
+        height,
+        depthOrLayers,
+        mipLevels);
+  }
+
+  @Override
+  public GpuTextureView createTextureView(GpuTexture texture) {
+    return this.createTextureView(texture, 0, texture.getMipLevels());
+  }
+
+  @Override
+  public GpuTextureView createTextureView(GpuTexture texture, int baseMipLevel, int mipLevels) {
+    return new VulkanGpuTextureView(this, (VulkanGpuTexture) texture, baseMipLevel, mipLevels);
+  }
+
+  @Override
+  public GpuBuffer createBuffer(@Nullable Supplier<String> label, int usage, long size) {
+    return new VulkanGpuBuffer(this, label, usage, size, this.isIntegratedIntelMoltenVK);
+  }
+
+  @Override
+  public GpuBuffer createBuffer(@Nullable Supplier<String> label, int usage, ByteBuffer data) {
+    GpuBuffer buffer = this.createBuffer(label, usage | 8, data.remaining());
+    this.createCommandEncoder().writeToBuffer(buffer.slice(), data);
+    return buffer;
+  }
+
+  @Override
+  public List<String> getLastDebugMessages() {
+    return List.of();
+  }
+
+  @Override
+  public boolean isDebuggingEnabled() {
+    return this.instance.debug().enabled();
+  }
+
+  @Override
+  public CompiledRenderPipeline precompilePipeline(
+      RenderPipeline pipeline, @Nullable ShaderSource customShaderSource) {
+    ShaderSource shaderSource =
+        customShaderSource == null ? this.defaultShaderSource : customShaderSource;
+    return this.pipelineCache.computeIfAbsent(
+        pipeline, ignored -> this.compilePipeline(pipeline, shaderSource));
+  }
+
+  protected VulkanRenderPipeline getOrCompilePipeline(RenderPipeline pipeline) {
+    return this.pipelineCache.computeIfAbsent(
+        pipeline, ignored -> this.compilePipeline(pipeline, this.defaultShaderSource));
+  }
+
+  protected IntermediaryShaderModule getOrCompileShader(
+      Identifier id, ShaderType type, ShaderDefines defines, ShaderSource shaderSource) {
+    ShaderCompilationKey key = new ShaderCompilationKey(id, type, defines);
+    return this.shaderCache.computeIfAbsent(key, ignored -> this.compileShader(key, shaderSource));
+  }
+
+  private IntermediaryShaderModule compileShader(
+      ShaderCompilationKey key, ShaderSource shaderSource) {
+    String source = shaderSource.get(key.id, key.type);
+    if (source == null) {
+      LOGGER.error("Couldn't find source for {} shader ({})", (Object) key.type, (Object) key.id);
+      return IntermediaryShaderModule.INVALID;
+    }
+    String sourceWithDefines = GlslPreprocessor.injectDefines(source, key.defines);
+    try {
+      return this.glslCompiler.createIntermediary(
+          key.id.toDebugFileName(), sourceWithDefines, key.type);
+    } catch (ShaderCompileException e) {
+      LOGGER.error(
+          "Couldn't compile {} shader {}: {}", new Object[] {key.type, key.id, e.getMessage()});
+      return IntermediaryShaderModule.INVALID;
+    }
+  }
+
+  private VulkanRenderPipeline compilePipeline(RenderPipeline pipeline, ShaderSource shaderSource) {
+    IntermediaryShaderModule vertexShader =
+        this.getOrCompileShader(
+            pipeline.getVertexShader(),
+            ShaderType.VERTEX,
+            pipeline.getShaderDefines(),
+            shaderSource);
+    IntermediaryShaderModule fragmentShader =
+        this.getOrCompileShader(
+            pipeline.getFragmentShader(),
+            ShaderType.FRAGMENT,
+            pipeline.getShaderDefines(),
+            shaderSource);
+    if (vertexShader == IntermediaryShaderModule.INVALID) {
+      LOGGER.error(
+          "Couldn't compile pipeline {}: vertex shader {} was invalid",
+          (Object) pipeline.getLocation(),
+          (Object) pipeline.getVertexShader());
+      return new VulkanRenderPipeline(
+          pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
+    }
+    if (fragmentShader == IntermediaryShaderModule.INVALID) {
+      LOGGER.error(
+          "Couldn't compile pipeline {}: fragment shader {} was invalid",
+          (Object) pipeline.getLocation(),
+          (Object) pipeline.getFragmentShader());
+      return new VulkanRenderPipeline(
+          pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
+    }
+    try {
+      GlslCompiler.CompiledModules modules =
+          this.glslCompiler.compile(
+              this,
+              pipeline,
+              vertexShader,
+              fragmentShader,
+              pipeline.getVertexFormat().getElementAttributeNames());
+      return VulkanRenderPipeline.compile(
+          this, modules.layout(), pipeline, modules.vertex(), modules.fragment());
+    } catch (ShaderCompileException e) {
+      LOGGER.error(
+          "Couldn't compile pipeline {}: {}",
+          (Object) pipeline.getLocation(),
+          (Object) e.getMessage());
+      return new VulkanRenderPipeline(
+          pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
+    }
+  }
+
+  @Override
+  public void clearPipelineCache() {
+    this.graphicsQueue.waitIdle();
+    this.pipelineCache.values().forEach(VulkanRenderPipeline::destroy);
+    this.pipelineCache.clear();
+    this.shaderCache.values().forEach(IntermediaryShaderModule::close);
+    this.shaderCache.clear();
+  }
+
+  @Override
+  public GpuQueryPool createTimestampQueryPool(int size) {
+    return new VulkanQueryPool(this, size);
+  }
+
+  @Override
+  public long getTimestampNow() {
+    return this.commandEncoder.getTimestampNow();
+  }
+
+  private record ShaderCompilationKey(Identifier id, ShaderType type, ShaderDefines defines) {
     @Override
-    public void close() {
-        this.commandEncoder.destroy();
-        this.clearPipelineCache();
-        Vma.vmaDestroyAllocator((long)this.vma);
-        VK12.vkDestroyDevice((VkDevice)this.vkDevice, null);
-        this.instance.close();
-        this.glslCompiler.close();
+    public String toString() {
+      String string = String.valueOf(this.id) + " (" + String.valueOf((Object) this.type) + ")";
+      if (!this.defines.isEmpty()) {
+        return string + " with " + String.valueOf(this.defines);
+      }
+      return string;
     }
-
-    @Override
-    public DeviceInfo getDeviceInfo() {
-        return this.deviceInfo;
-    }
-
-    public VulkanInstance instance() {
-        return this.instance;
-    }
-
-    public VkDevice vkDevice() {
-        return this.vkDevice;
-    }
-
-    public VulkanQueue graphicsQueue() {
-        return this.graphicsQueue;
-    }
-
-    public VulkanQueue computeQueue() {
-        return this.computeQueue;
-    }
-
-    public VulkanQueue transferQueue() {
-        return this.transferQueue;
-    }
-
-    public long vma() {
-        return this.vma;
-    }
-
-    @Override
-    public GpuSurfaceBackend createSurface(long windowHandle) {
-        return new VulkanGpuSurface(this, windowHandle);
-    }
-
-    @Override
-    public VulkanCommandEncoder createCommandEncoder() {
-        return this.commandEncoder;
-    }
-
-    @Override
-    public GpuSampler createSampler(AddressMode addressModeU, AddressMode addressModeV, FilterMode minFilter, FilterMode magFilter, int maxAnisotropy, OptionalDouble maxLod) {
-        return new VulkanGpuSampler(this, addressModeU, addressModeV, minFilter, magFilter, maxAnisotropy, maxLod);
-    }
-
-    @Override
-    public GpuTexture createTexture(@Nullable Supplier<String> label, int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels) {
-        return new VulkanGpuTexture(this, usage, this.isDebuggingEnabled() && label != null ? label.get() : "", format, width, height, depthOrLayers, mipLevels);
-    }
-
-    @Override
-    public GpuTexture createTexture(@Nullable String label, int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels) {
-        return new VulkanGpuTexture(this, usage, this.isDebuggingEnabled() && label != null ? label : "", format, width, height, depthOrLayers, mipLevels);
-    }
-
-    @Override
-    public GpuTextureView createTextureView(GpuTexture texture) {
-        return this.createTextureView(texture, 0, texture.getMipLevels());
-    }
-
-    @Override
-    public GpuTextureView createTextureView(GpuTexture texture, int baseMipLevel, int mipLevels) {
-        return new VulkanGpuTextureView(this, (VulkanGpuTexture)texture, baseMipLevel, mipLevels);
-    }
-
-    @Override
-    public GpuBuffer createBuffer(@Nullable Supplier<String> label, int usage, long size) {
-        return new VulkanGpuBuffer(this, label, usage, size, this.isIntegratedIntelMoltenVK);
-    }
-
-    @Override
-    public GpuBuffer createBuffer(@Nullable Supplier<String> label, int usage, ByteBuffer data) {
-        GpuBuffer buffer = this.createBuffer(label, usage | 8, data.remaining());
-        this.createCommandEncoder().writeToBuffer(buffer.slice(), data);
-        return buffer;
-    }
-
-    @Override
-    public List<String> getLastDebugMessages() {
-        return List.of();
-    }
-
-    @Override
-    public boolean isDebuggingEnabled() {
-        return this.instance.debug().enabled();
-    }
-
-    @Override
-    public CompiledRenderPipeline precompilePipeline(RenderPipeline pipeline, @Nullable ShaderSource customShaderSource) {
-        ShaderSource shaderSource = customShaderSource == null ? this.defaultShaderSource : customShaderSource;
-        return this.pipelineCache.computeIfAbsent(pipeline, ignored -> this.compilePipeline(pipeline, shaderSource));
-    }
-
-    protected VulkanRenderPipeline getOrCompilePipeline(RenderPipeline pipeline) {
-        return this.pipelineCache.computeIfAbsent(pipeline, ignored -> this.compilePipeline(pipeline, this.defaultShaderSource));
-    }
-
-    protected IntermediaryShaderModule getOrCompileShader(Identifier id, ShaderType type, ShaderDefines defines, ShaderSource shaderSource) {
-        ShaderCompilationKey key = new ShaderCompilationKey(id, type, defines);
-        return this.shaderCache.computeIfAbsent(key, ignored -> this.compileShader(key, shaderSource));
-    }
-
-    private IntermediaryShaderModule compileShader(ShaderCompilationKey key, ShaderSource shaderSource) {
-        String source = shaderSource.get(key.id, key.type);
-        if (source == null) {
-            LOGGER.error("Couldn't find source for {} shader ({})", (Object)key.type, (Object)key.id);
-            return IntermediaryShaderModule.INVALID;
-        }
-        String sourceWithDefines = GlslPreprocessor.injectDefines(source, key.defines);
-        try {
-            return this.glslCompiler.createIntermediary(key.id.toDebugFileName(), sourceWithDefines, key.type);
-        }
-        catch (ShaderCompileException e) {
-            LOGGER.error("Couldn't compile {} shader {}: {}", new Object[]{key.type, key.id, e.getMessage()});
-            return IntermediaryShaderModule.INVALID;
-        }
-    }
-
-    private VulkanRenderPipeline compilePipeline(RenderPipeline pipeline, ShaderSource shaderSource) {
-        IntermediaryShaderModule vertexShader = this.getOrCompileShader(pipeline.getVertexShader(), ShaderType.VERTEX, pipeline.getShaderDefines(), shaderSource);
-        IntermediaryShaderModule fragmentShader = this.getOrCompileShader(pipeline.getFragmentShader(), ShaderType.FRAGMENT, pipeline.getShaderDefines(), shaderSource);
-        if (vertexShader == IntermediaryShaderModule.INVALID) {
-            LOGGER.error("Couldn't compile pipeline {}: vertex shader {} was invalid", (Object)pipeline.getLocation(), (Object)pipeline.getVertexShader());
-            return new VulkanRenderPipeline(pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
-        }
-        if (fragmentShader == IntermediaryShaderModule.INVALID) {
-            LOGGER.error("Couldn't compile pipeline {}: fragment shader {} was invalid", (Object)pipeline.getLocation(), (Object)pipeline.getFragmentShader());
-            return new VulkanRenderPipeline(pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
-        }
-        try {
-            GlslCompiler.CompiledModules modules = this.glslCompiler.compile(this, pipeline, vertexShader, fragmentShader, pipeline.getVertexFormat().getElementAttributeNames());
-            return VulkanRenderPipeline.compile(this, modules.layout(), pipeline, modules.vertex(), modules.fragment());
-        }
-        catch (ShaderCompileException e) {
-            LOGGER.error("Couldn't compile pipeline {}: {}", (Object)pipeline.getLocation(), (Object)e.getMessage());
-            return new VulkanRenderPipeline(pipeline, this, 0L, 0L, 0L, VulkanBindGroupLayout.INVALID_LAYOUT, 0L, 0L);
-        }
-    }
-
-    @Override
-    public void clearPipelineCache() {
-        this.graphicsQueue.waitIdle();
-        this.pipelineCache.values().forEach(VulkanRenderPipeline::destroy);
-        this.pipelineCache.clear();
-        this.shaderCache.values().forEach(IntermediaryShaderModule::close);
-        this.shaderCache.clear();
-    }
-
-    @Override
-    public GpuQueryPool createTimestampQueryPool(int size) {
-        return new VulkanQueryPool(this, size);
-    }
-
-    @Override
-    public long getTimestampNow() {
-        return this.commandEncoder.getTimestampNow();
-    }
-
-    private record ShaderCompilationKey(Identifier id, ShaderType type, ShaderDefines defines) {
-        @Override
-        public String toString() {
-            String string = String.valueOf(this.id) + " (" + String.valueOf((Object)this.type) + ")";
-            if (!this.defines.isEmpty()) {
-                return string + " with " + String.valueOf(this.defines);
-            }
-            return string;
-        }
-    }
+  }
 }
-

@@ -5,6 +5,5 @@ package net.minecraft.client.resources.model;
 
 @FunctionalInterface
 public interface ModelDebugName {
-    public String debugName();
+  public String debugName();
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -17,17 +17,23 @@ import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.IdentifierPattern;
 
-public record SourceFilter(IdentifierPattern filter) implements SpriteSource
-{
-    public static final MapCodec<SourceFilter> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)IdentifierPattern.CODEC.fieldOf("pattern").forGetter(SourceFilter::filter)).apply((Applicative)i, SourceFilter::new));
+public record SourceFilter(IdentifierPattern filter) implements SpriteSource {
+  public static final MapCodec<SourceFilter> MAP_CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App)
+                          IdentifierPattern.CODEC
+                              .fieldOf("pattern")
+                              .forGetter(SourceFilter::filter))
+                  .apply((Applicative) i, SourceFilter::new));
 
-    @Override
-    public void run(ResourceManager resourceManager, SpriteSource.Output output) {
-        output.removeAll(this.filter.locationPredicate());
-    }
+  @Override
+  public void run(ResourceManager resourceManager, SpriteSource.Output output) {
+    output.removeAll(this.filter.locationPredicate());
+  }
 
-    public MapCodec<SourceFilter> codec() {
-        return MAP_CODEC;
-    }
+  public MapCodec<SourceFilter> codec() {
+    return MAP_CODEC;
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.mojang.datafixers.kinds.App
@@ -196,4 +196,3 @@ public class ComponentSerialization {
         }
     }
 }
-

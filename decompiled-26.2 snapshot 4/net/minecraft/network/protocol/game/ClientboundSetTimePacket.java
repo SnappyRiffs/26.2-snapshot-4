@@ -11,23 +11,27 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.GamePacketTypes;
 import net.minecraft.world.clock.ClockNetworkState;
 import net.minecraft.world.clock.WorldClock;
 
-public record ClientboundSetTimePacket(long gameTime, Map<Holder<WorldClock>, ClockNetworkState> clockUpdates) implements Packet<ClientGamePacketListener>
-{
-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSetTimePacket> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.LONG, ClientboundSetTimePacket::gameTime, ByteBufCodecs.map(HashMap::new, WorldClock.STREAM_CODEC, ClockNetworkState.STREAM_CODEC), ClientboundSetTimePacket::clockUpdates, ClientboundSetTimePacket::new);
+public record ClientboundSetTimePacket(
+    long gameTime, Map<Holder<WorldClock>, ClockNetworkState> clockUpdates)
+    implements Packet<ClientGamePacketListener> {
+  public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundSetTimePacket> STREAM_CODEC =
+      StreamCodec.composite(
+          ByteBufCodecs.LONG,
+          ClientboundSetTimePacket::gameTime,
+          ByteBufCodecs.map(HashMap::new, WorldClock.STREAM_CODEC, ClockNetworkState.STREAM_CODEC),
+          ClientboundSetTimePacket::clockUpdates,
+          ClientboundSetTimePacket::new);
 
-    @Override
-    public PacketType<ClientboundSetTimePacket> type() {
-        return GamePacketTypes.CLIENTBOUND_SET_TIME;
-    }
+  @Override
+  public PacketType<ClientboundSetTimePacket> type() {
+    return GamePacketTypes.CLIENTBOUND_SET_TIME;
+  }
 
-    @Override
-    public void handle(ClientGamePacketListener listener) {
-        listener.handleSetTime(this);
-    }
+  @Override
+  public void handle(ClientGamePacketListener listener) {
+    listener.handleSetTime(this);
+  }
 }
-

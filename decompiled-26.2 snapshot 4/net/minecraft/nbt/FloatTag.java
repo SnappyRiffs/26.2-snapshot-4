@@ -134,4 +134,3 @@ public record FloatTag(float value) implements NumericTag
         return visitor.build();
     }
 }
-

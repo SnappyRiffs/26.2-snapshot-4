@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.google.common.util.concurrent.ThreadFactoryBuilder
@@ -62,181 +62,231 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.EventLoopGroupHolder;
-import net.minecraft.server.network.LegacyQueryHandler;
-import net.minecraft.server.network.MemoryServerHandshakePacketListenerImpl;
-import net.minecraft.server.network.ServerHandshakePacketListenerImpl;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class ServerConnectionListener {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private final MinecraftServer server;
-    public volatile boolean running;
-    private final List<ChannelFuture> channels = Collections.synchronizedList(Lists.newArrayList());
-    private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private final MinecraftServer server;
+  public volatile boolean running;
+  private final List<ChannelFuture> channels = Collections.synchronizedList(Lists.newArrayList());
+  private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
 
-    public ServerConnectionListener(MinecraftServer server) {
-        this.server = server;
-        this.running = true;
+  public ServerConnectionListener(MinecraftServer server) {
+    this.server = server;
+    this.running = true;
+  }
+
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public void startTcpServerListener(@Nullable InetAddress address, int port) throws IOException {
+    List<ChannelFuture> list = this.channels;
+    synchronized (list) {
+      EventLoopGroupHolder eventLoopGroupHolder =
+          EventLoopGroupHolder.remote(this.server.useNativeTransport());
+      this.channels.add(
+          ((ServerBootstrap)
+                  ((ServerBootstrap)
+                          new ServerBootstrap().channel(eventLoopGroupHolder.serverChannelCls()))
+                      .childHandler(
+                          (ChannelHandler)
+                              new ChannelInitializer<Channel>(this) {
+                                final /* synthetic */ ServerConnectionListener this$0;
+
+                                {
+                                  ServerConnectionListener serverConnectionListener = this$0;
+                                  Objects.requireNonNull(serverConnectionListener);
+                                  this.this$0 = serverConnectionListener;
+                                }
+
+                                protected void initChannel(Channel channel) {
+                                  try {
+                                    channel
+                                        .config()
+                                        .setOption(ChannelOption.TCP_NODELAY, (Object) true);
+                                  } catch (ChannelException channelException) {
+                                    // empty catch block
+                                  }
+                                  ChannelPipeline pipeline =
+                                      channel
+                                          .pipeline()
+                                          .addLast(
+                                              "timeout",
+                                              (ChannelHandler) new ReadTimeoutHandler(30));
+                                  if (this.this$0.server.repliesToStatus()) {
+                                    pipeline.addLast(
+                                        "legacy_query",
+                                        (ChannelHandler)
+                                            new LegacyQueryHandler(this.this$0.getServer()));
+                                  }
+                                  Connection.configureSerialization(
+                                      pipeline, PacketFlow.SERVERBOUND, false, null);
+                                  int rateLimitPacketsPerSecond =
+                                      this.this$0.server.getRateLimitPacketsPerSecond();
+                                  Connection connection =
+                                      rateLimitPacketsPerSecond > 0
+                                          ? new RateKickingConnection(rateLimitPacketsPerSecond)
+                                          : new Connection(PacketFlow.SERVERBOUND);
+                                  this.this$0.connections.add(connection);
+                                  connection.configurePacketHandler(pipeline);
+                                  connection.setListenerForServerboundHandshake(
+                                      new ServerHandshakePacketListenerImpl(
+                                          this.this$0.server, connection));
+                                }
+                              })
+                      .group(eventLoopGroupHolder.eventLoopGroup())
+                      .localAddress(address, port))
+              .bind()
+              .syncUninterruptibly());
     }
+  }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public void startTcpServerListener(@Nullable InetAddress address, int port) throws IOException {
-        List<ChannelFuture> list = this.channels;
-        synchronized (list) {
-            EventLoopGroupHolder eventLoopGroupHolder = EventLoopGroupHolder.remote(this.server.useNativeTransport());
-            this.channels.add(((ServerBootstrap)((ServerBootstrap)new ServerBootstrap().channel(eventLoopGroupHolder.serverChannelCls())).childHandler((ChannelHandler)new ChannelInitializer<Channel>(this){
-                final /* synthetic */ ServerConnectionListener this$0;
-                {
-                    ServerConnectionListener serverConnectionListener = this$0;
-                    Objects.requireNonNull(serverConnectionListener);
-                    this.this$0 = serverConnectionListener;
-                }
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public SocketAddress startMemoryChannel() {
+    ChannelFuture newChannel;
+    List<ChannelFuture> list = this.channels;
+    synchronized (list) {
+      newChannel =
+          ((ServerBootstrap)
+                  ((ServerBootstrap)
+                          new ServerBootstrap()
+                              .channel(EventLoopGroupHolder.local().serverChannelCls()))
+                      .childHandler(
+                          (ChannelHandler)
+                              new ChannelInitializer<Channel>(this) {
+                                final /* synthetic */ ServerConnectionListener this$0;
 
-                protected void initChannel(Channel channel) {
-                    try {
-                        channel.config().setOption(ChannelOption.TCP_NODELAY, (Object)true);
-                    }
-                    catch (ChannelException channelException) {
-                        // empty catch block
-                    }
-                    ChannelPipeline pipeline = channel.pipeline().addLast("timeout", (ChannelHandler)new ReadTimeoutHandler(30));
-                    if (this.this$0.server.repliesToStatus()) {
-                        pipeline.addLast("legacy_query", (ChannelHandler)new LegacyQueryHandler(this.this$0.getServer()));
-                    }
-                    Connection.configureSerialization(pipeline, PacketFlow.SERVERBOUND, false, null);
-                    int rateLimitPacketsPerSecond = this.this$0.server.getRateLimitPacketsPerSecond();
-                    Connection connection = rateLimitPacketsPerSecond > 0 ? new RateKickingConnection(rateLimitPacketsPerSecond) : new Connection(PacketFlow.SERVERBOUND);
-                    this.this$0.connections.add(connection);
-                    connection.configurePacketHandler(pipeline);
-                    connection.setListenerForServerboundHandshake(new ServerHandshakePacketListenerImpl(this.this$0.server, connection));
-                }
-            }).group(eventLoopGroupHolder.eventLoopGroup()).localAddress(address, port)).bind().syncUninterruptibly());
-        }
+                                {
+                                  ServerConnectionListener serverConnectionListener = this$0;
+                                  Objects.requireNonNull(serverConnectionListener);
+                                  this.this$0 = serverConnectionListener;
+                                }
+
+                                protected void initChannel(Channel channel) {
+                                  Connection connection = new Connection(PacketFlow.SERVERBOUND);
+                                  connection.setListenerForServerboundHandshake(
+                                      new MemoryServerHandshakePacketListenerImpl(
+                                          this.this$0.server, connection));
+                                  this.this$0.connections.add(connection);
+                                  ChannelPipeline pipeline = channel.pipeline();
+                                  Connection.configureInMemoryPipeline(
+                                      pipeline, PacketFlow.SERVERBOUND);
+                                  if (SharedConstants.DEBUG_FAKE_LATENCY_MS > 0) {
+                                    pipeline.addLast(
+                                        "latency",
+                                        (ChannelHandler)
+                                            new LatencySimulator(
+                                                SharedConstants.DEBUG_FAKE_LATENCY_MS,
+                                                SharedConstants.DEBUG_FAKE_JITTER_MS));
+                                  }
+                                  connection.configurePacketHandler(pipeline);
+                                }
+                              })
+                      .group(EventLoopGroupHolder.local().eventLoopGroup())
+                      .localAddress((SocketAddress) LocalAddress.ANY))
+              .bind()
+              .syncUninterruptibly();
+      this.channels.add(newChannel);
     }
+    return newChannel.channel().localAddress();
+  }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public SocketAddress startMemoryChannel() {
-        ChannelFuture newChannel;
-        List<ChannelFuture> list = this.channels;
-        synchronized (list) {
-            newChannel = ((ServerBootstrap)((ServerBootstrap)new ServerBootstrap().channel(EventLoopGroupHolder.local().serverChannelCls())).childHandler((ChannelHandler)new ChannelInitializer<Channel>(this){
-                final /* synthetic */ ServerConnectionListener this$0;
-                {
-                    ServerConnectionListener serverConnectionListener = this$0;
-                    Objects.requireNonNull(serverConnectionListener);
-                    this.this$0 = serverConnectionListener;
-                }
-
-                protected void initChannel(Channel channel) {
-                    Connection connection = new Connection(PacketFlow.SERVERBOUND);
-                    connection.setListenerForServerboundHandshake(new MemoryServerHandshakePacketListenerImpl(this.this$0.server, connection));
-                    this.this$0.connections.add(connection);
-                    ChannelPipeline pipeline = channel.pipeline();
-                    Connection.configureInMemoryPipeline(pipeline, PacketFlow.SERVERBOUND);
-                    if (SharedConstants.DEBUG_FAKE_LATENCY_MS > 0) {
-                        pipeline.addLast("latency", (ChannelHandler)new LatencySimulator(SharedConstants.DEBUG_FAKE_LATENCY_MS, SharedConstants.DEBUG_FAKE_JITTER_MS));
-                    }
-                    connection.configurePacketHandler(pipeline);
-                }
-            }).group(EventLoopGroupHolder.local().eventLoopGroup()).localAddress((SocketAddress)LocalAddress.ANY)).bind().syncUninterruptibly();
-            this.channels.add(newChannel);
-        }
-        return newChannel.channel().localAddress();
+  public void stop() {
+    this.running = false;
+    for (ChannelFuture channel : this.channels) {
+      try {
+        channel.channel().close().sync();
+      } catch (InterruptedException ignored) {
+        LOGGER.error("Interrupted whilst closing channel");
+      }
     }
+  }
 
-    public void stop() {
-        this.running = false;
-        for (ChannelFuture channel : this.channels) {
-            try {
-                channel.channel().close().sync();
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public void tick() {
+    List<Connection> list = this.connections;
+    synchronized (list) {
+      Iterator<Connection> iterator = this.connections.iterator();
+      while (iterator.hasNext()) {
+        Connection connection = iterator.next();
+        if (connection.isConnecting()) continue;
+        if (connection.isConnected()) {
+          try {
+            connection.tick();
+          } catch (Exception e) {
+            if (connection.isMemoryConnection()) {
+              throw new ReportedException(CrashReport.forThrowable(e, "Ticking memory connection"));
             }
-            catch (InterruptedException ignored) {
-                LOGGER.error("Interrupted whilst closing channel");
-            }
+            LOGGER.warn(
+                "Failed to handle packet for {}",
+                (Object) connection.getLoggableAddress(this.server.logIPs()),
+                (Object) e);
+            MutableComponent component = Component.literal("Internal server error");
+            connection.send(
+                new ClientboundDisconnectPacket(component),
+                PacketSendListener.thenRun(() -> connection.disconnect(component)));
+            connection.setReadOnly();
+          }
+          continue;
         }
+        iterator.remove();
+        connection.handleDisconnection();
+      }
+    }
+  }
+
+  public MinecraftServer getServer() {
+    return this.server;
+  }
+
+  public List<Connection> getConnections() {
+    return this.connections;
+  }
+
+  private static class LatencySimulator extends ChannelInboundHandlerAdapter {
+    private static final Timer TIMER =
+        new HashedWheelTimer(
+            new ThreadFactoryBuilder()
+                .setNameFormat("Latency Simulator #%d")
+                .setDaemon(true)
+                .build());
+    private final int delay;
+    private final int jitter;
+    private final List<DelayedMessage> queuedMessages = Lists.newArrayList();
+
+    public LatencySimulator(int delay, int jitter) {
+      this.delay = delay;
+      this.jitter = jitter;
     }
 
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public void tick() {
-        List<Connection> list = this.connections;
-        synchronized (list) {
-            Iterator<Connection> iterator = this.connections.iterator();
-            while (iterator.hasNext()) {
-                Connection connection = iterator.next();
-                if (connection.isConnecting()) continue;
-                if (connection.isConnected()) {
-                    try {
-                        connection.tick();
-                    }
-                    catch (Exception e) {
-                        if (connection.isMemoryConnection()) {
-                            throw new ReportedException(CrashReport.forThrowable(e, "Ticking memory connection"));
-                        }
-                        LOGGER.warn("Failed to handle packet for {}", (Object)connection.getLoggableAddress(this.server.logIPs()), (Object)e);
-                        MutableComponent component = Component.literal("Internal server error");
-                        connection.send(new ClientboundDisconnectPacket(component), PacketSendListener.thenRun(() -> connection.disconnect(component)));
-                        connection.setReadOnly();
-                    }
-                    continue;
-                }
-                iterator.remove();
-                connection.handleDisconnection();
-            }
-        }
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+      this.delayDownstream(ctx, msg);
     }
 
-    public MinecraftServer getServer() {
-        return this.server;
+    private void delayDownstream(ChannelHandlerContext ctx, Object msg) {
+      int sendDelay = this.delay + (int) (Math.random() * (double) this.jitter);
+      this.queuedMessages.add(new DelayedMessage(ctx, msg));
+      TIMER.newTimeout(this::onTimeout, (long) sendDelay, TimeUnit.MILLISECONDS);
     }
 
-    public List<Connection> getConnections() {
-        return this.connections;
+    private void onTimeout(Timeout timeout) {
+      DelayedMessage next = this.queuedMessages.remove(0);
+      next.ctx.fireChannelRead(next.msg);
     }
 
-    private static class LatencySimulator
-    extends ChannelInboundHandlerAdapter {
-        private static final Timer TIMER = new HashedWheelTimer(new ThreadFactoryBuilder().setNameFormat("Latency Simulator #%d").setDaemon(true).build());
-        private final int delay;
-        private final int jitter;
-        private final List<DelayedMessage> queuedMessages = Lists.newArrayList();
+    private static class DelayedMessage {
+      public final ChannelHandlerContext ctx;
+      public final Object msg;
 
-        public LatencySimulator(int delay, int jitter) {
-            this.delay = delay;
-            this.jitter = jitter;
-        }
-
-        public void channelRead(ChannelHandlerContext ctx, Object msg) {
-            this.delayDownstream(ctx, msg);
-        }
-
-        private void delayDownstream(ChannelHandlerContext ctx, Object msg) {
-            int sendDelay = this.delay + (int)(Math.random() * (double)this.jitter);
-            this.queuedMessages.add(new DelayedMessage(ctx, msg));
-            TIMER.newTimeout(this::onTimeout, (long)sendDelay, TimeUnit.MILLISECONDS);
-        }
-
-        private void onTimeout(Timeout timeout) {
-            DelayedMessage next = this.queuedMessages.remove(0);
-            next.ctx.fireChannelRead(next.msg);
-        }
-
-        private static class DelayedMessage {
-            public final ChannelHandlerContext ctx;
-            public final Object msg;
-
-            public DelayedMessage(ChannelHandlerContext ctx, Object msg) {
-                this.ctx = ctx;
-                this.msg = msg;
-            }
-        }
+      public DelayedMessage(ChannelHandlerContext ctx, Object msg) {
+        this.ctx = ctx;
+        this.msg = msg;
+      }
     }
+  }
 }
-

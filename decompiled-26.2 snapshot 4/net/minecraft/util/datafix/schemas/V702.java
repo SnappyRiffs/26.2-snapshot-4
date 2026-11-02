@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.schemas.Schema
@@ -15,17 +15,25 @@ import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.util.datafix.fixes.References;
 
-public class V702
-extends Schema {
-    public V702(int versionKey, Schema parent) {
-        super(versionKey, parent);
-    }
+public class V702 extends Schema {
+  public V702(int versionKey, Schema parent) {
+    super(versionKey, parent);
+  }
 
-    public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {
-        Map map = super.registerEntities(schema);
-        schema.register(map, "ZombieVillager", name -> DSL.optionalFields((String)"Offers", (TypeTemplate)DSL.optionalFields((String)"Recipes", (TypeTemplate)DSL.list((TypeTemplate)References.VILLAGER_TRADE.in(schema)))));
-        schema.registerSimple(map, "Husk");
-        return map;
-    }
+  public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {
+    Map map = super.registerEntities(schema);
+    schema.register(
+        map,
+        "ZombieVillager",
+        name ->
+            DSL.optionalFields(
+                (String) "Offers",
+                (TypeTemplate)
+                    DSL.optionalFields(
+                        (String) "Recipes",
+                        (TypeTemplate)
+                            DSL.list((TypeTemplate) References.VILLAGER_TRADE.in(schema)))));
+    schema.registerSimple(map, "Husk");
+    return map;
+  }
 }
-

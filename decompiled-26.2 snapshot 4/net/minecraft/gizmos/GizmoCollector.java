@@ -3,29 +3,26 @@
  */
 package net.minecraft.gizmos;
 
-import net.minecraft.gizmos.Gizmo;
-import net.minecraft.gizmos.GizmoProperties;
-
 public interface GizmoCollector {
-    public static final GizmoProperties IGNORED = new GizmoProperties(){
+  public static final GizmoProperties IGNORED =
+      new GizmoProperties() {
 
         @Override
         public GizmoProperties setAlwaysOnTop() {
-            return this;
+          return this;
         }
 
         @Override
         public GizmoProperties persistForMillis(int milliseconds) {
-            return this;
+          return this;
         }
 
         @Override
         public GizmoProperties fadeOut() {
-            return this;
+          return this;
         }
-    };
-    public static final GizmoCollector NOOP = gizmo -> IGNORED;
+      };
+  public static final GizmoCollector NOOP = gizmo -> IGNORED;
 
-    public GizmoProperties add(Gizmo var1);
+  public GizmoProperties add(Gizmo var1);
 }
-

@@ -10,11 +10,10 @@ import net.minecraft.server.dialog.input.InputControl;
 
 @FunctionalInterface
 public interface InputControlHandler<T extends InputControl> {
-    public void addControl(T var1, Screen var2, Output var3);
+  public void addControl(T var1, Screen var2, Output var3);
 
-    @FunctionalInterface
-    public static interface Output {
-        public void accept(LayoutElement var1, Action.ValueGetter var2);
-    }
+  @FunctionalInterface
+  public static interface Output {
+    public void accept(LayoutElement var1, Action.ValueGetter var2);
+  }
 }
-

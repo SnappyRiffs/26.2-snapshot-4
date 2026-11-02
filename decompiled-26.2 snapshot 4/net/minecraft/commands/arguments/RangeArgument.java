@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.StringReader
  *  com.mojang.brigadier.arguments.ArgumentType
@@ -18,48 +18,48 @@ import java.util.Collection;
 import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.commands.CommandSourceStack;
 
-public interface RangeArgument<T extends MinMaxBounds<?>>
-extends ArgumentType<T> {
-    public static Ints intRange() {
-        return new Ints();
+public interface RangeArgument<T extends MinMaxBounds<?>> extends ArgumentType<T> {
+  public static Ints intRange() {
+    return new Ints();
+  }
+
+  public static Floats floatRange() {
+    return new Floats();
+  }
+
+  public static class Ints implements RangeArgument<MinMaxBounds.Ints> {
+    private static final Collection<String> EXAMPLES =
+        Arrays.asList("0..5", "0", "-5", "-100..", "..100");
+
+    public static MinMaxBounds.Ints getRange(
+        CommandContext<CommandSourceStack> context, String name) {
+      return (MinMaxBounds.Ints) context.getArgument(name, MinMaxBounds.Ints.class);
     }
 
-    public static Floats floatRange() {
-        return new Floats();
+    public MinMaxBounds.Ints parse(StringReader reader) throws CommandSyntaxException {
+      return MinMaxBounds.Ints.fromReader(reader);
     }
 
-    public static class Ints
-    implements RangeArgument<MinMaxBounds.Ints> {
-        private static final Collection<String> EXAMPLES = Arrays.asList("0..5", "0", "-5", "-100..", "..100");
+    public Collection<String> getExamples() {
+      return EXAMPLES;
+    }
+  }
 
-        public static MinMaxBounds.Ints getRange(CommandContext<CommandSourceStack> context, String name) {
-            return (MinMaxBounds.Ints)context.getArgument(name, MinMaxBounds.Ints.class);
-        }
+  public static class Floats implements RangeArgument<MinMaxBounds.Doubles> {
+    private static final Collection<String> EXAMPLES =
+        Arrays.asList("0..5.2", "0", "-5.4", "-100.76..", "..100");
 
-        public MinMaxBounds.Ints parse(StringReader reader) throws CommandSyntaxException {
-            return MinMaxBounds.Ints.fromReader(reader);
-        }
-
-        public Collection<String> getExamples() {
-            return EXAMPLES;
-        }
+    public static MinMaxBounds.Doubles getRange(
+        CommandContext<CommandSourceStack> context, String name) {
+      return (MinMaxBounds.Doubles) context.getArgument(name, MinMaxBounds.Doubles.class);
     }
 
-    public static class Floats
-    implements RangeArgument<MinMaxBounds.Doubles> {
-        private static final Collection<String> EXAMPLES = Arrays.asList("0..5.2", "0", "-5.4", "-100.76..", "..100");
-
-        public static MinMaxBounds.Doubles getRange(CommandContext<CommandSourceStack> context, String name) {
-            return (MinMaxBounds.Doubles)context.getArgument(name, MinMaxBounds.Doubles.class);
-        }
-
-        public MinMaxBounds.Doubles parse(StringReader reader) throws CommandSyntaxException {
-            return MinMaxBounds.Doubles.fromReader(reader);
-        }
-
-        public Collection<String> getExamples() {
-            return EXAMPLES;
-        }
+    public MinMaxBounds.Doubles parse(StringReader reader) throws CommandSyntaxException {
+      return MinMaxBounds.Doubles.fromReader(reader);
     }
+
+    public Collection<String> getExamples() {
+      return EXAMPLES;
+    }
+  }
 }
-

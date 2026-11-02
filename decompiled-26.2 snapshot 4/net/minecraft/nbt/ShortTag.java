@@ -147,4 +147,3 @@ public record ShortTag(short value) implements NumericTag
         }
     }
 }
-

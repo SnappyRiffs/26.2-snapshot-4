@@ -6,38 +6,37 @@ package net.minecraft.commands;
 import net.minecraft.network.chat.Component;
 
 public interface CommandSource {
-    public static final CommandSource NULL = new CommandSource(){
+  public static final CommandSource NULL =
+      new CommandSource() {
 
         @Override
-        public void sendSystemMessage(Component message) {
-        }
+        public void sendSystemMessage(Component message) {}
 
         @Override
         public boolean acceptsSuccess() {
-            return false;
+          return false;
         }
 
         @Override
         public boolean acceptsFailure() {
-            return false;
+          return false;
         }
 
         @Override
         public boolean shouldInformAdmins() {
-            return false;
+          return false;
         }
-    };
+      };
 
-    public void sendSystemMessage(Component var1);
+  public void sendSystemMessage(Component var1);
 
-    public boolean acceptsSuccess();
+  public boolean acceptsSuccess();
 
-    public boolean acceptsFailure();
+  public boolean acceptsFailure();
 
-    public boolean shouldInformAdmins();
+  public boolean shouldInformAdmins();
 
-    default public boolean alwaysAccepts() {
-        return false;
-    }
+  public default boolean alwaysAccepts() {
+    return false;
+  }
 }
-

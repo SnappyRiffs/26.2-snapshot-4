@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -17,18 +17,19 @@ import net.minecraft.world.level.gameevent.GameEventListener;
 import org.jspecify.annotations.Nullable;
 
 public interface EntityBlock {
-    public @Nullable BlockEntity newBlockEntity(BlockPos var1, BlockState var2);
+  public @Nullable BlockEntity newBlockEntity(BlockPos var1, BlockState var2);
 
-    default public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
-        return null;
-    }
+  public default <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+      Level level, BlockState blockState, BlockEntityType<T> type) {
+    return null;
+  }
 
-    default public <T extends BlockEntity> @Nullable GameEventListener getListener(ServerLevel level, T blockEntity) {
-        if (blockEntity instanceof GameEventListener.Provider) {
-            GameEventListener.Provider provider = (GameEventListener.Provider)((Object)blockEntity);
-            return provider.getListener();
-        }
-        return null;
+  public default <T extends BlockEntity> @Nullable GameEventListener getListener(
+      ServerLevel level, T blockEntity) {
+    if (blockEntity instanceof GameEventListener.Provider) {
+      GameEventListener.Provider provider = (GameEventListener.Provider) ((Object) blockEntity);
+      return provider.getListener();
     }
+    return null;
+  }
 }
-

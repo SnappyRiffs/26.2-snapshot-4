@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix4f
  *  org.joml.Matrix4fc
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.block.BlockTintSource;
-import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.BlockStateModelWrapper;
@@ -21,25 +20,28 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 public class BlockModelSet {
-    private static final Matrix4fc IDENTITY = new Matrix4f();
-    private final BlockStateModelSet fallback;
-    private final BlockColors blockColors;
-    private final Map<BlockState, BlockModel> blockModelByStateCache = new HashMap<BlockState, BlockModel>();
+  private static final Matrix4fc IDENTITY = new Matrix4f();
+  private final BlockStateModelSet fallback;
+  private final BlockColors blockColors;
+  private final Map<BlockState, BlockModel> blockModelByStateCache =
+      new HashMap<BlockState, BlockModel>();
 
-    public BlockModelSet(BlockStateModelSet fallback, Map<BlockState, BlockModel> blockModelByState, BlockColors blockColors) {
-        this.fallback = fallback;
-        this.blockModelByStateCache.putAll(blockModelByState);
-        this.blockColors = blockColors;
-    }
+  public BlockModelSet(
+      BlockStateModelSet fallback,
+      Map<BlockState, BlockModel> blockModelByState,
+      BlockColors blockColors) {
+    this.fallback = fallback;
+    this.blockModelByStateCache.putAll(blockModelByState);
+    this.blockColors = blockColors;
+  }
 
-    public BlockModel get(BlockState blockState) {
-        return this.blockModelByStateCache.computeIfAbsent(blockState, this::createFallbackModel);
-    }
+  public BlockModel get(BlockState blockState) {
+    return this.blockModelByStateCache.computeIfAbsent(blockState, this::createFallbackModel);
+  }
 
-    private BlockModel createFallbackModel(BlockState blockState) {
-        List<BlockTintSource> tints = this.blockColors.getTintSources(blockState);
-        BlockStateModel plainModel = this.fallback.get(blockState);
-        return new BlockStateModelWrapper(plainModel, tints, IDENTITY);
-    }
+  private BlockModel createFallbackModel(BlockState blockState) {
+    List<BlockTintSource> tints = this.blockColors.getTintSources(blockState);
+    BlockStateModel plainModel = this.fallback.get(blockState);
+    return new BlockStateModelWrapper(plainModel, tints, IDENTITY);
+  }
 }
-

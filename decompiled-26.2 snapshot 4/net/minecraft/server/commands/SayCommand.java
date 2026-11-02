@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -19,15 +19,28 @@ import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.players.PlayerList;
 
 public class SayCommand {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("say").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).then(Commands.argument("message", MessageArgument.message()).executes(c -> {
-            MessageArgument.resolveChatMessage((CommandContext<CommandSourceStack>)c, "message", message -> {
-                CommandSourceStack source = (CommandSourceStack)c.getSource();
-                PlayerList playerList = source.getServer().getPlayerList();
-                playerList.broadcastChatMessage((PlayerChatMessage)message, source, ChatType.bind(ChatType.SAY_COMMAND, source));
-            });
-            return 1;
-        })));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("say")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                .then(
+                    Commands.argument("message", MessageArgument.message())
+                        .executes(
+                            c -> {
+                              MessageArgument.resolveChatMessage(
+                                  (CommandContext<CommandSourceStack>) c,
+                                  "message",
+                                  message -> {
+                                    CommandSourceStack source = (CommandSourceStack) c.getSource();
+                                    PlayerList playerList = source.getServer().getPlayerList();
+                                    playerList.broadcastChatMessage(
+                                        (PlayerChatMessage) message,
+                                        source,
+                                        ChatType.bind(ChatType.SAY_COMMAND, source));
+                                  });
+                              return 1;
+                            })));
+  }
 }
-

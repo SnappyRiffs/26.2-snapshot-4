@@ -4,6 +4,5 @@
 package net.minecraft.client.resources.sounds;
 
 public interface AmbientSoundHandler {
-    public void tick();
+  public void tick();
 }
-

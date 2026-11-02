@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -10,6 +10,5 @@ import net.minecraft.world.entity.npc.villager.VillagerData;
 import org.jspecify.annotations.Nullable;
 
 public interface VillagerDataHolderRenderState {
-    public @Nullable VillagerData getVillagerData();
+  public @Nullable VillagerData getVillagerData();
 }
-

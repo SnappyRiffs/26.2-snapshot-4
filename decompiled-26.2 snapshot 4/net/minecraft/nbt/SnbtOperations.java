@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.Message
  *  com.mojang.brigadier.StringReader
@@ -99,4 +99,3 @@ public class SnbtOperations {
         public <T> @Nullable T run(DynamicOps<T> var1, List<T> var2, ParseState<StringReader> var3);
     }
 }
-

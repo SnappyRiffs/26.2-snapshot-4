@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.google.common.collect.Iterables
@@ -326,4 +326,3 @@ public class DataCommands {
         public ArgumentBuilder<CommandSourceStack, ?> create(DataManipulator var1);
     }
 }
-

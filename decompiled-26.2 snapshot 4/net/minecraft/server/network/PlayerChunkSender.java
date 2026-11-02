@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Comparators
  *  com.mojang.logging.LogUtils
@@ -136,4 +136,3 @@ lbl7:
         return playerPos.distanceSquared(chunk.getPos());
     }
 }
-

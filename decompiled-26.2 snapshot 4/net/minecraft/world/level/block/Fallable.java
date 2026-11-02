@@ -11,14 +11,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface Fallable {
-    default public void onLand(Level level, BlockPos pos, BlockState state, BlockState replacedBlock, FallingBlockEntity entity) {
-    }
+  public default void onLand(
+      Level level,
+      BlockPos pos,
+      BlockState state,
+      BlockState replacedBlock,
+      FallingBlockEntity entity) {}
 
-    default public void onBrokenAfterFall(Level level, BlockPos pos, FallingBlockEntity entity) {
-    }
+  public default void onBrokenAfterFall(Level level, BlockPos pos, FallingBlockEntity entity) {}
 
-    default public DamageSource getFallDamageSource(Entity entity) {
-        return entity.damageSources().fallingBlock(entity);
-    }
+  public default DamageSource getFallDamageSource(Entity entity) {
+    return entity.damageSources().fallingBlock(entity);
+  }
 }
-

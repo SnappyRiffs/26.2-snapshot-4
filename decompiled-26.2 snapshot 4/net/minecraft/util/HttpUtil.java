@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.hash.Funnels
  *  com.google.common.hash.HashCode
@@ -267,4 +267,3 @@ public class HttpUtil {
         public void requestFinished(boolean var1);
     }
 }
-

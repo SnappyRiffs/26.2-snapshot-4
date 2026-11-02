@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -17,6 +17,11 @@ import net.minecraft.server.dialog.action.ParsedTemplate;
 import net.minecraft.server.dialog.input.InputControl;
 
 public record Input(String key, InputControl control) {
-    public static final Codec<Input> CODEC = RecordCodecBuilder.create(i -> i.group((App)ParsedTemplate.VARIABLE_CODEC.fieldOf("key").forGetter(Input::key), (App)InputControl.MAP_CODEC.forGetter(Input::control)).apply((Applicative)i, Input::new));
+  public static final Codec<Input> CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App) ParsedTemplate.VARIABLE_CODEC.fieldOf("key").forGetter(Input::key),
+                      (App) InputControl.MAP_CODEC.forGetter(Input::control))
+                  .apply((Applicative) i, Input::new));
 }
-

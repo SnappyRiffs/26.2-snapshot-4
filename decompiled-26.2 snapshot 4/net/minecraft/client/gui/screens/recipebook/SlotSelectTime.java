@@ -5,6 +5,5 @@ package net.minecraft.client.gui.screens.recipebook;
 
 @FunctionalInterface
 public interface SlotSelectTime {
-    public int currentIndex();
+  public int currentIndex();
 }
-

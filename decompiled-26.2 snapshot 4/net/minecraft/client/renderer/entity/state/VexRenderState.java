@@ -3,10 +3,6 @@
  */
 package net.minecraft.client.renderer.entity.state;
 
-import net.minecraft.client.renderer.entity.state.ArmedEntityRenderState;
-
-public class VexRenderState
-extends ArmedEntityRenderState {
-    public boolean isCharging;
+public class VexRenderState extends ArmedEntityRenderState {
+  public boolean isCharging;
 }
-

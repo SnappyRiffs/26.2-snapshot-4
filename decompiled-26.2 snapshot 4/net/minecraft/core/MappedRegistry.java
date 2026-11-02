@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.ImmutableMap$Builder
@@ -536,4 +536,3 @@ implements WritableRegistry<T> {
         public Stream<HolderSet.Named<T>> getTags();
     }
 }
-

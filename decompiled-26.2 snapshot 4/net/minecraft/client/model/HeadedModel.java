@@ -7,10 +7,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
 
 public interface HeadedModel {
-    public ModelPart getHead();
+  public ModelPart getHead();
 
-    default public void translateToHead(PoseStack poseStack) {
-        this.getHead().translateAndRotate(poseStack);
-    }
+  public default void translateToHead(PoseStack poseStack) {
+    this.getHead().translateAndRotate(poseStack);
+  }
 }
-

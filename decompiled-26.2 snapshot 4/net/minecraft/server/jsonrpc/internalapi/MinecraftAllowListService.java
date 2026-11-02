@@ -9,14 +9,13 @@ import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.UserWhiteListEntry;
 
 public interface MinecraftAllowListService {
-    public Collection<UserWhiteListEntry> getEntries();
+  public Collection<UserWhiteListEntry> getEntries();
 
-    public boolean add(UserWhiteListEntry var1, ClientInfo var2);
+  public boolean add(UserWhiteListEntry var1, ClientInfo var2);
 
-    public void clear(ClientInfo var1);
+  public void clear(ClientInfo var1);
 
-    public void remove(NameAndId var1, ClientInfo var2);
+  public void remove(NameAndId var1, ClientInfo var2);
 
-    public void kickUnlistedPlayers(ClientInfo var1);
+  public void kickUnlistedPlayers(ClientInfo var1);
 }
-

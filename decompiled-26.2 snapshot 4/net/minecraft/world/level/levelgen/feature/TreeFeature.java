@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
@@ -234,4 +234,3 @@ extends Feature<TreeConfiguration> {
         return blockPositions;
     }
 }
-

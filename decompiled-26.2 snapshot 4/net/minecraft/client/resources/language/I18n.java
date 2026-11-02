@@ -8,27 +8,24 @@ import java.util.Locale;
 import net.minecraft.locale.Language;
 
 public class I18n {
-    private static volatile Language language = Language.getInstance();
+  private static volatile Language language = Language.getInstance();
 
-    private I18n() {
-    }
+  private I18n() {}
 
-    static void setLanguage(Language locale) {
-        language = locale;
-    }
+  static void setLanguage(Language locale) {
+    language = locale;
+  }
 
-    public static String get(String id, Object ... args) {
-        String value = language.getOrDefault(id);
-        try {
-            return String.format(Locale.ROOT, value, args);
-        }
-        catch (IllegalFormatException ignored) {
-            return "Format error: " + value;
-        }
+  public static String get(String id, Object... args) {
+    String value = language.getOrDefault(id);
+    try {
+      return String.format(Locale.ROOT, value, args);
+    } catch (IllegalFormatException ignored) {
+      return "Format error: " + value;
     }
+  }
 
-    public static boolean exists(String id) {
-        return language.has(id);
-    }
+  public static boolean exists(String id) {
+    return language.has(id);
+  }
 }
-

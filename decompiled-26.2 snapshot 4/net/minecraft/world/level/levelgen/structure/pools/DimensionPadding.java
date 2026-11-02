@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -19,16 +19,34 @@ import java.util.function.Function;
 import net.minecraft.util.ExtraCodecs;
 
 public record DimensionPadding(int bottom, int top) {
-    private static final Codec<DimensionPadding> RECORD_CODEC = RecordCodecBuilder.create(i -> i.group((App)ExtraCodecs.NON_NEGATIVE_INT.lenientOptionalFieldOf("bottom", (Object)0).forGetter(r -> r.bottom), (App)ExtraCodecs.NON_NEGATIVE_INT.lenientOptionalFieldOf("top", (Object)0).forGetter(r -> r.top)).apply((Applicative)i, DimensionPadding::new));
-    public static final Codec<DimensionPadding> CODEC = Codec.either(ExtraCodecs.NON_NEGATIVE_INT, RECORD_CODEC).xmap(e -> (DimensionPadding)e.map(DimensionPadding::new, Function.identity()), padding -> padding.hasEqualTopAndBottom() ? Either.left((Object)padding.bottom) : Either.right((Object)padding));
-    public static final DimensionPadding ZERO = new DimensionPadding(0);
+  private static final Codec<DimensionPadding> RECORD_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ExtraCodecs.NON_NEGATIVE_INT
+                              .lenientOptionalFieldOf("bottom", (Object) 0)
+                              .forGetter(r -> r.bottom),
+                      (App)
+                          ExtraCodecs.NON_NEGATIVE_INT
+                              .lenientOptionalFieldOf("top", (Object) 0)
+                              .forGetter(r -> r.top))
+                  .apply((Applicative) i, DimensionPadding::new));
+  public static final Codec<DimensionPadding> CODEC =
+      Codec.either(ExtraCodecs.NON_NEGATIVE_INT, RECORD_CODEC)
+          .xmap(
+              e -> (DimensionPadding) e.map(DimensionPadding::new, Function.identity()),
+              padding ->
+                  padding.hasEqualTopAndBottom()
+                      ? Either.left((Object) padding.bottom)
+                      : Either.right((Object) padding));
+  public static final DimensionPadding ZERO = new DimensionPadding(0);
 
-    public DimensionPadding(int value) {
-        this(value, value);
-    }
+  public DimensionPadding(int value) {
+    this(value, value);
+  }
 
-    public boolean hasEqualTopAndBottom() {
-        return this.top == this.bottom;
-    }
+  public boolean hasEqualTopAndBottom() {
+    return this.top == this.bottom;
+  }
 }
-

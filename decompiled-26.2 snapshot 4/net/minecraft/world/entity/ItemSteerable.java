@@ -4,6 +4,5 @@
 package net.minecraft.world.entity;
 
 public interface ItemSteerable {
-    public boolean boost();
+  public boolean boost();
 }
-

@@ -15,23 +15,22 @@ import net.minecraft.client.renderer.special.SpecialModelRenderers;
 import net.minecraft.client.renderer.texture.atlas.SpriteSources;
 
 public class ClientBootstrap {
-    private static volatile boolean isBootstrapped;
+  private static volatile boolean isBootstrapped;
 
-    public static void bootstrap() {
-        if (isBootstrapped) {
-            return;
-        }
-        isBootstrapped = true;
-        ItemModels.bootstrap();
-        SpecialModelRenderers.bootstrap();
-        ItemTintSources.bootstrap();
-        SelectItemModelProperties.bootstrap();
-        ConditionalItemModelProperties.bootstrap();
-        RangeSelectItemModelProperties.bootstrap();
-        SpriteSources.bootstrap();
-        DialogScreens.bootstrap();
-        InputControlHandlers.bootstrap();
-        DialogBodyHandlers.bootstrap();
+  public static void bootstrap() {
+    if (isBootstrapped) {
+      return;
     }
+    isBootstrapped = true;
+    ItemModels.bootstrap();
+    SpecialModelRenderers.bootstrap();
+    ItemTintSources.bootstrap();
+    SelectItemModelProperties.bootstrap();
+    ConditionalItemModelProperties.bootstrap();
+    RangeSelectItemModelProperties.bootstrap();
+    SpriteSources.bootstrap();
+    DialogScreens.bootstrap();
+    InputControlHandlers.bootstrap();
+    DialogBodyHandlers.bootstrap();
+  }
 }
-

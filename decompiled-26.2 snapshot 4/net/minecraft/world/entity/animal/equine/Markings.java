@@ -7,29 +7,29 @@ import java.util.function.IntFunction;
 import net.minecraft.util.ByIdMap;
 
 public enum Markings {
-    NONE(0),
-    WHITE(1),
-    WHITE_FIELD(2),
-    WHITE_DOTS(3),
-    BLACK_DOTS(4);
+  NONE(0),
+  WHITE(1),
+  WHITE_FIELD(2),
+  WHITE_DOTS(3),
+  BLACK_DOTS(4);
 
-    private static final IntFunction<Markings> BY_ID;
-    private final int id;
+  private static final IntFunction<Markings> BY_ID;
+  private final int id;
 
-    private Markings(int id) {
-        this.id = id;
-    }
+  private Markings(int id) {
+    this.id = id;
+  }
 
-    public int getId() {
-        return this.id;
-    }
+  public int getId() {
+    return this.id;
+  }
 
-    public static Markings byId(int id) {
-        return BY_ID.apply(id);
-    }
+  public static Markings byId(int id) {
+    return BY_ID.apply(id);
+  }
 
-    static {
-        BY_ID = ByIdMap.continuous(Markings::getId, Markings.values(), ByIdMap.OutOfBoundsStrategy.WRAP);
-    }
+  static {
+    BY_ID =
+        ByIdMap.continuous(Markings::getId, Markings.values(), ByIdMap.OutOfBoundsStrategy.WRAP);
+  }
 }
-

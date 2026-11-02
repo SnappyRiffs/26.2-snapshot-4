@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -176,4 +176,3 @@ extends Item {
         return notSpectator != false && notPlayer != false && notAlliedToPlayer != false && notTamedByPlayer != false && notArmorStand != false && withinRange != false && notFlyingInCreative != false;
     }
 }
-

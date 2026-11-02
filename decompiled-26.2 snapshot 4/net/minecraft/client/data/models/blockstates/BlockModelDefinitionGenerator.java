@@ -7,8 +7,7 @@ import net.minecraft.client.renderer.block.dispatch.BlockStateModelDispatcher;
 import net.minecraft.world.level.block.Block;
 
 public interface BlockModelDefinitionGenerator {
-    public Block block();
+  public Block block();
 
-    public BlockStateModelDispatcher create();
+  public BlockStateModelDispatcher create();
 }
-

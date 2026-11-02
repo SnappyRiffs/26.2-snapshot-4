@@ -11,28 +11,26 @@ import jdk.jfr.Name;
 import jdk.jfr.Period;
 import jdk.jfr.StackTrace;
 
-@Name(value="minecraft.ClientFps")
-@Label(value="Client fps")
-@Category(value={"Minecraft", "Ticking"})
-@StackTrace(value=false)
-@Period(value="1 s")
-public class ClientFpsEvent
-extends Event {
-    public static final String EVENT_NAME = "minecraft.ClientFps";
-    public static final EventType TYPE = EventType.getEventType(ClientFpsEvent.class);
-    @Name(value="fps")
-    @Label(value="Client fps")
-    public final int fps;
+@Name(value = "minecraft.ClientFps")
+@Label(value = "Client fps")
+@Category(value = {"Minecraft", "Ticking"})
+@StackTrace(value = false)
+@Period(value = "1 s")
+public class ClientFpsEvent extends Event {
+  public static final String EVENT_NAME = "minecraft.ClientFps";
+  public static final EventType TYPE = EventType.getEventType(ClientFpsEvent.class);
 
-    public ClientFpsEvent(int fps) {
-        this.fps = fps;
-    }
+  @Name(value = "fps")
+  @Label(value = "Client fps")
+  public final int fps;
 
-    public static class Fields {
-        public static final String FPS = "fps";
+  public ClientFpsEvent(int fps) {
+    this.fps = fps;
+  }
 
-        private Fields() {
-        }
-    }
+  public static class Fields {
+    public static final String FPS = "fps";
+
+    private Fields() {}
+  }
 }
-

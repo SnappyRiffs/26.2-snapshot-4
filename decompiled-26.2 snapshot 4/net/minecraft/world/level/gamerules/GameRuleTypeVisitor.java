@@ -3,16 +3,10 @@
  */
 package net.minecraft.world.level.gamerules;
 
-import net.minecraft.world.level.gamerules.GameRule;
-
 public interface GameRuleTypeVisitor {
-    default public <T> void visit(GameRule<T> gameRule) {
-    }
+  public default <T> void visit(GameRule<T> gameRule) {}
 
-    default public void visitBoolean(GameRule<Boolean> gameRule) {
-    }
+  public default void visitBoolean(GameRule<Boolean> gameRule) {}
 
-    default public void visitInteger(GameRule<Integer> gameRule) {
-    }
+  public default void visitInteger(GameRule<Integer> gameRule) {}
 }
-

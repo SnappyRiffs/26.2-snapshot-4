@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.ImmutableStringReader
  *  com.mojang.brigadier.Message
@@ -27,39 +27,38 @@ import java.util.regex.Pattern;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 
-public class UuidArgument
-implements ArgumentType<UUID> {
-    public static final SimpleCommandExceptionType ERROR_INVALID_UUID = new SimpleCommandExceptionType((Message)Component.translatable("argument.uuid.invalid"));
-    private static final Collection<String> EXAMPLES = Arrays.asList("dd12be42-52a9-4a91-a8a1-11c01849e498");
-    private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("^([-A-Fa-f0-9]+)");
+public class UuidArgument implements ArgumentType<UUID> {
+  public static final SimpleCommandExceptionType ERROR_INVALID_UUID =
+      new SimpleCommandExceptionType((Message) Component.translatable("argument.uuid.invalid"));
+  private static final Collection<String> EXAMPLES =
+      Arrays.asList("dd12be42-52a9-4a91-a8a1-11c01849e498");
+  private static final Pattern ALLOWED_CHARACTERS = Pattern.compile("^([-A-Fa-f0-9]+)");
 
-    public static UUID getUuid(CommandContext<CommandSourceStack> source, String name) {
-        return (UUID)source.getArgument(name, UUID.class);
-    }
+  public static UUID getUuid(CommandContext<CommandSourceStack> source, String name) {
+    return (UUID) source.getArgument(name, UUID.class);
+  }
 
-    public static UuidArgument uuid() {
-        return new UuidArgument();
-    }
+  public static UuidArgument uuid() {
+    return new UuidArgument();
+  }
 
-    public UUID parse(StringReader reader) throws CommandSyntaxException {
-        String remaining = reader.getRemaining();
-        Matcher matcher = ALLOWED_CHARACTERS.matcher(remaining);
-        if (matcher.find()) {
-            String maybeUUID = matcher.group(1);
-            try {
-                UUID result = UUID.fromString(maybeUUID);
-                reader.setCursor(reader.getCursor() + maybeUUID.length());
-                return result;
-            }
-            catch (IllegalArgumentException illegalArgumentException) {
-                // empty catch block
-            }
-        }
-        throw ERROR_INVALID_UUID.createWithContext((ImmutableStringReader)reader);
+  public UUID parse(StringReader reader) throws CommandSyntaxException {
+    String remaining = reader.getRemaining();
+    Matcher matcher = ALLOWED_CHARACTERS.matcher(remaining);
+    if (matcher.find()) {
+      String maybeUUID = matcher.group(1);
+      try {
+        UUID result = UUID.fromString(maybeUUID);
+        reader.setCursor(reader.getCursor() + maybeUUID.length());
+        return result;
+      } catch (IllegalArgumentException illegalArgumentException) {
+        // empty catch block
+      }
     }
+    throw ERROR_INVALID_UUID.createWithContext((ImmutableStringReader) reader);
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

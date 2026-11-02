@@ -28,17 +28,95 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyC
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
-public record VanillaShearingLoot(HolderLookup.Provider registries) implements LootTableSubProvider
-{
-    @Override
-    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
-        output.accept(BuiltInLootTables.BOGGED_SHEAR, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(2.0f)).add((LootPoolEntryContainer.Builder<?>)((Object)LootItem.lootTableItem(Items.BROWN_MUSHROOM).apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f))))).add((LootPoolEntryContainer.Builder<?>)((Object)LootItem.lootTableItem(Items.RED_MUSHROOM).apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0f)))))));
-        ColorCollection.zipApply(BuiltInLootTables.SHEAR_DYED_SHEEP, Blocks.WOOL, (dyedSheep, wool) -> output.accept((ResourceKey<LootTable>)dyedSheep, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(UniformGenerator.between(1.0f, 3.0f)).add(LootItem.lootTableItem(wool)))));
-        output.accept(BuiltInLootTables.SHEAR_SHEEP, LootTable.lootTable().withPool(EntityLootSubProvider.createSheepDispatchPool(BuiltInLootTables.SHEAR_DYED_SHEEP)));
-        output.accept(BuiltInLootTables.SHEAR_MOOSHROOM, LootTable.lootTable().withPool(LootPool.lootPool().add(AlternativesEntry.alternatives(new LootPoolEntryContainer.Builder[]{NestedLootTable.lootTableReference(BuiltInLootTables.SHEAR_RED_MOOSHROOM).when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().components(DataComponentExactPredicate.expect(DataComponents.MOOSHROOM_VARIANT, MushroomCow.Variant.RED)))), NestedLootTable.lootTableReference(BuiltInLootTables.SHEAR_BROWN_MOOSHROOM).when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().components(DataComponentExactPredicate.expect(DataComponents.MOOSHROOM_VARIANT, MushroomCow.Variant.BROWN))))}))));
-        output.accept(BuiltInLootTables.SHEAR_RED_MOOSHROOM, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(5.0f)).add(LootItem.lootTableItem(Items.RED_MUSHROOM))));
-        output.accept(BuiltInLootTables.SHEAR_BROWN_MOOSHROOM, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(5.0f)).add(LootItem.lootTableItem(Items.BROWN_MUSHROOM))));
-        output.accept(BuiltInLootTables.SHEAR_SNOW_GOLEM, LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).add(LootItem.lootTableItem(Items.CARVED_PUMPKIN))));
-    }
+public record VanillaShearingLoot(HolderLookup.Provider registries)
+    implements LootTableSubProvider {
+  @Override
+  public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
+    output.accept(
+        BuiltInLootTables.BOGGED_SHEAR,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(2.0f))
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((Object)
+                                LootItem.lootTableItem(Items.BROWN_MUSHROOM)
+                                    .apply(
+                                        SetItemCountFunction.setCount(
+                                            ConstantValue.exactly(1.0f)))))
+                    .add(
+                        (LootPoolEntryContainer.Builder<?>)
+                            ((Object)
+                                LootItem.lootTableItem(Items.RED_MUSHROOM)
+                                    .apply(
+                                        SetItemCountFunction.setCount(
+                                            ConstantValue.exactly(1.0f)))))));
+    ColorCollection.zipApply(
+        BuiltInLootTables.SHEAR_DYED_SHEEP,
+        Blocks.WOOL,
+        (dyedSheep, wool) ->
+            output.accept(
+                (ResourceKey<LootTable>) dyedSheep,
+                LootTable.lootTable()
+                    .withPool(
+                        LootPool.lootPool()
+                            .setRolls(UniformGenerator.between(1.0f, 3.0f))
+                            .add(LootItem.lootTableItem(wool)))));
+    output.accept(
+        BuiltInLootTables.SHEAR_SHEEP,
+        LootTable.lootTable()
+            .withPool(
+                EntityLootSubProvider.createSheepDispatchPool(BuiltInLootTables.SHEAR_DYED_SHEEP)));
+    output.accept(
+        BuiltInLootTables.SHEAR_MOOSHROOM,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .add(
+                        AlternativesEntry.alternatives(
+                            new LootPoolEntryContainer.Builder[] {
+                              NestedLootTable.lootTableReference(
+                                      BuiltInLootTables.SHEAR_RED_MOOSHROOM)
+                                  .when(
+                                      LootItemEntityPropertyCondition.hasProperties(
+                                          LootContext.EntityTarget.THIS,
+                                          EntityPredicate.Builder.entity()
+                                              .components(
+                                                  DataComponentExactPredicate.expect(
+                                                      DataComponents.MOOSHROOM_VARIANT,
+                                                      MushroomCow.Variant.RED)))),
+                              NestedLootTable.lootTableReference(
+                                      BuiltInLootTables.SHEAR_BROWN_MOOSHROOM)
+                                  .when(
+                                      LootItemEntityPropertyCondition.hasProperties(
+                                          LootContext.EntityTarget.THIS,
+                                          EntityPredicate.Builder.entity()
+                                              .components(
+                                                  DataComponentExactPredicate.expect(
+                                                      DataComponents.MOOSHROOM_VARIANT,
+                                                      MushroomCow.Variant.BROWN))))
+                            }))));
+    output.accept(
+        BuiltInLootTables.SHEAR_RED_MOOSHROOM,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(5.0f))
+                    .add(LootItem.lootTableItem(Items.RED_MUSHROOM))));
+    output.accept(
+        BuiltInLootTables.SHEAR_BROWN_MOOSHROOM,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(5.0f))
+                    .add(LootItem.lootTableItem(Items.BROWN_MUSHROOM))));
+    output.accept(
+        BuiltInLootTables.SHEAR_SNOW_GOLEM,
+        LootTable.lootTable()
+            .withPool(
+                LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1.0f))
+                    .add(LootItem.lootTableItem(Items.CARVED_PUMPKIN))));
+  }
 }
-

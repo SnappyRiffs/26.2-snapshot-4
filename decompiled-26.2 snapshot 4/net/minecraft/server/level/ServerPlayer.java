@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.cache.CacheBuilder
  *  com.google.common.cache.CacheLoader
@@ -2215,4 +2215,3 @@ extends Player {
         public static final SavedPosition EMPTY = new SavedPosition(Optional.empty(), Optional.empty(), Optional.empty());
     }
 }
-

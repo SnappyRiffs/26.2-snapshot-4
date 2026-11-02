@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  *  org.jspecify.annotations.Nullable
@@ -13,10 +13,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootContextUser;
 import org.jspecify.annotations.Nullable;
 
-public interface NbtProvider
-extends LootContextUser {
-    public @Nullable Tag get(LootContext var1);
+public interface NbtProvider extends LootContextUser {
+  public @Nullable Tag get(LootContext var1);
 
-    public MapCodec<? extends NbtProvider> codec();
+  public MapCodec<? extends NbtProvider> codec();
 }
-

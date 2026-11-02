@@ -14,8 +14,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Spawner;
 import net.minecraft.world.level.block.TrialSpawnerBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.trialspawner.PlayerDetector;
 import net.minecraft.world.level.block.entity.trialspawner.TrialSpawner;
 import net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerState;
@@ -24,80 +22,86 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class TrialSpawnerBlockEntity
-extends BlockEntity
-implements TrialSpawner.StateAccessor,
-Spawner {
-    private final TrialSpawner trialSpawner = this.createDefaultSpawner();
+public class TrialSpawnerBlockEntity extends BlockEntity
+    implements TrialSpawner.StateAccessor, Spawner {
+  private final TrialSpawner trialSpawner = this.createDefaultSpawner();
 
-    public TrialSpawnerBlockEntity(BlockPos worldPosition, BlockState blockState) {
-        super(BlockEntityTypes.TRIAL_SPAWNER, worldPosition, blockState);
-    }
+  public TrialSpawnerBlockEntity(BlockPos worldPosition, BlockState blockState) {
+    super(BlockEntityTypes.TRIAL_SPAWNER, worldPosition, blockState);
+  }
 
-    private TrialSpawner createDefaultSpawner() {
-        PlayerDetector playerDetector = SharedConstants.DEBUG_TRIAL_SPAWNER_DETECTS_SHEEP_AS_PLAYERS ? PlayerDetector.SHEEP : PlayerDetector.NO_CREATIVE_PLAYERS;
-        PlayerDetector.EntitySelector entitySelector = PlayerDetector.EntitySelector.SELECT_FROM_LEVEL;
-        return new TrialSpawner(TrialSpawner.FullConfig.DEFAULT, this, playerDetector, entitySelector);
-    }
+  private TrialSpawner createDefaultSpawner() {
+    PlayerDetector playerDetector =
+        SharedConstants.DEBUG_TRIAL_SPAWNER_DETECTS_SHEEP_AS_PLAYERS
+            ? PlayerDetector.SHEEP
+            : PlayerDetector.NO_CREATIVE_PLAYERS;
+    PlayerDetector.EntitySelector entitySelector = PlayerDetector.EntitySelector.SELECT_FROM_LEVEL;
+    return new TrialSpawner(TrialSpawner.FullConfig.DEFAULT, this, playerDetector, entitySelector);
+  }
 
-    @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        this.trialSpawner.load(input);
-        if (this.level != null) {
-            this.markUpdated();
-        }
+  @Override
+  protected void loadAdditional(ValueInput input) {
+    super.loadAdditional(input);
+    this.trialSpawner.load(input);
+    if (this.level != null) {
+      this.markUpdated();
     }
+  }
 
-    @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        this.trialSpawner.store(output);
-    }
+  @Override
+  protected void saveAdditional(ValueOutput output) {
+    super.saveAdditional(output);
+    this.trialSpawner.store(output);
+  }
 
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+  public ClientboundBlockEntityDataPacket getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return this.trialSpawner.getStateData().getUpdateTag(this.getBlockState().getValue(TrialSpawnerBlock.STATE));
-    }
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    return this.trialSpawner
+        .getStateData()
+        .getUpdateTag(this.getBlockState().getValue(TrialSpawnerBlock.STATE));
+  }
 
-    @Override
-    public void setEntityId(EntityType<?> type, RandomSource random) {
-        if (this.level == null) {
-            Util.logAndPauseIfInIde("Expected non-null level");
-            return;
-        }
-        this.trialSpawner.overrideEntityToSpawn(type, this.level);
-        this.setChanged();
+  @Override
+  public void setEntityId(EntityType<?> type, RandomSource random) {
+    if (this.level == null) {
+      Util.logAndPauseIfInIde("Expected non-null level");
+      return;
     }
+    this.trialSpawner.overrideEntityToSpawn(type, this.level);
+    this.setChanged();
+  }
 
-    public TrialSpawner getTrialSpawner() {
-        return this.trialSpawner;
-    }
+  public TrialSpawner getTrialSpawner() {
+    return this.trialSpawner;
+  }
 
-    @Override
-    public TrialSpawnerState getState() {
-        if (!this.getBlockState().hasProperty(BlockStateProperties.TRIAL_SPAWNER_STATE)) {
-            return TrialSpawnerState.INACTIVE;
-        }
-        return this.getBlockState().getValue(BlockStateProperties.TRIAL_SPAWNER_STATE);
+  @Override
+  public TrialSpawnerState getState() {
+    if (!this.getBlockState().hasProperty(BlockStateProperties.TRIAL_SPAWNER_STATE)) {
+      return TrialSpawnerState.INACTIVE;
     }
+    return this.getBlockState().getValue(BlockStateProperties.TRIAL_SPAWNER_STATE);
+  }
 
-    @Override
-    public void setState(Level level, TrialSpawnerState state) {
-        this.setChanged();
-        level.setBlockAndUpdate(this.worldPosition, (BlockState)this.getBlockState().setValue(BlockStateProperties.TRIAL_SPAWNER_STATE, state));
-    }
+  @Override
+  public void setState(Level level, TrialSpawnerState state) {
+    this.setChanged();
+    level.setBlockAndUpdate(
+        this.worldPosition,
+        (BlockState)
+            this.getBlockState().setValue(BlockStateProperties.TRIAL_SPAWNER_STATE, state));
+  }
 
-    @Override
-    public void markUpdated() {
-        this.setChanged();
-        if (this.level != null) {
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
-        }
+  @Override
+  public void markUpdated() {
+    this.setChanged();
+    if (this.level != null) {
+      this.level.sendBlockUpdated(
+          this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
     }
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix4fStack
  *  org.joml.Quaternionfc
@@ -12,7 +12,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.gui.pip.GuiSkinRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -20,30 +19,42 @@ import net.minecraft.util.Unit;
 import org.joml.Matrix4fStack;
 import org.joml.Quaternionfc;
 
-public class GuiSkinRenderer
-extends PictureInPictureRenderer<GuiSkinRenderState> {
-    @Override
-    public Class<GuiSkinRenderState> getRenderStateClass() {
-        return GuiSkinRenderState.class;
-    }
+public class GuiSkinRenderer extends PictureInPictureRenderer<GuiSkinRenderState> {
+  @Override
+  public Class<GuiSkinRenderState> getRenderStateClass() {
+    return GuiSkinRenderState.class;
+  }
 
-    @Override
-    protected void renderToTexture(GuiSkinRenderState skinState, PoseStack modelStack, SubmitNodeCollector submitNodeCollector) {
-        Minecraft.getInstance().gameRenderer.lighting().setupFor(Lighting.Entry.PLAYER_SKIN);
-        int guiScale = Minecraft.getInstance().gameRenderer.gameRenderState().windowRenderState.guiScale;
-        Matrix4fStack viewStack = RenderSystem.getModelViewStack();
-        viewStack.pushMatrix();
-        float scale = skinState.scale() * (float)guiScale;
-        viewStack.rotateAround((Quaternionfc)Axis.XP.rotationDegrees(skinState.rotationX()), 0.0f, scale * -skinState.pivotY(), 0.0f);
-        modelStack.mulPose((Quaternionfc)Axis.YP.rotationDegrees(-skinState.rotationY()));
-        modelStack.translate(0.0f, -1.6010001f, 0.0f);
-        submitNodeCollector.submitModel(skinState.playerModel(), Unit.INSTANCE, modelStack, skinState.texture(), 0xF000F0, OverlayTexture.NO_OVERLAY, 0, null);
-        viewStack.popMatrix();
-    }
+  @Override
+  protected void renderToTexture(
+      GuiSkinRenderState skinState, PoseStack modelStack, SubmitNodeCollector submitNodeCollector) {
+    Minecraft.getInstance().gameRenderer.lighting().setupFor(Lighting.Entry.PLAYER_SKIN);
+    int guiScale =
+        Minecraft.getInstance().gameRenderer.gameRenderState().windowRenderState.guiScale;
+    Matrix4fStack viewStack = RenderSystem.getModelViewStack();
+    viewStack.pushMatrix();
+    float scale = skinState.scale() * (float) guiScale;
+    viewStack.rotateAround(
+        (Quaternionfc) Axis.XP.rotationDegrees(skinState.rotationX()),
+        0.0f,
+        scale * -skinState.pivotY(),
+        0.0f);
+    modelStack.mulPose((Quaternionfc) Axis.YP.rotationDegrees(-skinState.rotationY()));
+    modelStack.translate(0.0f, -1.6010001f, 0.0f);
+    submitNodeCollector.submitModel(
+        skinState.playerModel(),
+        Unit.INSTANCE,
+        modelStack,
+        skinState.texture(),
+        0xF000F0,
+        OverlayTexture.NO_OVERLAY,
+        0,
+        null);
+    viewStack.popMatrix();
+  }
 
-    @Override
-    protected String getTextureLabel() {
-        return "player skin";
-    }
+  @Override
+  protected String getTextureLabel() {
+    return "player skin";
+  }
 }
-

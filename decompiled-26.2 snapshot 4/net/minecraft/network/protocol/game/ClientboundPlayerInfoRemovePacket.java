@@ -10,29 +10,28 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.GamePacketTypes;
 
-public record ClientboundPlayerInfoRemovePacket(List<UUID> profileIds) implements Packet<ClientGamePacketListener>
-{
-    public static final StreamCodec<FriendlyByteBuf, ClientboundPlayerInfoRemovePacket> STREAM_CODEC = Packet.codec(ClientboundPlayerInfoRemovePacket::write, ClientboundPlayerInfoRemovePacket::new);
+public record ClientboundPlayerInfoRemovePacket(List<UUID> profileIds)
+    implements Packet<ClientGamePacketListener> {
+  public static final StreamCodec<FriendlyByteBuf, ClientboundPlayerInfoRemovePacket> STREAM_CODEC =
+      Packet.codec(
+          ClientboundPlayerInfoRemovePacket::write, ClientboundPlayerInfoRemovePacket::new);
 
-    private ClientboundPlayerInfoRemovePacket(FriendlyByteBuf input) {
-        this(input.readList(UUIDUtil.STREAM_CODEC));
-    }
+  private ClientboundPlayerInfoRemovePacket(FriendlyByteBuf input) {
+    this(input.readList(UUIDUtil.STREAM_CODEC));
+  }
 
-    private void write(FriendlyByteBuf output) {
-        output.writeCollection(this.profileIds, UUIDUtil.STREAM_CODEC);
-    }
+  private void write(FriendlyByteBuf output) {
+    output.writeCollection(this.profileIds, UUIDUtil.STREAM_CODEC);
+  }
 
-    @Override
-    public PacketType<ClientboundPlayerInfoRemovePacket> type() {
-        return GamePacketTypes.CLIENTBOUND_PLAYER_INFO_REMOVE;
-    }
+  @Override
+  public PacketType<ClientboundPlayerInfoRemovePacket> type() {
+    return GamePacketTypes.CLIENTBOUND_PLAYER_INFO_REMOVE;
+  }
 
-    @Override
-    public void handle(ClientGamePacketListener listener) {
-        listener.handlePlayerInfoRemove(this);
-    }
+  @Override
+  public void handle(ClientGamePacketListener listener) {
+    listener.handlePlayerInfoRemove(this);
+  }
 }
-

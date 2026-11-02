@@ -13,6 +13,13 @@ import net.minecraft.client.renderer.state.OptionsRenderState;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.model.sprite.AtlasManager;
 
-public record FeatureFrameContext(OptionsRenderState options, Font font, BlockStateModelSet blockStateModelSet, BlockColors blockColors, TextureManager textureManager, AtlasManager atlasManager, GpuTextureView lightmap, MultiBufferSource bufferSource, OutlineBufferSource outlineBufferSource) {
-}
-
+public record FeatureFrameContext(
+    OptionsRenderState options,
+    Font font,
+    BlockStateModelSet blockStateModelSet,
+    BlockColors blockColors,
+    TextureManager textureManager,
+    AtlasManager atlasManager,
+    GpuTextureView lightmap,
+    MultiBufferSource bufferSource,
+    OutlineBufferSource outlineBufferSource) {}

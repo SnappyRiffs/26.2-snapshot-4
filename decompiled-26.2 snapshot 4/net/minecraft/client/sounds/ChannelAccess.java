@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Sets
  *  org.jspecify.annotations.Nullable
@@ -20,81 +20,88 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 public class ChannelAccess {
-    private final Set<ChannelHandle> channels = Sets.newIdentityHashSet();
-    private final Library library;
-    private final Executor executor;
+  private final Set<ChannelHandle> channels = Sets.newIdentityHashSet();
+  private final Library library;
+  private final Executor executor;
 
-    public ChannelAccess(Library library, Executor executor) {
-        this.library = library;
-        this.executor = executor;
-    }
+  public ChannelAccess(Library library, Executor executor) {
+    this.library = library;
+    this.executor = executor;
+  }
 
-    public CompletableFuture<@Nullable ChannelHandle> createHandle(Library.Pool pool) {
-        CompletableFuture<@Nullable ChannelHandle> result = new CompletableFuture<ChannelHandle>();
-        this.executor.execute(() -> {
-            Channel channel = this.library.acquireChannel(pool);
-            if (channel != null) {
-                ChannelHandle handle = new ChannelHandle(this, channel);
-                this.channels.add(handle);
-                result.complete(handle);
-            } else {
-                result.complete(null);
-            }
+  public CompletableFuture<@Nullable ChannelHandle> createHandle(Library.Pool pool) {
+    CompletableFuture<@Nullable ChannelHandle> result = new CompletableFuture<ChannelHandle>();
+    this.executor.execute(
+        () -> {
+          Channel channel = this.library.acquireChannel(pool);
+          if (channel != null) {
+            ChannelHandle handle = new ChannelHandle(this, channel);
+            this.channels.add(handle);
+            result.complete(handle);
+          } else {
+            result.complete(null);
+          }
         });
-        return result;
-    }
+    return result;
+  }
 
-    public void executeOnChannels(Consumer<Stream<Channel>> action) {
-        this.executor.execute(() -> action.accept(this.channels.stream().map(channelHandle -> channelHandle.channel).filter(Objects::nonNull)));
-    }
+  public void executeOnChannels(Consumer<Stream<Channel>> action) {
+    this.executor.execute(
+        () ->
+            action.accept(
+                this.channels.stream()
+                    .map(channelHandle -> channelHandle.channel)
+                    .filter(Objects::nonNull)));
+  }
 
-    public void scheduleTick() {
-        this.executor.execute(() -> {
-            Iterator<ChannelHandle> it = this.channels.iterator();
-            while (it.hasNext()) {
-                ChannelHandle handle = it.next();
-                handle.channel.updateStream();
-                if (!handle.channel.stopped()) continue;
-                handle.release();
-                it.remove();
-            }
+  public void scheduleTick() {
+    this.executor.execute(
+        () -> {
+          Iterator<ChannelHandle> it = this.channels.iterator();
+          while (it.hasNext()) {
+            ChannelHandle handle = it.next();
+            handle.channel.updateStream();
+            if (!handle.channel.stopped()) continue;
+            handle.release();
+            it.remove();
+          }
         });
+  }
+
+  public void clear() {
+    this.channels.forEach(ChannelHandle::release);
+    this.channels.clear();
+  }
+
+  public class ChannelHandle {
+    private @Nullable Channel channel;
+    private boolean stopped;
+    final /* synthetic */ ChannelAccess this$0;
+
+    public boolean isStopped() {
+      return this.stopped;
     }
 
-    public void clear() {
-        this.channels.forEach(ChannelHandle::release);
-        this.channels.clear();
+    public ChannelHandle(ChannelAccess this$0, Channel channel) {
+      ChannelAccess channelAccess = this$0;
+      Objects.requireNonNull(channelAccess);
+      this.this$0 = channelAccess;
+      this.channel = channel;
     }
 
-    public class ChannelHandle {
-        private @Nullable Channel channel;
-        private boolean stopped;
-        final /* synthetic */ ChannelAccess this$0;
-
-        public boolean isStopped() {
-            return this.stopped;
-        }
-
-        public ChannelHandle(ChannelAccess this$0, Channel channel) {
-            ChannelAccess channelAccess = this$0;
-            Objects.requireNonNull(channelAccess);
-            this.this$0 = channelAccess;
-            this.channel = channel;
-        }
-
-        public void execute(Consumer<Channel> action) {
-            this.this$0.executor.execute(() -> {
-                if (this.channel != null) {
-                    action.accept(this.channel);
-                }
-            });
-        }
-
-        public void release() {
-            this.stopped = true;
-            this.this$0.library.releaseChannel(this.channel);
-            this.channel = null;
-        }
+    public void execute(Consumer<Channel> action) {
+      this.this$0.executor.execute(
+          () -> {
+            if (this.channel != null) {
+              action.accept(this.channel);
+            }
+          });
     }
+
+    public void release() {
+      this.stopped = true;
+      this.this$0.library.releaseChannel(this.channel);
+      this.channel = null;
+    }
+  }
 }
-

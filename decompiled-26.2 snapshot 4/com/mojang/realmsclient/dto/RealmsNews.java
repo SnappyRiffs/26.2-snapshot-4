@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonObject
  *  com.mojang.logging.LogUtils
@@ -17,18 +17,16 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
 public record RealmsNews(@Nullable String newsLink) {
-    private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static RealmsNews parse(String json) {
-        String newsLink = null;
-        try {
-            JsonObject object = LenientJsonParser.parse(json).getAsJsonObject();
-            newsLink = JsonUtils.getStringOr("newsLink", object, null);
-        }
-        catch (Exception e) {
-            LOGGER.error("Could not parse RealmsNews", (Throwable)e);
-        }
-        return new RealmsNews(newsLink);
+  public static RealmsNews parse(String json) {
+    String newsLink = null;
+    try {
+      JsonObject object = LenientJsonParser.parse(json).getAsJsonObject();
+      newsLink = JsonUtils.getStringOr("newsLink", object, null);
+    } catch (Exception e) {
+      LOGGER.error("Could not parse RealmsNews", (Throwable) e);
     }
+    return new RealmsNews(newsLink);
+  }
 }
-

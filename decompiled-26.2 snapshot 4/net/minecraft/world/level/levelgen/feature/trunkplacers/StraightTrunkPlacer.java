@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.mojang.datafixers.kinds.Applicative
@@ -21,29 +21,36 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
 
-public class StraightTrunkPlacer
-extends TrunkPlacer {
-    public static final MapCodec<StraightTrunkPlacer> CODEC = RecordCodecBuilder.mapCodec(i -> StraightTrunkPlacer.trunkPlacerParts(i).apply((Applicative)i, StraightTrunkPlacer::new));
+public class StraightTrunkPlacer extends TrunkPlacer {
+  public static final MapCodec<StraightTrunkPlacer> CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              StraightTrunkPlacer.trunkPlacerParts(i)
+                  .apply((Applicative) i, StraightTrunkPlacer::new));
 
-    public StraightTrunkPlacer(int baseHeight, int heightRandA, int heightRandB) {
-        super(baseHeight, heightRandA, heightRandB);
+  public StraightTrunkPlacer(int baseHeight, int heightRandA, int heightRandB) {
+    super(baseHeight, heightRandA, heightRandB);
+  }
+
+  @Override
+  protected TrunkPlacerType<?> type() {
+    return TrunkPlacerType.STRAIGHT_TRUNK_PLACER;
+  }
+
+  @Override
+  public List<FoliagePlacer.FoliageAttachment> placeTrunk(
+      WorldGenLevel level,
+      BiConsumer<BlockPos, BlockState> trunkSetter,
+      RandomSource random,
+      int treeHeight,
+      BlockPos origin,
+      TreeConfiguration config) {
+    StraightTrunkPlacer.placeBelowTrunkBlock(level, trunkSetter, random, origin.below(), config);
+    for (int y = 0; y < treeHeight; ++y) {
+      this.placeLog(level, trunkSetter, random, origin.above(y), config);
     }
-
-    @Override
-    protected TrunkPlacerType<?> type() {
-        return TrunkPlacerType.STRAIGHT_TRUNK_PLACER;
-    }
-
-    @Override
-    public List<FoliagePlacer.FoliageAttachment> placeTrunk(WorldGenLevel level, BiConsumer<BlockPos, BlockState> trunkSetter, RandomSource random, int treeHeight, BlockPos origin, TreeConfiguration config) {
-        StraightTrunkPlacer.placeBelowTrunkBlock(level, trunkSetter, random, origin.below(), config);
-        for (int y = 0; y < treeHeight; ++y) {
-            this.placeLog(level, trunkSetter, random, origin.above(y), config);
-        }
-        return ImmutableList.of((Object)new FoliagePlacer.FoliageAttachment(origin.above(treeHeight), 0, false));
-    }
+    return ImmutableList.of(
+        (Object) new FoliagePlacer.FoliageAttachment(origin.above(treeHeight), 0, false));
+  }
 }
-

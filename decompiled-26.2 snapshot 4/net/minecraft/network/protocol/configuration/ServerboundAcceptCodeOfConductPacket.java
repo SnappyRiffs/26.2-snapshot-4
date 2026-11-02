@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  io.netty.buffer.ByteBuf
  */
@@ -10,22 +10,21 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.configuration.ConfigurationPacketTypes;
-import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
 
-public record ServerboundAcceptCodeOfConductPacket() implements Packet<ServerConfigurationPacketListener>
-{
-    public static final ServerboundAcceptCodeOfConductPacket INSTANCE = new ServerboundAcceptCodeOfConductPacket();
-    public static final StreamCodec<ByteBuf, ServerboundAcceptCodeOfConductPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+public record ServerboundAcceptCodeOfConductPacket()
+    implements Packet<ServerConfigurationPacketListener> {
+  public static final ServerboundAcceptCodeOfConductPacket INSTANCE =
+      new ServerboundAcceptCodeOfConductPacket();
+  public static final StreamCodec<ByteBuf, ServerboundAcceptCodeOfConductPacket> STREAM_CODEC =
+      StreamCodec.unit(INSTANCE);
 
-    @Override
-    public PacketType<ServerboundAcceptCodeOfConductPacket> type() {
-        return ConfigurationPacketTypes.SERVERBOUND_ACCEPT_CODE_OF_CONDUCT;
-    }
+  @Override
+  public PacketType<ServerboundAcceptCodeOfConductPacket> type() {
+    return ConfigurationPacketTypes.SERVERBOUND_ACCEPT_CODE_OF_CONDUCT;
+  }
 
-    @Override
-    public void handle(ServerConfigurationPacketListener listener) {
-        listener.handleAcceptCodeOfConduct(this);
-    }
+  @Override
+  public void handle(ServerConfigurationPacketListener listener) {
+    listener.handleAcceptCodeOfConduct(this);
+  }
 }
-

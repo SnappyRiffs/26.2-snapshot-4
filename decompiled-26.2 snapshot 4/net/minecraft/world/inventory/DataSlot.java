@@ -3,66 +3,63 @@
  */
 package net.minecraft.world.inventory;
 
-import net.minecraft.world.inventory.ContainerData;
-
 public abstract class DataSlot {
-    private int prevValue;
+  private int prevValue;
 
-    public static DataSlot forContainer(final ContainerData container, final int dataId) {
-        return new DataSlot(){
+  public static DataSlot forContainer(final ContainerData container, final int dataId) {
+    return new DataSlot() {
 
-            @Override
-            public int get() {
-                return container.get(dataId);
-            }
+      @Override
+      public int get() {
+        return container.get(dataId);
+      }
 
-            @Override
-            public void set(int value) {
-                container.set(dataId, value);
-            }
-        };
-    }
+      @Override
+      public void set(int value) {
+        container.set(dataId, value);
+      }
+    };
+  }
 
-    public static DataSlot shared(final int[] storage, final int index) {
-        return new DataSlot(){
+  public static DataSlot shared(final int[] storage, final int index) {
+    return new DataSlot() {
 
-            @Override
-            public int get() {
-                return storage[index];
-            }
+      @Override
+      public int get() {
+        return storage[index];
+      }
 
-            @Override
-            public void set(int value) {
-                storage[index] = value;
-            }
-        };
-    }
+      @Override
+      public void set(int value) {
+        storage[index] = value;
+      }
+    };
+  }
 
-    public static DataSlot standalone() {
-        return new DataSlot(){
-            private int value;
+  public static DataSlot standalone() {
+    return new DataSlot() {
+      private int value;
 
-            @Override
-            public int get() {
-                return this.value;
-            }
+      @Override
+      public int get() {
+        return this.value;
+      }
 
-            @Override
-            public void set(int value) {
-                this.value = value;
-            }
-        };
-    }
+      @Override
+      public void set(int value) {
+        this.value = value;
+      }
+    };
+  }
 
-    public abstract int get();
+  public abstract int get();
 
-    public abstract void set(int var1);
+  public abstract void set(int var1);
 
-    public boolean checkAndClearUpdateFlag() {
-        int currentValue = this.get();
-        boolean result = currentValue != this.prevValue;
-        this.prevValue = currentValue;
-        return result;
-    }
+  public boolean checkAndClearUpdateFlag() {
+    int currentValue = this.get();
+    boolean result = currentValue != this.prevValue;
+    this.prevValue = currentValue;
+    return result;
+  }
 }
-

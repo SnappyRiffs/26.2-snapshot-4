@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.base.MoreObjects
  */
@@ -12,24 +12,24 @@ import net.minecraft.client.gui.spectator.SpectatorMenu;
 import net.minecraft.client.gui.spectator.SpectatorMenuItem;
 
 public class SpectatorPage {
-    public static final int NO_SELECTION = -1;
-    private final List<SpectatorMenuItem> items;
-    private final int selection;
+  public static final int NO_SELECTION = -1;
+  private final List<SpectatorMenuItem> items;
+  private final int selection;
 
-    public SpectatorPage(List<SpectatorMenuItem> items, int selection) {
-        this.items = items;
-        this.selection = selection;
-    }
+  public SpectatorPage(List<SpectatorMenuItem> items, int selection) {
+    this.items = items;
+    this.selection = selection;
+  }
 
-    public SpectatorMenuItem getItem(int slot) {
-        if (slot < 0 || slot >= this.items.size()) {
-            return SpectatorMenu.EMPTY_SLOT;
-        }
-        return (SpectatorMenuItem)MoreObjects.firstNonNull((Object)this.items.get(slot), (Object)SpectatorMenu.EMPTY_SLOT);
+  public SpectatorMenuItem getItem(int slot) {
+    if (slot < 0 || slot >= this.items.size()) {
+      return SpectatorMenu.EMPTY_SLOT;
     }
+    return (SpectatorMenuItem)
+        MoreObjects.firstNonNull((Object) this.items.get(slot), (Object) SpectatorMenu.EMPTY_SLOT);
+  }
 
-    public int getSelectedSlot() {
-        return this.selection;
-    }
+  public int getSelectedSlot() {
+    return this.selection;
+  }
 }
-

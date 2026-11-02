@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix3x2f
  *  org.joml.Matrix3x2fc
@@ -14,29 +14,28 @@ import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fc;
 import org.jspecify.annotations.Nullable;
 
-public interface PictureInPictureRenderState
-extends ScreenArea {
-    public static final Matrix3x2fc IDENTITY_POSE = new Matrix3x2f();
+public interface PictureInPictureRenderState extends ScreenArea {
+  public static final Matrix3x2fc IDENTITY_POSE = new Matrix3x2f();
 
-    public int x0();
+  public int x0();
 
-    public int x1();
+  public int x1();
 
-    public int y0();
+  public int y0();
 
-    public int y1();
+  public int y1();
 
-    public float scale();
+  public float scale();
 
-    default public Matrix3x2fc pose() {
-        return IDENTITY_POSE;
-    }
+  public default Matrix3x2fc pose() {
+    return IDENTITY_POSE;
+  }
 
-    public @Nullable ScreenRectangle scissorArea();
+  public @Nullable ScreenRectangle scissorArea();
 
-    public static @Nullable ScreenRectangle getBounds(int x0, int y0, int x1, int y1, @Nullable ScreenRectangle scissorArea) {
-        ScreenRectangle bounds = new ScreenRectangle(x0, y0, x1 - x0, y1 - y0);
-        return scissorArea != null ? scissorArea.intersection(bounds) : bounds;
-    }
+  public static @Nullable ScreenRectangle getBounds(
+      int x0, int y0, int x1, int y1, @Nullable ScreenRectangle scissorArea) {
+    ScreenRectangle bounds = new ScreenRectangle(x0, y0, x1 - x0, y1 - y0);
+    return scissorArea != null ? scissorArea.intersection(bounds) : bounds;
+  }
 }
-

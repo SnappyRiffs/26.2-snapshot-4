@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonObject
  *  org.jspecify.annotations.Nullable
@@ -11,20 +11,19 @@ import com.google.gson.JsonObject;
 import org.jspecify.annotations.Nullable;
 
 public abstract class StoredUserEntry<T> {
-    private final @Nullable T user;
+  private final @Nullable T user;
 
-    public StoredUserEntry(@Nullable T user) {
-        this.user = user;
-    }
+  public StoredUserEntry(@Nullable T user) {
+    this.user = user;
+  }
 
-    public @Nullable T getUser() {
-        return this.user;
-    }
+  public @Nullable T getUser() {
+    return this.user;
+  }
 
-    boolean hasExpired() {
-        return false;
-    }
+  boolean hasExpired() {
+    return false;
+  }
 
-    protected abstract void serialize(JsonObject var1);
+  protected abstract void serialize(JsonObject var1);
 }
-

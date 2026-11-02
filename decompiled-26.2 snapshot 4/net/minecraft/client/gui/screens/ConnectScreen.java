@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  io.netty.channel.ChannelFuture
@@ -211,4 +211,3 @@ extends Screen {
         graphics.centeredText(this.font, this.status, this.width / 2, this.height / 2 - 50, -1);
     }
 }
-

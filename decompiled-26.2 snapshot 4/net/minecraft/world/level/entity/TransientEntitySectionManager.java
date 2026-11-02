@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  it.unimi.dsi.fastutil.longs.Long2ObjectFunction
@@ -167,4 +167,3 @@ public class TransientEntitySectionManager<T extends EntityAccess> {
         }
     }
 }
-

@@ -3,6 +3,4 @@
  */
 package com.mojang.realmsclient.dto;
 
-public interface ReflectionBasedSerialization {
-}
-
+public interface ReflectionBasedSerialization {}

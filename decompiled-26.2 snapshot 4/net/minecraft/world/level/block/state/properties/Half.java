@@ -5,24 +5,22 @@ package net.minecraft.world.level.block.state.properties;
 
 import net.minecraft.util.StringRepresentable;
 
-public enum Half implements StringRepresentable
-{
-    TOP("top"),
-    BOTTOM("bottom");
+public enum Half implements StringRepresentable {
+  TOP("top"),
+  BOTTOM("bottom");
 
-    private final String name;
+  private final String name;
 
-    private Half(String name) {
-        this.name = name;
-    }
+  private Half(String name) {
+    this.name = name;
+  }
 
-    public String toString() {
-        return this.name;
-    }
+  public String toString() {
+    return this.name;
+  }
 
-    @Override
-    public String getSerializedName() {
-        return this.name;
-    }
+  @Override
+  public String getSerializedName() {
+    return this.name;
+  }
 }
-

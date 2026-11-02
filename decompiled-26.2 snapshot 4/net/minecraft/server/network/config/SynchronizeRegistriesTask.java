@@ -22,39 +22,50 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.tags.TagNetworkSerialization;
 
-public class SynchronizeRegistriesTask
-implements ConfigurationTask {
-    public static final ConfigurationTask.Type TYPE = new ConfigurationTask.Type("synchronize_registries");
-    private final List<KnownPack> requestedPacks;
-    private final LayeredRegistryAccess<RegistryLayer> registries;
+public class SynchronizeRegistriesTask implements ConfigurationTask {
+  public static final ConfigurationTask.Type TYPE =
+      new ConfigurationTask.Type("synchronize_registries");
+  private final List<KnownPack> requestedPacks;
+  private final LayeredRegistryAccess<RegistryLayer> registries;
 
-    public SynchronizeRegistriesTask(List<KnownPack> knownPacks, LayeredRegistryAccess<RegistryLayer> registries) {
-        this.requestedPacks = knownPacks;
-        this.registries = registries;
-    }
+  public SynchronizeRegistriesTask(
+      List<KnownPack> knownPacks, LayeredRegistryAccess<RegistryLayer> registries) {
+    this.requestedPacks = knownPacks;
+    this.registries = registries;
+  }
 
-    @Override
-    public void start(Consumer<Packet<?>> connection) {
-        connection.accept(new ClientboundSelectKnownPacks(this.requestedPacks));
-    }
+  @Override
+  public void start(Consumer<Packet<?>> connection) {
+    connection.accept(new ClientboundSelectKnownPacks(this.requestedPacks));
+  }
 
-    private void sendRegistries(Consumer<Packet<?>> connection, Set<KnownPack> negotiatedPacks) {
-        RegistryOps<Tag> ops = this.registries.compositeAccess().createSerializationContext(NbtOps.INSTANCE);
-        RegistrySynchronization.packRegistries(ops, this.registries.getAccessFrom(RegistryLayer.WORLDGEN), negotiatedPacks, (registryKey, entries) -> connection.accept(new ClientboundRegistryDataPacket((ResourceKey<? extends Registry<?>>)registryKey, (List<RegistrySynchronization.PackedRegistryEntry>)entries)));
-        connection.accept(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(this.registries)));
-    }
+  private void sendRegistries(Consumer<Packet<?>> connection, Set<KnownPack> negotiatedPacks) {
+    RegistryOps<Tag> ops =
+        this.registries.compositeAccess().createSerializationContext(NbtOps.INSTANCE);
+    RegistrySynchronization.packRegistries(
+        ops,
+        this.registries.getAccessFrom(RegistryLayer.WORLDGEN),
+        negotiatedPacks,
+        (registryKey, entries) ->
+            connection.accept(
+                new ClientboundRegistryDataPacket(
+                    (ResourceKey<? extends Registry<?>>) registryKey,
+                    (List<RegistrySynchronization.PackedRegistryEntry>) entries)));
+    connection.accept(
+        new ClientboundUpdateTagsPacket(
+            TagNetworkSerialization.serializeTagsToNetwork(this.registries)));
+  }
 
-    public void handleResponse(List<KnownPack> acceptedPacks, Consumer<Packet<?>> connection) {
-        if (acceptedPacks.equals(this.requestedPacks)) {
-            this.sendRegistries(connection, Set.copyOf(this.requestedPacks));
-        } else {
-            this.sendRegistries(connection, Set.of());
-        }
+  public void handleResponse(List<KnownPack> acceptedPacks, Consumer<Packet<?>> connection) {
+    if (acceptedPacks.equals(this.requestedPacks)) {
+      this.sendRegistries(connection, Set.copyOf(this.requestedPacks));
+    } else {
+      this.sendRegistries(connection, Set.of());
     }
+  }
 
-    @Override
-    public ConfigurationTask.Type type() {
-        return TYPE;
-    }
+  @Override
+  public ConfigurationTask.Type type() {
+    return TYPE;
+  }
 }
-

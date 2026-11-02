@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
@@ -17,21 +17,22 @@ import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.Typed;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
-import net.minecraft.util.datafix.fixes.LockComponentPredicateFix;
-import net.minecraft.util.datafix.fixes.References;
 
-public class ContainerBlockEntityLockPredicateFix
-extends DataFix {
-    public ContainerBlockEntityLockPredicateFix(Schema outputSchema) {
-        super(outputSchema, false);
-    }
+public class ContainerBlockEntityLockPredicateFix extends DataFix {
+  public ContainerBlockEntityLockPredicateFix(Schema outputSchema) {
+    super(outputSchema, false);
+  }
 
-    protected TypeRewriteRule makeRule() {
-        return this.fixTypeEverywhereTyped("ContainerBlockEntityLockPredicateFix", (Type)this.getInputSchema().findChoiceType(References.BLOCK_ENTITY), ContainerBlockEntityLockPredicateFix::fixBlockEntity);
-    }
+  protected TypeRewriteRule makeRule() {
+    return this.fixTypeEverywhereTyped(
+        "ContainerBlockEntityLockPredicateFix",
+        (Type) this.getInputSchema().findChoiceType(References.BLOCK_ENTITY),
+        ContainerBlockEntityLockPredicateFix::fixBlockEntity);
+  }
 
-    private static Typed<?> fixBlockEntity(Typed<?> entity) {
-        return entity.update(DSL.remainderFinder(), tag -> tag.renameAndFixField("Lock", "lock", LockComponentPredicateFix::fixLock));
-    }
+  private static Typed<?> fixBlockEntity(Typed<?> entity) {
+    return entity.update(
+        DSL.remainderFinder(),
+        tag -> tag.renameAndFixField("Lock", "lock", LockComponentPredicateFix::fixLock));
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.DataFixer
  *  com.mojang.logging.LogUtils
@@ -25,59 +25,60 @@ import net.minecraft.util.datafix.DataFixTypes;
 import org.slf4j.Logger;
 
 public class HotbarManager {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    public static final int NUM_HOTBAR_GROUPS = 9;
-    private final Path optionsFile;
-    private final DataFixer fixerUpper;
-    private final Hotbar[] hotbars = new Hotbar[9];
-    private boolean loaded;
+  private static final Logger LOGGER = LogUtils.getLogger();
+  public static final int NUM_HOTBAR_GROUPS = 9;
+  private final Path optionsFile;
+  private final DataFixer fixerUpper;
+  private final Hotbar[] hotbars = new Hotbar[9];
+  private boolean loaded;
 
-    public HotbarManager(Path workingDirectory, DataFixer fixerUpper) {
-        this.optionsFile = workingDirectory.resolve("hotbar.nbt");
-        this.fixerUpper = fixerUpper;
-        for (int i = 0; i < 9; ++i) {
-            this.hotbars[i] = new Hotbar();
-        }
+  public HotbarManager(Path workingDirectory, DataFixer fixerUpper) {
+    this.optionsFile = workingDirectory.resolve("hotbar.nbt");
+    this.fixerUpper = fixerUpper;
+    for (int i = 0; i < 9; ++i) {
+      this.hotbars[i] = new Hotbar();
     }
+  }
 
-    private void load() {
-        try {
-            CompoundTag tag = NbtIo.read(this.optionsFile);
-            if (tag == null) {
-                return;
-            }
-            int version = NbtUtils.getDataVersion(tag, 1343);
-            tag = DataFixTypes.HOTBAR.updateToCurrentVersion(this.fixerUpper, tag, version);
-            for (int i = 0; i < 9; ++i) {
-                this.hotbars[i] = Hotbar.CODEC.parse((DynamicOps)NbtOps.INSTANCE, (Object)tag.get(String.valueOf(i))).resultOrPartial(error -> LOGGER.warn("Failed to parse hotbar: {}", error)).orElseGet(Hotbar::new);
-            }
-        }
-        catch (Exception e) {
-            LOGGER.error("Failed to load creative mode options", (Throwable)e);
-        }
+  private void load() {
+    try {
+      CompoundTag tag = NbtIo.read(this.optionsFile);
+      if (tag == null) {
+        return;
+      }
+      int version = NbtUtils.getDataVersion(tag, 1343);
+      tag = DataFixTypes.HOTBAR.updateToCurrentVersion(this.fixerUpper, tag, version);
+      for (int i = 0; i < 9; ++i) {
+        this.hotbars[i] =
+            Hotbar.CODEC
+                .parse((DynamicOps) NbtOps.INSTANCE, (Object) tag.get(String.valueOf(i)))
+                .resultOrPartial(error -> LOGGER.warn("Failed to parse hotbar: {}", error))
+                .orElseGet(Hotbar::new);
+      }
+    } catch (Exception e) {
+      LOGGER.error("Failed to load creative mode options", (Throwable) e);
     }
+  }
 
-    public void save() {
-        try {
-            CompoundTag tag = NbtUtils.addCurrentDataVersion(new CompoundTag());
-            for (int i = 0; i < 9; ++i) {
-                Hotbar hotbar = this.get(i);
-                DataResult result = Hotbar.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)hotbar);
-                tag.put(String.valueOf(i), (Tag)result.getOrThrow());
-            }
-            NbtIo.write(tag, this.optionsFile);
-        }
-        catch (Exception e) {
-            LOGGER.error("Failed to save creative mode options", (Throwable)e);
-        }
+  public void save() {
+    try {
+      CompoundTag tag = NbtUtils.addCurrentDataVersion(new CompoundTag());
+      for (int i = 0; i < 9; ++i) {
+        Hotbar hotbar = this.get(i);
+        DataResult result = Hotbar.CODEC.encodeStart((DynamicOps) NbtOps.INSTANCE, (Object) hotbar);
+        tag.put(String.valueOf(i), (Tag) result.getOrThrow());
+      }
+      NbtIo.write(tag, this.optionsFile);
+    } catch (Exception e) {
+      LOGGER.error("Failed to save creative mode options", (Throwable) e);
     }
+  }
 
-    public Hotbar get(int id) {
-        if (!this.loaded) {
-            this.load();
-            this.loaded = true;
-        }
-        return this.hotbars[id];
+  public Hotbar get(int id) {
+    if (!this.loaded) {
+      this.load();
+      this.loaded = true;
     }
+    return this.hotbars[id];
+  }
 }
-

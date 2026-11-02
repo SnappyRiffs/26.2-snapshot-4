@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.joml.Matrix4f
  *  org.joml.Vector3f
@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.level.WorldBorderRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -39,138 +38,202 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public class WorldBorderRenderer
-implements AutoCloseable {
-    public static final Identifier FORCEFIELD_LOCATION = Identifier.withDefaultNamespace("textures/misc/forcefield.png");
-    private boolean needsRebuild = true;
-    private double lastMinX;
-    private double lastMinZ;
-    private double lastBorderMinX;
-    private double lastBorderMaxX;
-    private double lastBorderMinZ;
-    private double lastBorderMaxZ;
-    private final GpuBuffer worldBorderBuffer = RenderSystem.getDevice().createBuffer(() -> "World border vertex buffer", 40, 16L * (long)DefaultVertexFormat.POSITION_TEX.getVertexSize());
-    private final RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+public class WorldBorderRenderer implements AutoCloseable {
+  public static final Identifier FORCEFIELD_LOCATION =
+      Identifier.withDefaultNamespace("textures/misc/forcefield.png");
+  private boolean needsRebuild = true;
+  private double lastMinX;
+  private double lastMinZ;
+  private double lastBorderMinX;
+  private double lastBorderMaxX;
+  private double lastBorderMinZ;
+  private double lastBorderMaxZ;
+  private final GpuBuffer worldBorderBuffer =
+      RenderSystem.getDevice()
+          .createBuffer(
+              () -> "World border vertex buffer",
+              40,
+              16L * (long) DefaultVertexFormat.POSITION_TEX.getVertexSize());
+  private final RenderSystem.AutoStorageIndexBuffer indices =
+      RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
 
-    @Override
-    public void close() {
-        this.worldBorderBuffer.close();
-    }
+  @Override
+  public void close() {
+    this.worldBorderBuffer.close();
+  }
 
-    private void rebuildWorldBorderBuffer(WorldBorderRenderState state, double renderDistance, double cameraZ, double cameraX, float halfHeightY, float v1, float v0) {
-        try (ByteBufferBuilder byteBufferBuilder = ByteBufferBuilder.exactlySized(DefaultVertexFormat.POSITION_TEX.getVertexSize() * 4 * 4);){
-            double borderMinX = state.minX;
-            double borderMaxX = state.maxX;
-            double borderMinZ = state.minZ;
-            double borderMaxZ = state.maxZ;
-            double minZ = Math.max((double)Mth.floor(cameraZ - renderDistance), borderMinZ);
-            double maxZ = Math.min((double)Mth.ceil(cameraZ + renderDistance), borderMaxZ);
-            float u0z = (float)(Mth.floor(minZ) & 1) * 0.5f;
-            float u1z = (float)(maxZ - minZ) / 2.0f;
-            double minX = Math.max((double)Mth.floor(cameraX - renderDistance), borderMinX);
-            double maxX = Math.min((double)Mth.ceil(cameraX + renderDistance), borderMaxX);
-            float u0x = (float)(Mth.floor(minX) & 1) * 0.5f;
-            float u1x = (float)(maxX - minX) / 2.0f;
-            BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-            bufferBuilder.addVertex(0.0f, -halfHeightY, (float)(borderMaxZ - minZ)).setUv(u0x, v1);
-            bufferBuilder.addVertex((float)(maxX - minX), -halfHeightY, (float)(borderMaxZ - minZ)).setUv(u1x + u0x, v1);
-            bufferBuilder.addVertex((float)(maxX - minX), halfHeightY, (float)(borderMaxZ - minZ)).setUv(u1x + u0x, v0);
-            bufferBuilder.addVertex(0.0f, halfHeightY, (float)(borderMaxZ - minZ)).setUv(u0x, v0);
-            bufferBuilder.addVertex(0.0f, -halfHeightY, 0.0f).setUv(u0z, v1);
-            bufferBuilder.addVertex(0.0f, -halfHeightY, (float)(maxZ - minZ)).setUv(u1z + u0z, v1);
-            bufferBuilder.addVertex(0.0f, halfHeightY, (float)(maxZ - minZ)).setUv(u1z + u0z, v0);
-            bufferBuilder.addVertex(0.0f, halfHeightY, 0.0f).setUv(u0z, v0);
-            bufferBuilder.addVertex((float)(maxX - minX), -halfHeightY, 0.0f).setUv(u0x, v1);
-            bufferBuilder.addVertex(0.0f, -halfHeightY, 0.0f).setUv(u1x + u0x, v1);
-            bufferBuilder.addVertex(0.0f, halfHeightY, 0.0f).setUv(u1x + u0x, v0);
-            bufferBuilder.addVertex((float)(maxX - minX), halfHeightY, 0.0f).setUv(u0x, v0);
-            bufferBuilder.addVertex((float)(borderMaxX - minX), -halfHeightY, (float)(maxZ - minZ)).setUv(u0z, v1);
-            bufferBuilder.addVertex((float)(borderMaxX - minX), -halfHeightY, 0.0f).setUv(u1z + u0z, v1);
-            bufferBuilder.addVertex((float)(borderMaxX - minX), halfHeightY, 0.0f).setUv(u1z + u0z, v0);
-            bufferBuilder.addVertex((float)(borderMaxX - minX), halfHeightY, (float)(maxZ - minZ)).setUv(u0z, v0);
-            try (MeshData meshData = bufferBuilder.buildOrThrow();){
-                RenderSystem.getDevice().createCommandEncoder().writeToBuffer(this.worldBorderBuffer.slice(), meshData.vertexBuffer());
-            }
-            this.lastBorderMinX = borderMinX;
-            this.lastBorderMaxX = borderMaxX;
-            this.lastBorderMinZ = borderMinZ;
-            this.lastBorderMaxZ = borderMaxZ;
-            this.lastMinX = minX;
-            this.lastMinZ = minZ;
-            this.needsRebuild = false;
-        }
+  private void rebuildWorldBorderBuffer(
+      WorldBorderRenderState state,
+      double renderDistance,
+      double cameraZ,
+      double cameraX,
+      float halfHeightY,
+      float v1,
+      float v0) {
+    try (ByteBufferBuilder byteBufferBuilder =
+        ByteBufferBuilder.exactlySized(
+            DefaultVertexFormat.POSITION_TEX.getVertexSize() * 4 * 4); ) {
+      double borderMinX = state.minX;
+      double borderMaxX = state.maxX;
+      double borderMinZ = state.minZ;
+      double borderMaxZ = state.maxZ;
+      double minZ = Math.max((double) Mth.floor(cameraZ - renderDistance), borderMinZ);
+      double maxZ = Math.min((double) Mth.ceil(cameraZ + renderDistance), borderMaxZ);
+      float u0z = (float) (Mth.floor(minZ) & 1) * 0.5f;
+      float u1z = (float) (maxZ - minZ) / 2.0f;
+      double minX = Math.max((double) Mth.floor(cameraX - renderDistance), borderMinX);
+      double maxX = Math.min((double) Mth.ceil(cameraX + renderDistance), borderMaxX);
+      float u0x = (float) (Mth.floor(minX) & 1) * 0.5f;
+      float u1x = (float) (maxX - minX) / 2.0f;
+      BufferBuilder bufferBuilder =
+          new BufferBuilder(
+              byteBufferBuilder, VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+      bufferBuilder.addVertex(0.0f, -halfHeightY, (float) (borderMaxZ - minZ)).setUv(u0x, v1);
+      bufferBuilder
+          .addVertex((float) (maxX - minX), -halfHeightY, (float) (borderMaxZ - minZ))
+          .setUv(u1x + u0x, v1);
+      bufferBuilder
+          .addVertex((float) (maxX - minX), halfHeightY, (float) (borderMaxZ - minZ))
+          .setUv(u1x + u0x, v0);
+      bufferBuilder.addVertex(0.0f, halfHeightY, (float) (borderMaxZ - minZ)).setUv(u0x, v0);
+      bufferBuilder.addVertex(0.0f, -halfHeightY, 0.0f).setUv(u0z, v1);
+      bufferBuilder.addVertex(0.0f, -halfHeightY, (float) (maxZ - minZ)).setUv(u1z + u0z, v1);
+      bufferBuilder.addVertex(0.0f, halfHeightY, (float) (maxZ - minZ)).setUv(u1z + u0z, v0);
+      bufferBuilder.addVertex(0.0f, halfHeightY, 0.0f).setUv(u0z, v0);
+      bufferBuilder.addVertex((float) (maxX - minX), -halfHeightY, 0.0f).setUv(u0x, v1);
+      bufferBuilder.addVertex(0.0f, -halfHeightY, 0.0f).setUv(u1x + u0x, v1);
+      bufferBuilder.addVertex(0.0f, halfHeightY, 0.0f).setUv(u1x + u0x, v0);
+      bufferBuilder.addVertex((float) (maxX - minX), halfHeightY, 0.0f).setUv(u0x, v0);
+      bufferBuilder
+          .addVertex((float) (borderMaxX - minX), -halfHeightY, (float) (maxZ - minZ))
+          .setUv(u0z, v1);
+      bufferBuilder.addVertex((float) (borderMaxX - minX), -halfHeightY, 0.0f).setUv(u1z + u0z, v1);
+      bufferBuilder.addVertex((float) (borderMaxX - minX), halfHeightY, 0.0f).setUv(u1z + u0z, v0);
+      bufferBuilder
+          .addVertex((float) (borderMaxX - minX), halfHeightY, (float) (maxZ - minZ))
+          .setUv(u0z, v0);
+      try (MeshData meshData = bufferBuilder.buildOrThrow(); ) {
+        RenderSystem.getDevice()
+            .createCommandEncoder()
+            .writeToBuffer(this.worldBorderBuffer.slice(), meshData.vertexBuffer());
+      }
+      this.lastBorderMinX = borderMinX;
+      this.lastBorderMaxX = borderMaxX;
+      this.lastBorderMinZ = borderMinZ;
+      this.lastBorderMaxZ = borderMaxZ;
+      this.lastMinX = minX;
+      this.lastMinZ = minZ;
+      this.needsRebuild = false;
     }
+  }
 
-    public void extract(WorldBorder border, float deltaPartialTick, Vec3 cameraPos, double renderDistance, WorldBorderRenderState state) {
-        state.minX = border.getMinX(deltaPartialTick);
-        state.maxX = border.getMaxX(deltaPartialTick);
-        state.minZ = border.getMinZ(deltaPartialTick);
-        state.maxZ = border.getMaxZ(deltaPartialTick);
-        if (cameraPos.x < state.maxX - renderDistance && cameraPos.x > state.minX + renderDistance && cameraPos.z < state.maxZ - renderDistance && cameraPos.z > state.minZ + renderDistance || cameraPos.x < state.minX - renderDistance || cameraPos.x > state.maxX + renderDistance || cameraPos.z < state.minZ - renderDistance || cameraPos.z > state.maxZ + renderDistance) {
-            state.alpha = 0.0;
-            return;
-        }
-        state.alpha = 1.0 - border.getDistanceToBorder(cameraPos.x, cameraPos.z) / renderDistance;
-        state.alpha = Math.pow(state.alpha, 4.0);
-        state.alpha = Mth.clamp(state.alpha, 0.0, 1.0);
-        state.tint = border.getStatus().getColor();
+  public void extract(
+      WorldBorder border,
+      float deltaPartialTick,
+      Vec3 cameraPos,
+      double renderDistance,
+      WorldBorderRenderState state) {
+    state.minX = border.getMinX(deltaPartialTick);
+    state.maxX = border.getMaxX(deltaPartialTick);
+    state.minZ = border.getMinZ(deltaPartialTick);
+    state.maxZ = border.getMaxZ(deltaPartialTick);
+    if (cameraPos.x < state.maxX - renderDistance
+            && cameraPos.x > state.minX + renderDistance
+            && cameraPos.z < state.maxZ - renderDistance
+            && cameraPos.z > state.minZ + renderDistance
+        || cameraPos.x < state.minX - renderDistance
+        || cameraPos.x > state.maxX + renderDistance
+        || cameraPos.z < state.minZ - renderDistance
+        || cameraPos.z > state.maxZ + renderDistance) {
+      state.alpha = 0.0;
+      return;
     }
+    state.alpha = 1.0 - border.getDistanceToBorder(cameraPos.x, cameraPos.z) / renderDistance;
+    state.alpha = Math.pow(state.alpha, 4.0);
+    state.alpha = Mth.clamp(state.alpha, 0.0, 1.0);
+    state.tint = border.getStatus().getColor();
+  }
 
-    public void render(WorldBorderRenderState state, Vec3 cameraPos, double renderDistance, double depthFar) {
-        GpuTextureView depthTexture;
-        GpuTextureView colorTexture;
-        if (state.alpha <= 0.0) {
-            return;
-        }
-        double cameraX = cameraPos.x;
-        double cameraZ = cameraPos.z;
-        float halfHeightY = (float)depthFar;
-        float red = (float)ARGB.red(state.tint) / 255.0f;
-        float green = (float)ARGB.green(state.tint) / 255.0f;
-        float blue = (float)ARGB.blue(state.tint) / 255.0f;
-        float offset = (float)(Util.getMillis() % 3000L) / 3000.0f;
-        float v0 = (float)(-Mth.frac(cameraPos.y * 0.5));
-        float v1 = v0 + halfHeightY;
-        if (this.shouldRebuildWorldBorderBuffer(state)) {
-            this.rebuildWorldBorderBuffer(state, renderDistance, cameraZ, cameraX, halfHeightY, v1, v0);
-        }
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        AbstractTexture abstractTexture = textureManager.getTexture(FORCEFIELD_LOCATION);
-        RenderPipeline renderPipeline = RenderPipelines.WORLD_BORDER;
-        RenderTarget mainRenderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-        RenderTarget weatherTarget = Minecraft.getInstance().levelRenderer.weatherTarget();
-        if (weatherTarget != null) {
-            colorTexture = weatherTarget.getColorTextureView();
-            depthTexture = weatherTarget.getDepthTextureView();
-        } else {
-            colorTexture = mainRenderTarget.getColorTextureView();
-            depthTexture = mainRenderTarget.getDepthTextureView();
-        }
-        GpuBuffer indexBuffer = this.indices.getBuffer(6);
-        GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(RenderSystem.getModelViewMatrixCopy(), new Vector4f(red, green, blue, (float)state.alpha), new Vector3f((float)(this.lastMinX - cameraX), (float)(-cameraPos.y), (float)(this.lastMinZ - cameraZ)), new Matrix4f().translation(offset, offset, 0.0f));
-        try (RenderPass renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(() -> "World border", colorTexture, OptionalInt.empty(), depthTexture, OptionalDouble.empty());){
-            renderPass.setPipeline(renderPipeline);
-            RenderSystem.bindDefaultUniforms(renderPass);
-            renderPass.setUniform("DynamicTransforms", dynamicTransforms);
-            renderPass.setIndexBuffer(indexBuffer, this.indices.type());
-            renderPass.bindTexture("Sampler0", abstractTexture.getTextureView(), abstractTexture.getSampler());
-            renderPass.setVertexBuffer(0, this.worldBorderBuffer);
-            ArrayList draws = new ArrayList();
-            for (WorldBorderRenderState.DistancePerDirection distancePerDirection : state.closestBorder(cameraX, cameraZ)) {
-                if (!(distancePerDirection.distance() < renderDistance)) continue;
-                int sideIndex = distancePerDirection.direction().get2DDataValue();
-                draws.add(new RenderPass.Draw(0, this.worldBorderBuffer, indexBuffer, this.indices.type(), 6 * sideIndex, 6, 0));
-            }
-            renderPass.drawMultipleIndexed(draws, null, null, Collections.emptyList(), this);
-        }
+  public void render(
+      WorldBorderRenderState state, Vec3 cameraPos, double renderDistance, double depthFar) {
+    GpuTextureView depthTexture;
+    GpuTextureView colorTexture;
+    if (state.alpha <= 0.0) {
+      return;
     }
+    double cameraX = cameraPos.x;
+    double cameraZ = cameraPos.z;
+    float halfHeightY = (float) depthFar;
+    float red = (float) ARGB.red(state.tint) / 255.0f;
+    float green = (float) ARGB.green(state.tint) / 255.0f;
+    float blue = (float) ARGB.blue(state.tint) / 255.0f;
+    float offset = (float) (Util.getMillis() % 3000L) / 3000.0f;
+    float v0 = (float) (-Mth.frac(cameraPos.y * 0.5));
+    float v1 = v0 + halfHeightY;
+    if (this.shouldRebuildWorldBorderBuffer(state)) {
+      this.rebuildWorldBorderBuffer(state, renderDistance, cameraZ, cameraX, halfHeightY, v1, v0);
+    }
+    TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+    AbstractTexture abstractTexture = textureManager.getTexture(FORCEFIELD_LOCATION);
+    RenderPipeline renderPipeline = RenderPipelines.WORLD_BORDER;
+    RenderTarget mainRenderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+    RenderTarget weatherTarget = Minecraft.getInstance().levelRenderer.weatherTarget();
+    if (weatherTarget != null) {
+      colorTexture = weatherTarget.getColorTextureView();
+      depthTexture = weatherTarget.getDepthTextureView();
+    } else {
+      colorTexture = mainRenderTarget.getColorTextureView();
+      depthTexture = mainRenderTarget.getDepthTextureView();
+    }
+    GpuBuffer indexBuffer = this.indices.getBuffer(6);
+    GpuBufferSlice dynamicTransforms =
+        RenderSystem.getDynamicUniforms()
+            .writeTransform(
+                RenderSystem.getModelViewMatrixCopy(),
+                new Vector4f(red, green, blue, (float) state.alpha),
+                new Vector3f(
+                    (float) (this.lastMinX - cameraX),
+                    (float) (-cameraPos.y),
+                    (float) (this.lastMinZ - cameraZ)),
+                new Matrix4f().translation(offset, offset, 0.0f));
+    try (RenderPass renderPass =
+        RenderSystem.getDevice()
+            .createCommandEncoder()
+            .createRenderPass(
+                () -> "World border",
+                colorTexture,
+                OptionalInt.empty(),
+                depthTexture,
+                OptionalDouble.empty()); ) {
+      renderPass.setPipeline(renderPipeline);
+      RenderSystem.bindDefaultUniforms(renderPass);
+      renderPass.setUniform("DynamicTransforms", dynamicTransforms);
+      renderPass.setIndexBuffer(indexBuffer, this.indices.type());
+      renderPass.bindTexture(
+          "Sampler0", abstractTexture.getTextureView(), abstractTexture.getSampler());
+      renderPass.setVertexBuffer(0, this.worldBorderBuffer);
+      ArrayList draws = new ArrayList();
+      for (WorldBorderRenderState.DistancePerDirection distancePerDirection :
+          state.closestBorder(cameraX, cameraZ)) {
+        if (!(distancePerDirection.distance() < renderDistance)) continue;
+        int sideIndex = distancePerDirection.direction().get2DDataValue();
+        draws.add(
+            new RenderPass.Draw(
+                0, this.worldBorderBuffer, indexBuffer, this.indices.type(), 6 * sideIndex, 6, 0));
+      }
+      renderPass.drawMultipleIndexed(draws, null, null, Collections.emptyList(), this);
+    }
+  }
 
-    public void invalidate() {
-        this.needsRebuild = true;
-    }
+  public void invalidate() {
+    this.needsRebuild = true;
+  }
 
-    private boolean shouldRebuildWorldBorderBuffer(WorldBorderRenderState state) {
-        return this.needsRebuild || state.minX != this.lastBorderMinX || state.minZ != this.lastBorderMinZ || state.maxX != this.lastBorderMaxX || state.maxZ != this.lastBorderMaxZ;
-    }
+  private boolean shouldRebuildWorldBorderBuffer(WorldBorderRenderState state) {
+    return this.needsRebuild
+        || state.minX != this.lastBorderMinX
+        || state.minZ != this.lastBorderMinZ
+        || state.maxX != this.lastBorderMaxX
+        || state.maxZ != this.lastBorderMaxZ;
+  }
 }
-

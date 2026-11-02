@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.authlib.minecraft.BanDetails
  *  com.mojang.logging.LogUtils
@@ -312,4 +312,3 @@ extends Screen {
         this.minecraft.gui.setScreen(screen);
     }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.TypeAdapter
  *  com.google.gson.stream.JsonReader
@@ -18,40 +18,40 @@ import java.io.IOException;
 import org.slf4j.Logger;
 
 public enum RegionSelectionPreference {
-    AUTOMATIC_PLAYER(0, "realms.configuration.region_preference.automatic_player"),
-    AUTOMATIC_OWNER(1, "realms.configuration.region_preference.automatic_owner"),
-    MANUAL(2, "");
+  AUTOMATIC_PLAYER(0, "realms.configuration.region_preference.automatic_player"),
+  AUTOMATIC_OWNER(1, "realms.configuration.region_preference.automatic_owner"),
+  MANUAL(2, "");
 
-    public static final RegionSelectionPreference DEFAULT_SELECTION;
-    public final int id;
-    public final String translationKey;
+  public static final RegionSelectionPreference DEFAULT_SELECTION;
+  public final int id;
+  public final String translationKey;
 
-    private RegionSelectionPreference(int id, String translationKey) {
-        this.id = id;
-        this.translationKey = translationKey;
+  private RegionSelectionPreference(int id, String translationKey) {
+    this.id = id;
+    this.translationKey = translationKey;
+  }
+
+  static {
+    DEFAULT_SELECTION = AUTOMATIC_PLAYER;
+  }
+
+  public static class RegionSelectionPreferenceJsonAdapter
+      extends TypeAdapter<RegionSelectionPreference> {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    public void write(JsonWriter jsonWriter, RegionSelectionPreference regionSelectionPreference)
+        throws IOException {
+      jsonWriter.value((long) regionSelectionPreference.id);
     }
 
-    static {
-        DEFAULT_SELECTION = AUTOMATIC_PLAYER;
+    public RegionSelectionPreference read(JsonReader jsonReader) throws IOException {
+      int id = jsonReader.nextInt();
+      for (RegionSelectionPreference value : RegionSelectionPreference.values()) {
+        if (value.id != id) continue;
+        return value;
+      }
+      LOGGER.warn("Unsupported RegionSelectionPreference {}", (Object) id);
+      return DEFAULT_SELECTION;
     }
-
-    public static class RegionSelectionPreferenceJsonAdapter
-    extends TypeAdapter<RegionSelectionPreference> {
-        private static final Logger LOGGER = LogUtils.getLogger();
-
-        public void write(JsonWriter jsonWriter, RegionSelectionPreference regionSelectionPreference) throws IOException {
-            jsonWriter.value((long)regionSelectionPreference.id);
-        }
-
-        public RegionSelectionPreference read(JsonReader jsonReader) throws IOException {
-            int id = jsonReader.nextInt();
-            for (RegionSelectionPreference value : RegionSelectionPreference.values()) {
-                if (value.id != id) continue;
-                return value;
-            }
-            LOGGER.warn("Unsupported RegionSelectionPreference {}", (Object)id);
-            return DEFAULT_SELECTION;
-        }
-    }
+  }
 }
-

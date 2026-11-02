@@ -11,12 +11,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.FuelValues;
 
 public class SlotDisplayContext {
-    public static final ContextKey<FuelValues> FUEL_VALUES = ContextKey.vanilla("fuel_values");
-    public static final ContextKey<HolderLookup.Provider> REGISTRIES = ContextKey.vanilla("registries");
-    public static final ContextKeySet CONTEXT = new ContextKeySet.Builder().optional(FUEL_VALUES).optional(REGISTRIES).build();
+  public static final ContextKey<FuelValues> FUEL_VALUES = ContextKey.vanilla("fuel_values");
+  public static final ContextKey<HolderLookup.Provider> REGISTRIES =
+      ContextKey.vanilla("registries");
+  public static final ContextKeySet CONTEXT =
+      new ContextKeySet.Builder().optional(FUEL_VALUES).optional(REGISTRIES).build();
 
-    public static ContextMap fromLevel(Level level) {
-        return new ContextMap.Builder().withParameter(FUEL_VALUES, level.fuelValues()).withParameter(REGISTRIES, level.registryAccess()).create(CONTEXT);
-    }
+  public static ContextMap fromLevel(Level level) {
+    return new ContextMap.Builder()
+        .withParameter(FUEL_VALUES, level.fuelValues())
+        .withParameter(REGISTRIES, level.registryAccess())
+        .create(CONTEXT);
+  }
 }
-

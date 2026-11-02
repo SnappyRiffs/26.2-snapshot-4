@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -22,24 +22,37 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding;
 
-public record RandomGroupPoolAlias(WeightedList<List<PoolAliasBinding>> groups) implements PoolAliasBinding
-{
-    static final MapCodec<RandomGroupPoolAlias> CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)WeightedList.nonEmptyCodec(Codec.list(PoolAliasBinding.CODEC)).fieldOf("groups").forGetter(RandomGroupPoolAlias::groups)).apply((Applicative)i, RandomGroupPoolAlias::new));
+public record RandomGroupPoolAlias(WeightedList<List<PoolAliasBinding>> groups)
+    implements PoolAliasBinding {
+  static final MapCodec<RandomGroupPoolAlias> CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App)
+                          WeightedList.nonEmptyCodec(Codec.list(PoolAliasBinding.CODEC))
+                              .fieldOf("groups")
+                              .forGetter(RandomGroupPoolAlias::groups))
+                  .apply((Applicative) i, RandomGroupPoolAlias::new));
 
-    @Override
-    public void forEachResolved(RandomSource random, BiConsumer<ResourceKey<StructureTemplatePool>, ResourceKey<StructureTemplatePool>> aliasAndTargetConsumer) {
-        this.groups.getRandomOrThrow(random).forEach(binding -> binding.forEachResolved(random, aliasAndTargetConsumer));
-    }
+  @Override
+  public void forEachResolved(
+      RandomSource random,
+      BiConsumer<ResourceKey<StructureTemplatePool>, ResourceKey<StructureTemplatePool>>
+          aliasAndTargetConsumer) {
+    this.groups
+        .getRandomOrThrow(random)
+        .forEach(binding -> binding.forEachResolved(random, aliasAndTargetConsumer));
+  }
 
-    @Override
-    public Stream<ResourceKey<StructureTemplatePool>> allTargets() {
-        return this.groups.unwrap().stream().flatMap(weightedEntry -> ((List)weightedEntry.value()).stream()).flatMap(PoolAliasBinding::allTargets);
-    }
+  @Override
+  public Stream<ResourceKey<StructureTemplatePool>> allTargets() {
+    return this.groups.unwrap().stream()
+        .flatMap(weightedEntry -> ((List) weightedEntry.value()).stream())
+        .flatMap(PoolAliasBinding::allTargets);
+  }
 
-    public MapCodec<RandomGroupPoolAlias> codec() {
-        return CODEC;
-    }
+  public MapCodec<RandomGroupPoolAlias> codec() {
+    return CODEC;
+  }
 }
-

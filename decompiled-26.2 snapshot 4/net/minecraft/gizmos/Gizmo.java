@@ -3,9 +3,6 @@
  */
 package net.minecraft.gizmos;
 
-import net.minecraft.gizmos.GizmoPrimitives;
-
 public interface Gizmo {
-    public void emit(GizmoPrimitives var1, float var2);
+  public void emit(GizmoPrimitives var1, float var2);
 }
-

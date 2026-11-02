@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -16,8 +16,6 @@
  */
 package com.mojang.blaze3d.font;
 
-import com.mojang.blaze3d.font.GlyphProvider;
-import com.mojang.blaze3d.font.UnbakedGlyph;
 import com.mojang.datafixers.kinds.App;
 import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.datafixers.util.Either;
@@ -35,39 +33,46 @@ import net.minecraft.client.gui.font.providers.GlyphProviderType;
 import net.minecraft.util.ExtraCodecs;
 import org.jspecify.annotations.Nullable;
 
-public class SpaceProvider
-implements GlyphProvider {
-    private final Int2ObjectMap<EmptyGlyph> glyphs;
+public class SpaceProvider implements GlyphProvider {
+  private final Int2ObjectMap<EmptyGlyph> glyphs;
 
-    public SpaceProvider(Map<Integer, Float> advances) {
-        this.glyphs = new Int2ObjectOpenHashMap(advances.size());
-        advances.forEach((codepoint, advance) -> this.glyphs.put(codepoint.intValue(), (Object)new EmptyGlyph(advance.floatValue())));
+  public SpaceProvider(Map<Integer, Float> advances) {
+    this.glyphs = new Int2ObjectOpenHashMap(advances.size());
+    advances.forEach(
+        (codepoint, advance) ->
+            this.glyphs.put(codepoint.intValue(), (Object) new EmptyGlyph(advance.floatValue())));
+  }
+
+  @Override
+  public @Nullable UnbakedGlyph getGlyph(int codepoint) {
+    return (UnbakedGlyph) this.glyphs.get(codepoint);
+  }
+
+  @Override
+  public IntSet getSupportedGlyphs() {
+    return IntSets.unmodifiable((IntSet) this.glyphs.keySet());
+  }
+
+  public record Definition(Map<Integer, Float> advances) implements GlyphProviderDefinition {
+    public static final MapCodec<Definition> CODEC =
+        RecordCodecBuilder.mapCodec(
+            i ->
+                i.group(
+                        (App)
+                            Codec.unboundedMap(ExtraCodecs.CODEPOINT, (Codec) Codec.FLOAT)
+                                .fieldOf("advances")
+                                .forGetter(Definition::advances))
+                    .apply((Applicative) i, Definition::new));
+
+    @Override
+    public GlyphProviderType type() {
+      return GlyphProviderType.SPACE;
     }
 
     @Override
-    public @Nullable UnbakedGlyph getGlyph(int codepoint) {
-        return (UnbakedGlyph)this.glyphs.get(codepoint);
+    public Either<GlyphProviderDefinition.Loader, GlyphProviderDefinition.Reference> unpack() {
+      GlyphProviderDefinition.Loader loader = resourceManager -> new SpaceProvider(this.advances);
+      return Either.left((Object) loader);
     }
-
-    @Override
-    public IntSet getSupportedGlyphs() {
-        return IntSets.unmodifiable((IntSet)this.glyphs.keySet());
-    }
-
-    public record Definition(Map<Integer, Float> advances) implements GlyphProviderDefinition
-    {
-        public static final MapCodec<Definition> CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)Codec.unboundedMap(ExtraCodecs.CODEPOINT, (Codec)Codec.FLOAT).fieldOf("advances").forGetter(Definition::advances)).apply((Applicative)i, Definition::new));
-
-        @Override
-        public GlyphProviderType type() {
-            return GlyphProviderType.SPACE;
-        }
-
-        @Override
-        public Either<GlyphProviderDefinition.Loader, GlyphProviderDefinition.Reference> unpack() {
-            GlyphProviderDefinition.Loader loader = resourceManager -> new SpaceProvider(this.advances);
-            return Either.left((Object)loader);
-        }
-    }
+  }
 }
-

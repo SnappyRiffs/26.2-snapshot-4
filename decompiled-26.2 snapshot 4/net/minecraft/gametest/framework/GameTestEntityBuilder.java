@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -9,7 +9,6 @@ package net.minecraft.gametest.framework;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -20,63 +19,70 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 public class GameTestEntityBuilder<E extends Entity> {
-    protected final GameTestHelper testHelper;
-    private final EntityType<E> entityType;
-    private final Vec3 position;
-    private @Nullable EntitySpawnReason spawnReason;
-    private @Nullable Rotation rotation;
-    private boolean requirePersistence = true;
+  protected final GameTestHelper testHelper;
+  private final EntityType<E> entityType;
+  private final Vec3 position;
+  private @Nullable EntitySpawnReason spawnReason;
+  private @Nullable Rotation rotation;
+  private boolean requirePersistence = true;
 
-    public GameTestEntityBuilder(GameTestHelper testHelper, EntityType<E> entityType, Vec3 position) {
-        this.testHelper = testHelper;
-        this.entityType = entityType;
-        this.position = position;
-    }
+  public GameTestEntityBuilder(GameTestHelper testHelper, EntityType<E> entityType, Vec3 position) {
+    this.testHelper = testHelper;
+    this.entityType = entityType;
+    this.position = position;
+  }
 
-    public GameTestEntityBuilder<E> spawnReason(@Nullable EntitySpawnReason spawnReason) {
-        this.spawnReason = spawnReason;
-        return this;
-    }
+  public GameTestEntityBuilder<E> spawnReason(@Nullable EntitySpawnReason spawnReason) {
+    this.spawnReason = spawnReason;
+    return this;
+  }
 
-    public GameTestEntityBuilder<E> rotation(@Nullable Rotation rotation) {
-        this.rotation = rotation == null ? null : this.testHelper.getTestRotation().getRotated(rotation);
-        return this;
-    }
+  public GameTestEntityBuilder<E> rotation(@Nullable Rotation rotation) {
+    this.rotation =
+        rotation == null ? null : this.testHelper.getTestRotation().getRotated(rotation);
+    return this;
+  }
 
-    public GameTestEntityBuilder<E> requirePersistence(boolean requirePersistence) {
-        this.requirePersistence = requirePersistence;
-        return this;
-    }
+  public GameTestEntityBuilder<E> requirePersistence(boolean requirePersistence) {
+    this.requirePersistence = requirePersistence;
+    return this;
+  }
 
-    public E spawn() {
-        ServerLevel level = this.testHelper.getLevel();
-        E entity = this.entityType.create(level, EntitySpawnReason.STRUCTURE);
-        if (entity == null) {
-            throw this.testHelper.assertionException(BlockPos.containing(this.position), "test.error.spawn_failure", this.entityType.builtInRegistryHolder().getRegisteredName());
-        }
-        if (this.requirePersistence && entity instanceof Mob) {
-            Mob mob = (Mob)entity;
-            mob.setPersistenceRequired();
-        }
-        Vec3 absoluteVec = this.testHelper.absoluteVec(this.position);
-        float yRot = ((Entity)entity).rotate(this.rotation == null ? this.testHelper.getTestRotation() : this.rotation);
-        ((Entity)entity).snapTo(absoluteVec.x, absoluteVec.y, absoluteVec.z, yRot, ((Entity)entity).getXRot());
-        ((Entity)entity).setYBodyRot(yRot);
-        ((Entity)entity).setYHeadRot(yRot);
-        if (this.spawnReason != null && entity instanceof Mob) {
-            Mob mob = (Mob)entity;
-            mob.finalizeSpawn(level, level.getCurrentDifficultyAt(mob.blockPosition()), this.spawnReason, null);
-        }
-        level.addFreshEntityWithPassengers((Entity)entity);
-        return entity;
+  public E spawn() {
+    ServerLevel level = this.testHelper.getLevel();
+    E entity = this.entityType.create(level, EntitySpawnReason.STRUCTURE);
+    if (entity == null) {
+      throw this.testHelper.assertionException(
+          BlockPos.containing(this.position),
+          "test.error.spawn_failure",
+          this.entityType.builtInRegistryHolder().getRegisteredName());
     }
+    if (this.requirePersistence && entity instanceof Mob) {
+      Mob mob = (Mob) entity;
+      mob.setPersistenceRequired();
+    }
+    Vec3 absoluteVec = this.testHelper.absoluteVec(this.position);
+    float yRot =
+        ((Entity) entity)
+            .rotate(this.rotation == null ? this.testHelper.getTestRotation() : this.rotation);
+    ((Entity) entity)
+        .snapTo(absoluteVec.x, absoluteVec.y, absoluteVec.z, yRot, ((Entity) entity).getXRot());
+    ((Entity) entity).setYBodyRot(yRot);
+    ((Entity) entity).setYHeadRot(yRot);
+    if (this.spawnReason != null && entity instanceof Mob) {
+      Mob mob = (Mob) entity;
+      mob.finalizeSpawn(
+          level, level.getCurrentDifficultyAt(mob.blockPosition()), this.spawnReason, null);
+    }
+    level.addFreshEntityWithPassengers((Entity) entity);
+    return entity;
+  }
 
-    public List<E> spawn(int amount) {
-        ArrayList<E> entities = new ArrayList<E>();
-        for (int i = 0; i < amount; ++i) {
-            entities.add(this.spawn());
-        }
-        return entities;
+  public List<E> spawn(int amount) {
+    ArrayList<E> entities = new ArrayList<E>();
+    for (int i = 0; i < amount; ++i) {
+      entities.add(this.spawn());
     }
+    return entities;
+  }
 }
-

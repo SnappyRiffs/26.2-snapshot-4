@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -17,117 +17,136 @@ import net.minecraft.util.StringUtil;
 import org.jspecify.annotations.Nullable;
 
 public class GameConfig {
-    public final UserData user;
-    public final DisplayData display;
-    public final FolderData location;
-    public final GameData game;
-    public final QuickPlayData quickPlay;
+  public final UserData user;
+  public final DisplayData display;
+  public final FolderData location;
+  public final GameData game;
+  public final QuickPlayData quickPlay;
 
-    public GameConfig(UserData userData, DisplayData displayData, FolderData folderData, GameData gameData, QuickPlayData quickPlayData) {
-        this.user = userData;
-        this.display = displayData;
-        this.location = folderData;
-        this.game = gameData;
-        this.quickPlay = quickPlayData;
+  public GameConfig(
+      UserData userData,
+      DisplayData displayData,
+      FolderData folderData,
+      GameData gameData,
+      QuickPlayData quickPlayData) {
+    this.user = userData;
+    this.display = displayData;
+    this.location = folderData;
+    this.game = gameData;
+    this.quickPlay = quickPlayData;
+  }
+
+  public static class UserData {
+    public final User user;
+    public final Proxy proxy;
+
+    public UserData(User user, Proxy proxy) {
+      this.user = user;
+      this.proxy = proxy;
+    }
+  }
+
+  public static class FolderData {
+    public final File gameDirectory;
+    public final File resourcePackDirectory;
+    public final File assetDirectory;
+    public final @Nullable String assetIndex;
+
+    public FolderData(
+        File gameDirectory,
+        File resourcePackDirectory,
+        File assetDirectory,
+        @Nullable String assetIndex) {
+      this.gameDirectory = gameDirectory;
+      this.resourcePackDirectory = resourcePackDirectory;
+      this.assetDirectory = assetDirectory;
+      this.assetIndex = assetIndex;
     }
 
-    public static class UserData {
-        public final User user;
-        public final Proxy proxy;
-
-        public UserData(User user, Proxy proxy) {
-            this.user = user;
-            this.proxy = proxy;
-        }
+    public Path getExternalAssetSource() {
+      return this.assetIndex == null
+          ? this.assetDirectory.toPath()
+          : IndexedAssetSource.createIndexFs(this.assetDirectory.toPath(), this.assetIndex);
     }
+  }
 
-    public static class FolderData {
-        public final File gameDirectory;
-        public final File resourcePackDirectory;
-        public final File assetDirectory;
-        public final @Nullable String assetIndex;
+  public static class GameData {
+    public final boolean demo;
+    public final String launchVersion;
+    public final String versionType;
+    public final boolean disableMultiplayer;
+    public final boolean disableChat;
+    public final boolean captureTracyImages;
+    public final boolean renderDebugLabels;
+    public final boolean vulkanValidation;
+    public final @Nullable PreferredGraphicsApi forcedGraphicsApi;
+    public final boolean offlineDeveloperMode;
 
-        public FolderData(File gameDirectory, File resourcePackDirectory, File assetDirectory, @Nullable String assetIndex) {
-            this.gameDirectory = gameDirectory;
-            this.resourcePackDirectory = resourcePackDirectory;
-            this.assetDirectory = assetDirectory;
-            this.assetIndex = assetIndex;
-        }
-
-        public Path getExternalAssetSource() {
-            return this.assetIndex == null ? this.assetDirectory.toPath() : IndexedAssetSource.createIndexFs(this.assetDirectory.toPath(), this.assetIndex);
-        }
+    public GameData(
+        boolean demo,
+        String launchVersion,
+        String versionType,
+        boolean disableMultiplayer,
+        boolean disableChat,
+        boolean captureTracyImages,
+        boolean vulkanValidation,
+        boolean renderDebugLabels,
+        @Nullable PreferredGraphicsApi forcedGraphicsApi,
+        boolean offlineDeveloperMode) {
+      this.demo = demo;
+      this.launchVersion = launchVersion;
+      this.versionType = versionType;
+      this.disableMultiplayer = disableMultiplayer;
+      this.disableChat = disableChat;
+      this.captureTracyImages = captureTracyImages;
+      this.vulkanValidation = vulkanValidation;
+      this.renderDebugLabels = renderDebugLabels;
+      this.forcedGraphicsApi = forcedGraphicsApi;
+      this.offlineDeveloperMode = offlineDeveloperMode;
     }
+  }
 
-    public static class GameData {
-        public final boolean demo;
-        public final String launchVersion;
-        public final String versionType;
-        public final boolean disableMultiplayer;
-        public final boolean disableChat;
-        public final boolean captureTracyImages;
-        public final boolean renderDebugLabels;
-        public final boolean vulkanValidation;
-        public final @Nullable PreferredGraphicsApi forcedGraphicsApi;
-        public final boolean offlineDeveloperMode;
-
-        public GameData(boolean demo, String launchVersion, String versionType, boolean disableMultiplayer, boolean disableChat, boolean captureTracyImages, boolean vulkanValidation, boolean renderDebugLabels, @Nullable PreferredGraphicsApi forcedGraphicsApi, boolean offlineDeveloperMode) {
-            this.demo = demo;
-            this.launchVersion = launchVersion;
-            this.versionType = versionType;
-            this.disableMultiplayer = disableMultiplayer;
-            this.disableChat = disableChat;
-            this.captureTracyImages = captureTracyImages;
-            this.vulkanValidation = vulkanValidation;
-            this.renderDebugLabels = renderDebugLabels;
-            this.forcedGraphicsApi = forcedGraphicsApi;
-            this.offlineDeveloperMode = offlineDeveloperMode;
-        }
+  public record QuickPlayData(@Nullable String logPath, QuickPlayVariant variant) {
+    public boolean isEnabled() {
+      return this.variant.isEnabled();
     }
+  }
 
-    public record QuickPlayData(@Nullable String logPath, QuickPlayVariant variant) {
-        public boolean isEnabled() {
-            return this.variant.isEnabled();
-        }
+  public record QuickPlayDisabled() implements QuickPlayVariant {
+    @Override
+    public boolean isEnabled() {
+      return false;
     }
+  }
 
-    public record QuickPlayDisabled() implements QuickPlayVariant
-    {
-        @Override
-        public boolean isEnabled() {
-            return false;
-        }
+  public record QuickPlayRealmsData(String realmId) implements QuickPlayVariant {
+    @Override
+    public boolean isEnabled() {
+      return !StringUtil.isBlank(this.realmId);
     }
+  }
 
-    public record QuickPlayRealmsData(String realmId) implements QuickPlayVariant
-    {
-        @Override
-        public boolean isEnabled() {
-            return !StringUtil.isBlank(this.realmId);
-        }
+  public record QuickPlayMultiplayerData(String serverAddress) implements QuickPlayVariant {
+    @Override
+    public boolean isEnabled() {
+      return !StringUtil.isBlank(this.serverAddress);
     }
+  }
 
-    public record QuickPlayMultiplayerData(String serverAddress) implements QuickPlayVariant
-    {
-        @Override
-        public boolean isEnabled() {
-            return !StringUtil.isBlank(this.serverAddress);
-        }
+  public record QuickPlaySinglePlayerData(@Nullable String worldId) implements QuickPlayVariant {
+    @Override
+    public boolean isEnabled() {
+      return true;
     }
+  }
 
-    public record QuickPlaySinglePlayerData(@Nullable String worldId) implements QuickPlayVariant
-    {
-        @Override
-        public boolean isEnabled() {
-            return true;
-        }
-    }
+  public static sealed interface QuickPlayVariant
+      permits QuickPlaySinglePlayerData,
+          QuickPlayMultiplayerData,
+          QuickPlayRealmsData,
+          QuickPlayDisabled {
+    public static final QuickPlayVariant DISABLED = new QuickPlayDisabled();
 
-    public static sealed interface QuickPlayVariant
-    permits QuickPlaySinglePlayerData, QuickPlayMultiplayerData, QuickPlayRealmsData, QuickPlayDisabled {
-        public static final QuickPlayVariant DISABLED = new QuickPlayDisabled();
-
-        public boolean isEnabled();
-    }
+    public boolean isEnabled();
+  }
 }
-

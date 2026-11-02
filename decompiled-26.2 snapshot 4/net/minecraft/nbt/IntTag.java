@@ -147,4 +147,3 @@ public record IntTag(int value) implements NumericTag
         }
     }
 }
-

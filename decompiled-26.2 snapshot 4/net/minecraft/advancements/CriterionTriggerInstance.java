@@ -6,6 +6,5 @@ package net.minecraft.advancements;
 import net.minecraft.world.level.storage.loot.ValidationContextSource;
 
 public interface CriterionTriggerInstance {
-    public void validate(ValidationContextSource var1);
+  public void validate(ValidationContextSource var1);
 }
-

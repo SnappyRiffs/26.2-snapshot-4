@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.CommandDispatcher
  *  com.mojang.brigadier.builder.LiteralArgumentBuilder
@@ -19,16 +19,29 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameType;
 
 public class DefaultGameModeCommands {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("defaultgamemode").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).then(Commands.argument("gamemode", GameModeArgument.gameMode()).executes(c -> DefaultGameModeCommands.setMode((CommandSourceStack)c.getSource(), GameModeArgument.getGameMode((CommandContext<CommandSourceStack>)c, "gamemode")))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    Commands.literal("defaultgamemode")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                .then(
+                    Commands.argument("gamemode", GameModeArgument.gameMode())
+                        .executes(
+                            c ->
+                                DefaultGameModeCommands.setMode(
+                                    (CommandSourceStack) c.getSource(),
+                                    GameModeArgument.getGameMode(
+                                        (CommandContext<CommandSourceStack>) c, "gamemode")))));
+  }
 
-    private static int setMode(CommandSourceStack source, GameType type) {
-        MinecraftServer server = source.getServer();
-        server.setDefaultGameType(type);
-        int count = server.enforceGameTypeForPlayers(server.getForcedGameType());
-        source.sendSuccess(() -> Component.translatable("commands.defaultgamemode.success", type.getLongDisplayName()), true);
-        return count;
-    }
+  private static int setMode(CommandSourceStack source, GameType type) {
+    MinecraftServer server = source.getServer();
+    server.setDefaultGameType(type);
+    int count = server.enforceGameTypeForPlayers(server.getForcedGameType());
+    source.sendSuccess(
+        () -> Component.translatable("commands.defaultgamemode.success", type.getLongDisplayName()),
+        true);
+    return count;
+  }
 }
-

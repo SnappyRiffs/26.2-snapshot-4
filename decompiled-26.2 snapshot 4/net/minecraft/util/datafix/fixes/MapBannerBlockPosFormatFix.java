@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.DSL
  *  com.mojang.datafixers.DataFix
@@ -20,20 +20,34 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.Type;
 import com.mojang.datafixers.types.templates.List;
 import net.minecraft.util.datafix.ExtraDataFixUtils;
-import net.minecraft.util.datafix.fixes.References;
 
-public class MapBannerBlockPosFormatFix
-extends DataFix {
-    public MapBannerBlockPosFormatFix(Schema outputSchema) {
-        super(outputSchema, false);
-    }
+public class MapBannerBlockPosFormatFix extends DataFix {
+  public MapBannerBlockPosFormatFix(Schema outputSchema) {
+    super(outputSchema, false);
+  }
 
-    protected TypeRewriteRule makeRule() {
-        Type type = this.getInputSchema().getType(References.SAVED_DATA_MAP_DATA);
-        OpticFinder dataF = type.findField("data");
-        OpticFinder bannersF = dataF.type().findField("banners");
-        OpticFinder bannerF = DSL.typeFinder((Type)((List.ListType)bannersF.type()).getElement());
-        return this.fixTypeEverywhereTyped("MapBannerBlockPosFormatFix", type, input -> input.updateTyped(dataF, data -> data.updateTyped(bannersF, banners -> banners.updateTyped(bannerF, banner -> banner.update(DSL.remainderFinder(), bannerTag -> bannerTag.update("Pos", ExtraDataFixUtils::fixBlockPos))))));
-    }
+  protected TypeRewriteRule makeRule() {
+    Type type = this.getInputSchema().getType(References.SAVED_DATA_MAP_DATA);
+    OpticFinder dataF = type.findField("data");
+    OpticFinder bannersF = dataF.type().findField("banners");
+    OpticFinder bannerF = DSL.typeFinder((Type) ((List.ListType) bannersF.type()).getElement());
+    return this.fixTypeEverywhereTyped(
+        "MapBannerBlockPosFormatFix",
+        type,
+        input ->
+            input.updateTyped(
+                dataF,
+                data ->
+                    data.updateTyped(
+                        bannersF,
+                        banners ->
+                            banners.updateTyped(
+                                bannerF,
+                                banner ->
+                                    banner.update(
+                                        DSL.remainderFinder(),
+                                        bannerTag ->
+                                            bannerTag.update(
+                                                "Pos", ExtraDataFixUtils::fixBlockPos))))));
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  com.mojang.brigadier.CommandDispatcher
@@ -21,20 +21,47 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 public class KillCommand {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        dispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("kill").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))).executes(c -> KillCommand.kill((CommandSourceStack)c.getSource(), (Collection<? extends Entity>)ImmutableList.of((Object)((CommandSourceStack)c.getSource()).getEntityOrException())))).then(Commands.argument("targets", EntityArgument.entities()).executes(c -> KillCommand.kill((CommandSourceStack)c.getSource(), EntityArgument.getEntities((CommandContext<CommandSourceStack>)c, "targets")))));
-    }
+  public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    dispatcher.register(
+        (LiteralArgumentBuilder)
+            ((LiteralArgumentBuilder)
+                    ((LiteralArgumentBuilder)
+                            Commands.literal("kill")
+                                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)))
+                        .executes(
+                            c ->
+                                KillCommand.kill(
+                                    (CommandSourceStack) c.getSource(),
+                                    (Collection<? extends Entity>)
+                                        ImmutableList.of(
+                                            (Object)
+                                                ((CommandSourceStack) c.getSource())
+                                                    .getEntityOrException()))))
+                .then(
+                    Commands.argument("targets", EntityArgument.entities())
+                        .executes(
+                            c ->
+                                KillCommand.kill(
+                                    (CommandSourceStack) c.getSource(),
+                                    EntityArgument.getEntities(
+                                        (CommandContext<CommandSourceStack>) c, "targets")))));
+  }
 
-    private static int kill(CommandSourceStack source, Collection<? extends Entity> victims) {
-        for (Entity entity : victims) {
-            entity.kill(source.getLevel());
-        }
-        if (victims.size() == 1) {
-            source.sendSuccess(() -> Component.translatable("commands.kill.success.single", ((Entity)victims.iterator().next()).getDisplayName()), true);
-        } else {
-            source.sendSuccess(() -> Component.translatable("commands.kill.success.multiple", victims.size()), true);
-        }
-        return victims.size();
+  private static int kill(CommandSourceStack source, Collection<? extends Entity> victims) {
+    for (Entity entity : victims) {
+      entity.kill(source.getLevel());
     }
+    if (victims.size() == 1) {
+      source.sendSuccess(
+          () ->
+              Component.translatable(
+                  "commands.kill.success.single",
+                  ((Entity) victims.iterator().next()).getDisplayName()),
+          true);
+    } else {
+      source.sendSuccess(
+          () -> Component.translatable("commands.kill.success.multiple", victims.size()), true);
+    }
+    return victims.size();
+  }
 }
-

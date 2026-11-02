@@ -8,17 +8,15 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PackReloadConfig {
-    public void scheduleReload(Callbacks var1);
+  public void scheduleReload(Callbacks var1);
 
-    public static interface Callbacks {
-        public void onSuccess();
+  public static interface Callbacks {
+    public void onSuccess();
 
-        public void onFailure(boolean var1);
+    public void onFailure(boolean var1);
 
-        public List<IdAndPath> packsToLoad();
-    }
+    public List<IdAndPath> packsToLoad();
+  }
 
-    public record IdAndPath(UUID id, Path path) {
-    }
+  public record IdAndPath(UUID id, Path path) {}
 }
-

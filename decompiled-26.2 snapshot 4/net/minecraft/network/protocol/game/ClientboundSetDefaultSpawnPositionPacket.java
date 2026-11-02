@@ -7,22 +7,24 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.GamePacketTypes;
 import net.minecraft.world.level.storage.LevelData;
 
-public record ClientboundSetDefaultSpawnPositionPacket(LevelData.RespawnData respawnData) implements Packet<ClientGamePacketListener>
-{
-    public static final StreamCodec<FriendlyByteBuf, ClientboundSetDefaultSpawnPositionPacket> STREAM_CODEC = StreamCodec.composite(LevelData.RespawnData.STREAM_CODEC, ClientboundSetDefaultSpawnPositionPacket::respawnData, ClientboundSetDefaultSpawnPositionPacket::new);
+public record ClientboundSetDefaultSpawnPositionPacket(LevelData.RespawnData respawnData)
+    implements Packet<ClientGamePacketListener> {
+  public static final StreamCodec<FriendlyByteBuf, ClientboundSetDefaultSpawnPositionPacket>
+      STREAM_CODEC =
+          StreamCodec.composite(
+              LevelData.RespawnData.STREAM_CODEC,
+              ClientboundSetDefaultSpawnPositionPacket::respawnData,
+              ClientboundSetDefaultSpawnPositionPacket::new);
 
-    @Override
-    public PacketType<ClientboundSetDefaultSpawnPositionPacket> type() {
-        return GamePacketTypes.CLIENTBOUND_SET_DEFAULT_SPAWN_POSITION;
-    }
+  @Override
+  public PacketType<ClientboundSetDefaultSpawnPositionPacket> type() {
+    return GamePacketTypes.CLIENTBOUND_SET_DEFAULT_SPAWN_POSITION;
+  }
 
-    @Override
-    public void handle(ClientGamePacketListener listener) {
-        listener.handleSetSpawn(this);
-    }
+  @Override
+  public void handle(ClientGamePacketListener listener) {
+    listener.handleSetSpawn(this);
+  }
 }
-

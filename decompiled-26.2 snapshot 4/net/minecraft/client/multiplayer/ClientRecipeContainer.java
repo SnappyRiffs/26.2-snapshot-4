@@ -10,24 +10,24 @@ import net.minecraft.world.item.crafting.RecipePropertySet;
 import net.minecraft.world.item.crafting.SelectableRecipe;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 
-public class ClientRecipeContainer
-implements RecipeAccess {
-    private final Map<ResourceKey<RecipePropertySet>, RecipePropertySet> itemSets;
-    private final SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes;
+public class ClientRecipeContainer implements RecipeAccess {
+  private final Map<ResourceKey<RecipePropertySet>, RecipePropertySet> itemSets;
+  private final SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes;
 
-    public ClientRecipeContainer(Map<ResourceKey<RecipePropertySet>, RecipePropertySet> itemSets, SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes) {
-        this.itemSets = itemSets;
-        this.stonecutterRecipes = stonecutterRecipes;
-    }
+  public ClientRecipeContainer(
+      Map<ResourceKey<RecipePropertySet>, RecipePropertySet> itemSets,
+      SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes) {
+    this.itemSets = itemSets;
+    this.stonecutterRecipes = stonecutterRecipes;
+  }
 
-    @Override
-    public RecipePropertySet propertySet(ResourceKey<RecipePropertySet> id) {
-        return this.itemSets.getOrDefault(id, RecipePropertySet.EMPTY);
-    }
+  @Override
+  public RecipePropertySet propertySet(ResourceKey<RecipePropertySet> id) {
+    return this.itemSets.getOrDefault(id, RecipePropertySet.EMPTY);
+  }
 
-    @Override
-    public SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes() {
-        return this.stonecutterRecipes;
-    }
+  @Override
+  public SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes() {
+    return this.stonecutterRecipes;
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.JsonElement
  *  com.google.gson.JsonIOException
@@ -26,26 +26,23 @@ import java.io.Reader;
 import java.io.StringReader;
 
 public class StrictJsonParser {
-    public static JsonElement parse(Reader reader) throws JsonIOException, JsonSyntaxException {
-        try {
-            JsonReader jsonReader = new JsonReader(reader);
-            jsonReader.setStrictness(Strictness.STRICT);
-            JsonElement element = JsonParser.parseReader((JsonReader)jsonReader);
-            if (!element.isJsonNull() && jsonReader.peek() != JsonToken.END_DOCUMENT) {
-                throw new JsonSyntaxException("Did not consume the entire document.");
-            }
-            return element;
-        }
-        catch (MalformedJsonException | NumberFormatException e) {
-            throw new JsonSyntaxException(e);
-        }
-        catch (IOException e) {
-            throw new JsonIOException((Throwable)e);
-        }
+  public static JsonElement parse(Reader reader) throws JsonIOException, JsonSyntaxException {
+    try {
+      JsonReader jsonReader = new JsonReader(reader);
+      jsonReader.setStrictness(Strictness.STRICT);
+      JsonElement element = JsonParser.parseReader((JsonReader) jsonReader);
+      if (!element.isJsonNull() && jsonReader.peek() != JsonToken.END_DOCUMENT) {
+        throw new JsonSyntaxException("Did not consume the entire document.");
+      }
+      return element;
+    } catch (MalformedJsonException | NumberFormatException e) {
+      throw new JsonSyntaxException(e);
+    } catch (IOException e) {
+      throw new JsonIOException((Throwable) e);
     }
+  }
 
-    public static JsonElement parse(String json) throws JsonSyntaxException {
-        return StrictJsonParser.parse(new StringReader(json));
-    }
+  public static JsonElement parse(String json) throws JsonSyntaxException {
+    return StrictJsonParser.parse(new StringReader(json));
+  }
 }
-

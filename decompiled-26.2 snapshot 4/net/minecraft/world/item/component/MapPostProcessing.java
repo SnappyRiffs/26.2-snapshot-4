@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  io.netty.buffer.ByteBuf
  */
@@ -13,24 +13,25 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 
 public enum MapPostProcessing {
-    LOCK(0),
-    SCALE(1);
+  LOCK(0),
+  SCALE(1);
 
-    public static final IntFunction<MapPostProcessing> ID_MAP;
-    public static final StreamCodec<ByteBuf, MapPostProcessing> STREAM_CODEC;
-    private final int id;
+  public static final IntFunction<MapPostProcessing> ID_MAP;
+  public static final StreamCodec<ByteBuf, MapPostProcessing> STREAM_CODEC;
+  private final int id;
 
-    private MapPostProcessing(int id) {
-        this.id = id;
-    }
+  private MapPostProcessing(int id) {
+    this.id = id;
+  }
 
-    public int id() {
-        return this.id;
-    }
+  public int id() {
+    return this.id;
+  }
 
-    static {
-        ID_MAP = ByIdMap.continuous(MapPostProcessing::id, MapPostProcessing.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
-        STREAM_CODEC = ByteBufCodecs.idMapper(ID_MAP, MapPostProcessing::id);
-    }
+  static {
+    ID_MAP =
+        ByIdMap.continuous(
+            MapPostProcessing::id, MapPostProcessing.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+    STREAM_CODEC = ByteBufCodecs.idMapper(ID_MAP, MapPostProcessing::id);
+  }
 }
-

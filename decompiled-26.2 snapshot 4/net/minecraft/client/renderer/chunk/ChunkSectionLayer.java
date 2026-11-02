@@ -10,50 +10,49 @@ import java.util.Locale;
 import net.minecraft.client.renderer.RenderPipelines;
 
 public enum ChunkSectionLayer {
-    SOLID(RenderPipelines.SOLID_TERRAIN, 0x400000, false),
-    CUTOUT(RenderPipelines.CUTOUT_TERRAIN, 0x400000, false),
-    TRANSLUCENT(RenderPipelines.TRANSLUCENT_TERRAIN, 786432, true);
+  SOLID(RenderPipelines.SOLID_TERRAIN, 0x400000, false),
+  CUTOUT(RenderPipelines.CUTOUT_TERRAIN, 0x400000, false),
+  TRANSLUCENT(RenderPipelines.TRANSLUCENT_TERRAIN, 786432, true);
 
-    private final RenderPipeline pipeline;
-    private final int bufferSize;
-    private final boolean translucent;
-    private final String label;
+  private final RenderPipeline pipeline;
+  private final int bufferSize;
+  private final boolean translucent;
+  private final String label;
 
-    private ChunkSectionLayer(RenderPipeline pipeline, int bufferSize, boolean translucent) {
-        this.pipeline = pipeline;
-        this.bufferSize = bufferSize;
-        this.translucent = translucent;
-        this.label = this.toString().toLowerCase(Locale.ROOT);
+  private ChunkSectionLayer(RenderPipeline pipeline, int bufferSize, boolean translucent) {
+    this.pipeline = pipeline;
+    this.bufferSize = bufferSize;
+    this.translucent = translucent;
+    this.label = this.toString().toLowerCase(Locale.ROOT);
+  }
+
+  public static ChunkSectionLayer byTransparency(Transparency transparency) {
+    if (transparency.hasTranslucent()) {
+      return TRANSLUCENT;
     }
-
-    public static ChunkSectionLayer byTransparency(Transparency transparency) {
-        if (transparency.hasTranslucent()) {
-            return TRANSLUCENT;
-        }
-        if (transparency.hasTransparent()) {
-            return CUTOUT;
-        }
-        return SOLID;
+    if (transparency.hasTransparent()) {
+      return CUTOUT;
     }
+    return SOLID;
+  }
 
-    public RenderPipeline pipeline() {
-        return this.pipeline;
-    }
+  public RenderPipeline pipeline() {
+    return this.pipeline;
+  }
 
-    public int bufferSize() {
-        return this.bufferSize;
-    }
+  public int bufferSize() {
+    return this.bufferSize;
+  }
 
-    public String label() {
-        return this.label;
-    }
+  public String label() {
+    return this.label;
+  }
 
-    public boolean translucent() {
-        return this.translucent;
-    }
+  public boolean translucent() {
+    return this.translucent;
+  }
 
-    public VertexFormat vertexFormat() {
-        return this.pipeline.getVertexFormat();
-    }
+  public VertexFormat vertexFormat() {
+    return this.pipeline.getVertexFormat();
+  }
 }
-

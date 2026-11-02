@@ -6,12 +6,9 @@ package com.mojang.realmsclient.gui.screens.configuration;
 import com.mojang.realmsclient.dto.RealmsServer;
 
 public interface RealmsConfigurationTab {
-    public void updateData(RealmsServer var1);
+  public void updateData(RealmsServer var1);
 
-    default public void onSelected(RealmsServer serverData) {
-    }
+  public default void onSelected(RealmsServer serverData) {}
 
-    default public void onDeselected(RealmsServer serverData) {
-    }
+  public default void onDeselected(RealmsServer serverData) {}
 }
-

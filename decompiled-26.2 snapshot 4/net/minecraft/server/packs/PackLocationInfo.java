@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.arguments.StringArgumentType
  */
@@ -15,9 +15,19 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.PackSource;
 
-public record PackLocationInfo(String id, Component title, PackSource source, Optional<KnownPack> knownPackInfo) {
-    public Component createChatLink(boolean enabled, Component description) {
-        return ComponentUtils.wrapInSquareBrackets(this.source.decorate(Component.literal(this.id))).withStyle(s -> s.withColor(enabled ? ChatFormatting.GREEN : ChatFormatting.RED).withInsertion(StringArgumentType.escapeIfRequired((String)this.id)).withHoverEvent(new HoverEvent.ShowText(Component.empty().append(this.title).append("\n").append(description))));
-    }
+public record PackLocationInfo(
+    String id, Component title, PackSource source, Optional<KnownPack> knownPackInfo) {
+  public Component createChatLink(boolean enabled, Component description) {
+    return ComponentUtils.wrapInSquareBrackets(this.source.decorate(Component.literal(this.id)))
+        .withStyle(
+            s ->
+                s.withColor(enabled ? ChatFormatting.GREEN : ChatFormatting.RED)
+                    .withInsertion(StringArgumentType.escapeIfRequired((String) this.id))
+                    .withHoverEvent(
+                        new HoverEvent.ShowText(
+                            Component.empty()
+                                .append(this.title)
+                                .append("\n")
+                                .append(description))));
+  }
 }
-

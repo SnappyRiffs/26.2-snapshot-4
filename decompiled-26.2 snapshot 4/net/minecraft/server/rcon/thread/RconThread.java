@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.mojang.logging.LogUtils
@@ -19,107 +19,98 @@ import java.net.SocketTimeoutException;
 import java.util.List;
 import net.minecraft.server.ServerInterface;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
-import net.minecraft.server.rcon.thread.GenericThread;
-import net.minecraft.server.rcon.thread.RconClient;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public class RconThread
-extends GenericThread {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private final ServerSocket socket;
-    private final String rconPassword;
-    private final List<RconClient> clients = Lists.newArrayList();
-    private final ServerInterface serverInterface;
+public class RconThread extends GenericThread {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private final ServerSocket socket;
+  private final String rconPassword;
+  private final List<RconClient> clients = Lists.newArrayList();
+  private final ServerInterface serverInterface;
 
-    private RconThread(ServerInterface serverInterface, ServerSocket socket, String rconPassword) {
-        super("RCON Listener");
-        this.serverInterface = serverInterface;
-        this.socket = socket;
-        this.rconPassword = rconPassword;
-    }
+  private RconThread(ServerInterface serverInterface, ServerSocket socket, String rconPassword) {
+    super("RCON Listener");
+    this.serverInterface = serverInterface;
+    this.socket = socket;
+    this.rconPassword = rconPassword;
+  }
 
-    private void clearClients() {
-        this.clients.removeIf(client -> !client.isRunning());
-    }
+  private void clearClients() {
+    this.clients.removeIf(client -> !client.isRunning());
+  }
 
-    @Override
-    public void run() {
+  @Override
+  public void run() {
+    try {
+      while (this.running) {
         try {
-            while (this.running) {
-                try {
-                    Socket client = this.socket.accept();
-                    RconClient rconClient = new RconClient(this.serverInterface, this.rconPassword, client);
-                    rconClient.start();
-                    this.clients.add(rconClient);
-                    this.clearClients();
-                }
-                catch (SocketTimeoutException ignored) {
-                    this.clearClients();
-                }
-                catch (IOException e) {
-                    if (!this.running) continue;
-                    LOGGER.info("IO exception: ", (Throwable)e);
-                }
-            }
+          Socket client = this.socket.accept();
+          RconClient rconClient = new RconClient(this.serverInterface, this.rconPassword, client);
+          rconClient.start();
+          this.clients.add(rconClient);
+          this.clearClients();
+        } catch (SocketTimeoutException ignored) {
+          this.clearClients();
+        } catch (IOException e) {
+          if (!this.running) continue;
+          LOGGER.info("IO exception: ", (Throwable) e);
         }
-        finally {
-            this.closeSocket(this.socket);
-        }
+      }
+    } finally {
+      this.closeSocket(this.socket);
     }
+  }
 
-    public static @Nullable RconThread create(ServerInterface serverInterface) {
-        int port;
-        DedicatedServerProperties settings = serverInterface.getProperties();
-        String serverIp = serverInterface.getServerIp();
-        if (serverIp.isEmpty()) {
-            serverIp = "0.0.0.0";
-        }
-        if (0 >= (port = settings.rconPort) || 65535 < port) {
-            LOGGER.warn("Invalid rcon port {} found in server.properties, rcon disabled!", (Object)port);
-            return null;
-        }
-        String password = settings.rconPassword;
-        if (password.isEmpty()) {
-            LOGGER.warn("No rcon password set in server.properties, rcon disabled!");
-            return null;
-        }
-        try {
-            ServerSocket socket = new ServerSocket(port, 0, InetAddress.getByName(serverIp));
-            socket.setSoTimeout(500);
-            RconThread result = new RconThread(serverInterface, socket, password);
-            if (!result.start()) {
-                return null;
-            }
-            LOGGER.info("RCON running on {}:{}", (Object)serverIp, (Object)port);
-            return result;
-        }
-        catch (IOException e) {
-            LOGGER.warn("Unable to initialise RCON on {}:{}", new Object[]{serverIp, port, e});
-            return null;
-        }
+  public static @Nullable RconThread create(ServerInterface serverInterface) {
+    int port;
+    DedicatedServerProperties settings = serverInterface.getProperties();
+    String serverIp = serverInterface.getServerIp();
+    if (serverIp.isEmpty()) {
+      serverIp = "0.0.0.0";
     }
+    if (0 >= (port = settings.rconPort) || 65535 < port) {
+      LOGGER.warn("Invalid rcon port {} found in server.properties, rcon disabled!", (Object) port);
+      return null;
+    }
+    String password = settings.rconPassword;
+    if (password.isEmpty()) {
+      LOGGER.warn("No rcon password set in server.properties, rcon disabled!");
+      return null;
+    }
+    try {
+      ServerSocket socket = new ServerSocket(port, 0, InetAddress.getByName(serverIp));
+      socket.setSoTimeout(500);
+      RconThread result = new RconThread(serverInterface, socket, password);
+      if (!result.start()) {
+        return null;
+      }
+      LOGGER.info("RCON running on {}:{}", (Object) serverIp, (Object) port);
+      return result;
+    } catch (IOException e) {
+      LOGGER.warn("Unable to initialise RCON on {}:{}", new Object[] {serverIp, port, e});
+      return null;
+    }
+  }
 
-    @Override
-    public void stop() {
-        this.running = false;
-        this.closeSocket(this.socket);
-        super.stop();
-        for (RconClient rconClient : this.clients) {
-            if (!rconClient.isRunning()) continue;
-            rconClient.stop();
-        }
-        this.clients.clear();
+  @Override
+  public void stop() {
+    this.running = false;
+    this.closeSocket(this.socket);
+    super.stop();
+    for (RconClient rconClient : this.clients) {
+      if (!rconClient.isRunning()) continue;
+      rconClient.stop();
     }
+    this.clients.clear();
+  }
 
-    private void closeSocket(ServerSocket socket) {
-        LOGGER.debug("closeSocket: {}", (Object)socket);
-        try {
-            socket.close();
-        }
-        catch (IOException e) {
-            LOGGER.warn("Failed to close socket", (Throwable)e);
-        }
+  private void closeSocket(ServerSocket socket) {
+    LOGGER.debug("closeSocket: {}", (Object) socket);
+    try {
+      socket.close();
+    } catch (IOException e) {
+      LOGGER.warn("Failed to close socket", (Throwable) e);
     }
+  }
 }
-

@@ -7,8 +7,7 @@ import net.minecraft.client.gui.font.glyphs.BakedGlyph;
 import net.minecraft.util.RandomSource;
 
 public interface GlyphSource {
-    public BakedGlyph getGlyph(int var1);
+  public BakedGlyph getGlyph(int var1);
 
-    public BakedGlyph getRandomGlyph(RandomSource var1, int var2);
+  public BakedGlyph getRandomGlyph(RandomSource var1, int var2);
 }
-

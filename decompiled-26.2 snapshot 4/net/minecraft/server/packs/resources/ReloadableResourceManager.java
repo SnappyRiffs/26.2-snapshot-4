@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Lists
  *  com.mojang.logging.LogUtils
@@ -22,73 +22,81 @@ import java.util.stream.Stream;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.CloseableResourceManager;
-import net.minecraft.server.packs.resources.MultiPackResourceManager;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ReloadInstance;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimpleReloadInstance;
 import net.minecraft.util.Unit;
 import org.slf4j.Logger;
 
-public class ReloadableResourceManager
-implements AutoCloseable,
-ResourceManager {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private CloseableResourceManager resources;
-    private final List<PreparableReloadListener> listeners = Lists.newArrayList();
-    private final PackType type;
+public class ReloadableResourceManager implements AutoCloseable, ResourceManager {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private CloseableResourceManager resources;
+  private final List<PreparableReloadListener> listeners = Lists.newArrayList();
+  private final PackType type;
 
-    public ReloadableResourceManager(PackType type) {
-        this.type = type;
-        this.resources = new MultiPackResourceManager(type, List.of());
-    }
+  public ReloadableResourceManager(PackType type) {
+    this.type = type;
+    this.resources = new MultiPackResourceManager(type, List.of());
+  }
 
-    @Override
-    public void close() {
-        this.resources.close();
-    }
+  @Override
+  public void close() {
+    this.resources.close();
+  }
 
-    public void registerReloadListener(PreparableReloadListener listener) {
-        this.listeners.add(listener);
-    }
+  public void registerReloadListener(PreparableReloadListener listener) {
+    this.listeners.add(listener);
+  }
 
-    public ReloadInstance createReload(Executor backgroundExecutor, Executor mainThreadExecutor, CompletableFuture<Unit> initialTask, List<PackResources> resourcePacks) {
-        LOGGER.info("Reloading ResourceManager: {}", LogUtils.defer(() -> resourcePacks.stream().map(PackResources::packId).collect(Collectors.joining(", "))));
-        this.resources.close();
-        this.resources = new MultiPackResourceManager(this.type, resourcePacks);
-        return SimpleReloadInstance.create(this.resources, this.listeners, backgroundExecutor, mainThreadExecutor, initialTask, LOGGER.isDebugEnabled());
-    }
+  public ReloadInstance createReload(
+      Executor backgroundExecutor,
+      Executor mainThreadExecutor,
+      CompletableFuture<Unit> initialTask,
+      List<PackResources> resourcePacks) {
+    LOGGER.info(
+        "Reloading ResourceManager: {}",
+        LogUtils.defer(
+            () ->
+                resourcePacks.stream()
+                    .map(PackResources::packId)
+                    .collect(Collectors.joining(", "))));
+    this.resources.close();
+    this.resources = new MultiPackResourceManager(this.type, resourcePacks);
+    return SimpleReloadInstance.create(
+        this.resources,
+        this.listeners,
+        backgroundExecutor,
+        mainThreadExecutor,
+        initialTask,
+        LOGGER.isDebugEnabled());
+  }
 
-    @Override
-    public Optional<Resource> getResource(Identifier location) {
-        return this.resources.getResource(location);
-    }
+  @Override
+  public Optional<Resource> getResource(Identifier location) {
+    return this.resources.getResource(location);
+  }
 
-    @Override
-    public Set<String> getNamespaces() {
-        return this.resources.getNamespaces();
-    }
+  @Override
+  public Set<String> getNamespaces() {
+    return this.resources.getNamespaces();
+  }
 
-    @Override
-    public List<Resource> getResourceStack(Identifier location) {
-        return this.resources.getResourceStack(location);
-    }
+  @Override
+  public List<Resource> getResourceStack(Identifier location) {
+    return this.resources.getResourceStack(location);
+  }
 
-    @Override
-    public Map<Identifier, Resource> listResources(String directory, Predicate<Identifier> filenameFilter) {
-        return this.resources.listResources(directory, filenameFilter);
-    }
+  @Override
+  public Map<Identifier, Resource> listResources(
+      String directory, Predicate<Identifier> filenameFilter) {
+    return this.resources.listResources(directory, filenameFilter);
+  }
 
-    @Override
-    public Map<Identifier, List<Resource>> listResourceStacks(String directory, Predicate<Identifier> filter) {
-        return this.resources.listResourceStacks(directory, filter);
-    }
+  @Override
+  public Map<Identifier, List<Resource>> listResourceStacks(
+      String directory, Predicate<Identifier> filter) {
+    return this.resources.listResourceStacks(directory, filter);
+  }
 
-    @Override
-    public Stream<PackResources> listPacks() {
-        return this.resources.listPacks();
-    }
+  @Override
+  public Stream<PackResources> listPacks() {
+    return this.resources.listPacks();
+  }
 }
-

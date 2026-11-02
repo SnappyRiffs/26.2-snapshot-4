@@ -4,12 +4,11 @@
 package net.minecraft.server;
 
 public interface ServerInfo {
-    public String getMotd();
+  public String getMotd();
 
-    public String getServerVersion();
+  public String getServerVersion();
 
-    public int getPlayerCount();
+  public int getPlayerCount();
 
-    public int getMaxPlayers();
+  public int getMaxPlayers();
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.Iterables
  *  com.google.common.collect.Lists
@@ -224,4 +224,3 @@ TooltipProvider
         PotionContents.addPotionTooltip(this.getAllEffects(), consumer, components.getOrDefault(DataComponents.POTION_DURATION_SCALE, Float.valueOf(1.0f)).floatValue(), context.tickRate());
     }
 }
-

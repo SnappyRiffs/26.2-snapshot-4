@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.Gson
  *  com.google.gson.GsonBuilder
@@ -339,4 +339,3 @@ public class PlayerAdvancements {
     public record TriggerInstanceKey(AdvancementHolder advancement, String criterion) {
     }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  *  io.netty.buffer.ByteBuf
@@ -15,38 +15,38 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
 
-public enum CopperGolemState implements StringRepresentable
-{
-    IDLE("idle", 0),
-    GETTING_ITEM("getting_item", 1),
-    GETTING_NO_ITEM("getting_no_item", 2),
-    DROPPING_ITEM("dropping_item", 3),
-    DROPPING_NO_ITEM("dropping_no_item", 4);
+public enum CopperGolemState implements StringRepresentable {
+  IDLE("idle", 0),
+  GETTING_ITEM("getting_item", 1),
+  GETTING_NO_ITEM("getting_no_item", 2),
+  DROPPING_ITEM("dropping_item", 3),
+  DROPPING_NO_ITEM("dropping_no_item", 4);
 
-    public static final Codec<CopperGolemState> CODEC;
-    private static final IntFunction<CopperGolemState> BY_ID;
-    public static final StreamCodec<ByteBuf, CopperGolemState> STREAM_CODEC;
-    private final String name;
-    private final int id;
+  public static final Codec<CopperGolemState> CODEC;
+  private static final IntFunction<CopperGolemState> BY_ID;
+  public static final StreamCodec<ByteBuf, CopperGolemState> STREAM_CODEC;
+  private final String name;
+  private final int id;
 
-    private CopperGolemState(String name, int id) {
-        this.name = name;
-        this.id = id;
-    }
+  private CopperGolemState(String name, int id) {
+    this.name = name;
+    this.id = id;
+  }
 
-    @Override
-    public String getSerializedName() {
-        return this.name;
-    }
+  @Override
+  public String getSerializedName() {
+    return this.name;
+  }
 
-    private int id() {
-        return this.id;
-    }
+  private int id() {
+    return this.id;
+  }
 
-    static {
-        CODEC = StringRepresentable.fromEnum(CopperGolemState::values);
-        BY_ID = ByIdMap.continuous(CopperGolemState::id, CopperGolemState.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
-        STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, CopperGolemState::id);
-    }
+  static {
+    CODEC = StringRepresentable.fromEnum(CopperGolemState::values);
+    BY_ID =
+        ByIdMap.continuous(
+            CopperGolemState::id, CopperGolemState.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+    STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, CopperGolemState::id);
+  }
 }
-

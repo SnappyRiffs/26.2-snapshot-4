@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableMap
  *  com.google.common.collect.ImmutableMap$Builder
@@ -26,27 +26,44 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 
 public class LoadedBlockModels {
-    private static final Matrix4fc IDENTITY = new Matrix4f();
-    private final Map<BlockState, BlockModel.Unbaked> unbakedModels;
-    private final EntityModelSet entityModelSet;
-    private final SpriteGetter sprites;
-    private final PlayerSkinRenderCache playerSkinRenderCache;
+  private static final Matrix4fc IDENTITY = new Matrix4f();
+  private final Map<BlockState, BlockModel.Unbaked> unbakedModels;
+  private final EntityModelSet entityModelSet;
+  private final SpriteGetter sprites;
+  private final PlayerSkinRenderCache playerSkinRenderCache;
 
-    public LoadedBlockModels(Map<BlockState, BlockModel.Unbaked> unbakedModels, EntityModelSet entityModelSet, SpriteGetter sprites, PlayerSkinRenderCache playerSkinRenderCache) {
-        this.unbakedModels = unbakedModels;
-        this.entityModelSet = entityModelSet;
-        this.sprites = sprites;
-        this.playerSkinRenderCache = playerSkinRenderCache;
-    }
+  public LoadedBlockModels(
+      Map<BlockState, BlockModel.Unbaked> unbakedModels,
+      EntityModelSet entityModelSet,
+      SpriteGetter sprites,
+      PlayerSkinRenderCache playerSkinRenderCache) {
+    this.unbakedModels = unbakedModels;
+    this.entityModelSet = entityModelSet;
+    this.sprites = sprites;
+    this.playerSkinRenderCache = playerSkinRenderCache;
+  }
 
-    public CompletableFuture<Map<BlockState, BlockModel>> bake(Function<BlockState, BlockStateModel> bakedBlockStateModels, BlockStateModel missingModel, Executor executor) {
-        return CompletableFuture.supplyAsync(() -> {
-            BlockStateModelWrapper wrappedMissingModel = new BlockStateModelWrapper(missingModel, List.of(), IDENTITY);
-            BlockModel.BakingContext context = new BlockModel.BakingContext(this.entityModelSet, this.sprites, this.playerSkinRenderCache, bakedBlockStateModels, wrappedMissingModel);
-            ImmutableMap.Builder result = ImmutableMap.builder();
-            this.unbakedModels.forEach((blockState, unbakedModel) -> result.put(blockState, (Object)unbakedModel.bake(context, IDENTITY)));
-            return result.build();
-        }, executor);
-    }
+  public CompletableFuture<Map<BlockState, BlockModel>> bake(
+      Function<BlockState, BlockStateModel> bakedBlockStateModels,
+      BlockStateModel missingModel,
+      Executor executor) {
+    return CompletableFuture.supplyAsync(
+        () -> {
+          BlockStateModelWrapper wrappedMissingModel =
+              new BlockStateModelWrapper(missingModel, List.of(), IDENTITY);
+          BlockModel.BakingContext context =
+              new BlockModel.BakingContext(
+                  this.entityModelSet,
+                  this.sprites,
+                  this.playerSkinRenderCache,
+                  bakedBlockStateModels,
+                  wrappedMissingModel);
+          ImmutableMap.Builder result = ImmutableMap.builder();
+          this.unbakedModels.forEach(
+              (blockState, unbakedModel) ->
+                  result.put(blockState, (Object) unbakedModel.bake(context, IDENTITY)));
+          return result.build();
+        },
+        executor);
+  }
 }
-

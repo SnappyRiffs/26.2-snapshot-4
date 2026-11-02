@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -18,53 +18,52 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import org.jspecify.annotations.Nullable;
 
-public interface BlockAndTintGetter
-extends BlockAndLightGetter {
-    public static final BlockAndTintGetter EMPTY = new BlockAndTintGetter(){
+public interface BlockAndTintGetter extends BlockAndLightGetter {
+  public static final BlockAndTintGetter EMPTY =
+      new BlockAndTintGetter() {
 
         @Override
         public CardinalLighting cardinalLighting() {
-            return CardinalLighting.DEFAULT;
+          return CardinalLighting.DEFAULT;
         }
 
         @Override
         public LevelLightEngine getLightEngine() {
-            return LevelLightEngine.EMPTY;
+          return LevelLightEngine.EMPTY;
         }
 
         @Override
         public int getBlockTint(BlockPos pos, ColorResolver color) {
-            return -1;
+          return -1;
         }
 
         @Override
         public @Nullable BlockEntity getBlockEntity(BlockPos pos) {
-            return null;
+          return null;
         }
 
         @Override
         public BlockState getBlockState(BlockPos pos) {
-            return Blocks.AIR.defaultBlockState();
+          return Blocks.AIR.defaultBlockState();
         }
 
         @Override
         public FluidState getFluidState(BlockPos pos) {
-            return Fluids.EMPTY.defaultFluidState();
+          return Fluids.EMPTY.defaultFluidState();
         }
 
         @Override
         public int getHeight() {
-            return 0;
+          return 0;
         }
 
         @Override
         public int getMinY() {
-            return 0;
+          return 0;
         }
-    };
+      };
 
-    public CardinalLighting cardinalLighting();
+  public CardinalLighting cardinalLighting();
 
-    public int getBlockTint(BlockPos var1, ColorResolver var2);
+  public int getBlockTint(BlockPos var1, ColorResolver var2);
 }
-

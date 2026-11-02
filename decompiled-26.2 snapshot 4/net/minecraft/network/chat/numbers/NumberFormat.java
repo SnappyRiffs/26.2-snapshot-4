@@ -4,11 +4,9 @@
 package net.minecraft.network.chat.numbers;
 
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.numbers.NumberFormatType;
 
 public interface NumberFormat {
-    public MutableComponent format(int var1);
+  public MutableComponent format(int var1);
 
-    public NumberFormatType<? extends NumberFormat> type();
+  public NumberFormatType<? extends NumberFormat> type();
 }
-

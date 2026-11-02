@@ -6,14 +6,13 @@ package net.minecraft.client.gui.font;
 import net.minecraft.network.chat.Style;
 
 public interface ActiveArea {
-    public Style style();
+  public Style style();
 
-    public float activeLeft();
+  public float activeLeft();
 
-    public float activeTop();
+  public float activeTop();
 
-    public float activeRight();
+  public float activeRight();
 
-    public float activeBottom();
+  public float activeBottom();
 }
-

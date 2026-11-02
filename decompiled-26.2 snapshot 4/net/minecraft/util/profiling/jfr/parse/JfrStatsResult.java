@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.util.Pair
  *  org.jspecify.annotations.Nullable
@@ -31,14 +31,46 @@ import net.minecraft.util.profiling.jfr.stats.TimedStatSummary;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.jspecify.annotations.Nullable;
 
-public record JfrStatsResult(Instant recordingStarted, Instant recordingEnded, Duration recordingDuration, @Nullable Duration worldCreationDuration, List<FpsStat> fps, List<TickTimeStat> serverTickTimes, List<CpuLoadStat> cpuLoadStats, GcHeapStat.Summary heapSummary, ThreadAllocationStat.Summary threadAllocationSummary, IoSummary<PacketIdentification> receivedPacketsSummary, IoSummary<PacketIdentification> sentPacketsSummary, IoSummary<ChunkIdentification> writtenChunks, IoSummary<ChunkIdentification> readChunks, FileIOStat.Summary fileWrites, FileIOStat.Summary fileReads, List<ChunkGenStat> chunkGenStats, List<StructureGenStat> structureGenStats) {
-    public List<Pair<ChunkStatus, TimedStatSummary<ChunkGenStat>>> chunkGenSummary() {
-        Map<ChunkStatus, List<ChunkGenStat>> byStatus = this.chunkGenStats.stream().collect(Collectors.groupingBy(ChunkGenStat::status));
-        return byStatus.entrySet().stream().map(e -> Pair.of((Object)((ChunkStatus)e.getKey()), TimedStatSummary.summary((List)e.getValue()))).filter(pair -> ((Optional)pair.getSecond()).isPresent()).map(e -> Pair.of((Object)((ChunkStatus)e.getFirst()), (Object)((TimedStatSummary)((Optional)e.getSecond()).get()))).sorted(Comparator.comparing(pair -> ((TimedStatSummary)pair.getSecond()).totalDuration()).reversed()).toList();
-    }
+public record JfrStatsResult(
+    Instant recordingStarted,
+    Instant recordingEnded,
+    Duration recordingDuration,
+    @Nullable Duration worldCreationDuration,
+    List<FpsStat> fps,
+    List<TickTimeStat> serverTickTimes,
+    List<CpuLoadStat> cpuLoadStats,
+    GcHeapStat.Summary heapSummary,
+    ThreadAllocationStat.Summary threadAllocationSummary,
+    IoSummary<PacketIdentification> receivedPacketsSummary,
+    IoSummary<PacketIdentification> sentPacketsSummary,
+    IoSummary<ChunkIdentification> writtenChunks,
+    IoSummary<ChunkIdentification> readChunks,
+    FileIOStat.Summary fileWrites,
+    FileIOStat.Summary fileReads,
+    List<ChunkGenStat> chunkGenStats,
+    List<StructureGenStat> structureGenStats) {
+  public List<Pair<ChunkStatus, TimedStatSummary<ChunkGenStat>>> chunkGenSummary() {
+    Map<ChunkStatus, List<ChunkGenStat>> byStatus =
+        this.chunkGenStats.stream().collect(Collectors.groupingBy(ChunkGenStat::status));
+    return byStatus.entrySet().stream()
+        .map(
+            e ->
+                Pair.of(
+                    (Object) ((ChunkStatus) e.getKey()),
+                    TimedStatSummary.summary((List) e.getValue())))
+        .filter(pair -> ((Optional) pair.getSecond()).isPresent())
+        .map(
+            e ->
+                Pair.of(
+                    (Object) ((ChunkStatus) e.getFirst()),
+                    (Object) ((TimedStatSummary) ((Optional) e.getSecond()).get())))
+        .sorted(
+            Comparator.comparing(pair -> ((TimedStatSummary) pair.getSecond()).totalDuration())
+                .reversed())
+        .toList();
+  }
 
-    public String asJson() {
-        return new JfrResultJsonSerializer().format(this);
-    }
+  public String asJson() {
+    return new JfrResultJsonSerializer().format(this);
+  }
 }
-

@@ -6,6 +6,5 @@ package net.minecraft.network.protocol.login.custom;
 import net.minecraft.network.FriendlyByteBuf;
 
 public interface CustomQueryAnswerPayload {
-    public void write(FriendlyByteBuf var1);
+  public void write(FriendlyByteBuf var1);
 }
-

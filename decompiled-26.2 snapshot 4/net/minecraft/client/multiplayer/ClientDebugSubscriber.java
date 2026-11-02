@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
  *  org.jspecify.annotations.Nullable
@@ -318,4 +318,3 @@ public class ClientDebugSubscriber {
         }
     }
 }
-

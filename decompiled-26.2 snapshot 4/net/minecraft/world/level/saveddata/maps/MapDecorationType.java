@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.Codec
  */
@@ -15,13 +15,19 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 
-public record MapDecorationType(Identifier assetId, boolean showOnItemFrame, int mapColor, boolean explorationMapElement, boolean trackCount) {
-    public static final int NO_MAP_COLOR = -1;
-    public static final Codec<Holder<MapDecorationType>> CODEC = BuiltInRegistries.MAP_DECORATION_TYPE.holderByNameCodec();
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MapDecorationType>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.MAP_DECORATION_TYPE);
+public record MapDecorationType(
+    Identifier assetId,
+    boolean showOnItemFrame,
+    int mapColor,
+    boolean explorationMapElement,
+    boolean trackCount) {
+  public static final int NO_MAP_COLOR = -1;
+  public static final Codec<Holder<MapDecorationType>> CODEC =
+      BuiltInRegistries.MAP_DECORATION_TYPE.holderByNameCodec();
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MapDecorationType>> STREAM_CODEC =
+      ByteBufCodecs.holderRegistry(Registries.MAP_DECORATION_TYPE);
 
-    public boolean hasMapColor() {
-        return this.mapColor != -1;
-    }
+  public boolean hasMapColor() {
+    return this.mapColor != -1;
+  }
 }
-

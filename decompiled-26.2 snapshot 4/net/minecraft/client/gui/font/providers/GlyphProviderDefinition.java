@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -20,26 +20,34 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.io.IOException;
 import net.minecraft.client.gui.font.FontOption;
-import net.minecraft.client.gui.font.providers.GlyphProviderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 public interface GlyphProviderDefinition {
-    public static final MapCodec<GlyphProviderDefinition> MAP_CODEC = GlyphProviderType.CODEC.dispatchMap(GlyphProviderDefinition::type, GlyphProviderType::mapCodec);
+  public static final MapCodec<GlyphProviderDefinition> MAP_CODEC =
+      GlyphProviderType.CODEC.dispatchMap(
+          GlyphProviderDefinition::type, GlyphProviderType::mapCodec);
 
-    public GlyphProviderType type();
+  public GlyphProviderType type();
 
-    public Either<Loader, Reference> unpack();
+  public Either<Loader, Reference> unpack();
 
-    public record Conditional(GlyphProviderDefinition definition, FontOption.Filter filter) {
-        public static final Codec<Conditional> CODEC = RecordCodecBuilder.create(i -> i.group((App)MAP_CODEC.forGetter(Conditional::definition), (App)FontOption.Filter.CODEC.optionalFieldOf("filter", (Object)FontOption.Filter.ALWAYS_PASS).forGetter(Conditional::filter)).apply((Applicative)i, Conditional::new));
-    }
+  public record Conditional(GlyphProviderDefinition definition, FontOption.Filter filter) {
+    public static final Codec<Conditional> CODEC =
+        RecordCodecBuilder.create(
+            i ->
+                i.group(
+                        (App) MAP_CODEC.forGetter(Conditional::definition),
+                        (App)
+                            FontOption.Filter.CODEC
+                                .optionalFieldOf("filter", (Object) FontOption.Filter.ALWAYS_PASS)
+                                .forGetter(Conditional::filter))
+                    .apply((Applicative) i, Conditional::new));
+  }
 
-    public record Reference(Identifier id) {
-    }
+  public record Reference(Identifier id) {}
 
-    public static interface Loader {
-        public GlyphProvider load(ResourceManager var1) throws IOException;
-    }
+  public static interface Loader {
+    public GlyphProvider load(ResourceManager var1) throws IOException;
+  }
 }
-

@@ -9,6 +9,6 @@ import java.util.function.Consumer;
 import net.minecraft.server.packs.DownloadQueue;
 
 public interface PackDownloader {
-    public void download(Map<UUID, DownloadQueue.DownloadRequest> var1, Consumer<DownloadQueue.BatchResult> var2);
+  public void download(
+      Map<UUID, DownloadQueue.DownloadRequest> var1, Consumer<DownloadQueue.BatchResult> var2);
 }
-

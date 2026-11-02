@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -25,56 +25,70 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
-public record TeleportRandomlyConsumeEffect(float diameter) implements ConsumeEffect
-{
-    private static final float DEFAULT_DIAMETER = 16.0f;
-    public static final MapCodec<TeleportRandomlyConsumeEffect> CODEC = RecordCodecBuilder.mapCodec(i -> i.group((App)ExtraCodecs.POSITIVE_FLOAT.optionalFieldOf("diameter", (Object)Float.valueOf(16.0f)).forGetter(TeleportRandomlyConsumeEffect::diameter)).apply((Applicative)i, TeleportRandomlyConsumeEffect::new));
-    public static final StreamCodec<RegistryFriendlyByteBuf, TeleportRandomlyConsumeEffect> STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.FLOAT, TeleportRandomlyConsumeEffect::diameter, TeleportRandomlyConsumeEffect::new);
+public record TeleportRandomlyConsumeEffect(float diameter) implements ConsumeEffect {
+  private static final float DEFAULT_DIAMETER = 16.0f;
+  public static final MapCodec<TeleportRandomlyConsumeEffect> CODEC =
+      RecordCodecBuilder.mapCodec(
+          i ->
+              i.group(
+                      (App)
+                          ExtraCodecs.POSITIVE_FLOAT
+                              .optionalFieldOf("diameter", (Object) Float.valueOf(16.0f))
+                              .forGetter(TeleportRandomlyConsumeEffect::diameter))
+                  .apply((Applicative) i, TeleportRandomlyConsumeEffect::new));
+  public static final StreamCodec<RegistryFriendlyByteBuf, TeleportRandomlyConsumeEffect>
+      STREAM_CODEC =
+          StreamCodec.composite(
+              ByteBufCodecs.FLOAT,
+              TeleportRandomlyConsumeEffect::diameter,
+              TeleportRandomlyConsumeEffect::new);
 
-    public TeleportRandomlyConsumeEffect() {
-        this(16.0f);
-    }
+  public TeleportRandomlyConsumeEffect() {
+    this(16.0f);
+  }
 
-    public ConsumeEffect.Type<TeleportRandomlyConsumeEffect> getType() {
-        return ConsumeEffect.Type.TELEPORT_RANDOMLY;
-    }
+  public ConsumeEffect.Type<TeleportRandomlyConsumeEffect> getType() {
+    return ConsumeEffect.Type.TELEPORT_RANDOMLY;
+  }
 
-    @Override
-    public boolean apply(Level level, ItemStack stack, LivingEntity user) {
-        boolean teleported = false;
-        for (int attempt = 0; attempt < 16; ++attempt) {
-            SoundSource soundSource;
-            SoundEvent soundEvent;
-            double xx = user.getX() + (user.getRandom().nextDouble() - 0.5) * (double)this.diameter;
-            double yy = Mth.clamp(user.getY() + (user.getRandom().nextDouble() - 0.5) * (double)this.diameter, (double)level.getMinY(), (double)(level.getMinY() + ((ServerLevel)level).getLogicalHeight() - 1));
-            double zz = user.getZ() + (user.getRandom().nextDouble() - 0.5) * (double)this.diameter;
-            if (user.isPassenger()) {
-                user.stopRiding();
-            }
-            Vec3 oldPos = user.position();
-            if (!user.randomTeleport(xx, yy, zz, true)) continue;
-            level.gameEvent(GameEvent.TELEPORT, oldPos, GameEvent.Context.of(user));
-            if (user instanceof Fox) {
-                soundEvent = SoundEvents.FOX_TELEPORT;
-                soundSource = SoundSource.NEUTRAL;
-            } else {
-                soundEvent = SoundEvents.CHORUS_FRUIT_TELEPORT;
-                soundSource = SoundSource.PLAYERS;
-            }
-            level.playSound(null, user.getX(), user.getY(), user.getZ(), soundEvent, soundSource);
-            user.resetFallDistance();
-            teleported = true;
-            break;
-        }
-        if (teleported) {
-            user.resetCurrentImpulseContext();
-        }
-        return teleported;
+  @Override
+  public boolean apply(Level level, ItemStack stack, LivingEntity user) {
+    boolean teleported = false;
+    for (int attempt = 0; attempt < 16; ++attempt) {
+      SoundSource soundSource;
+      SoundEvent soundEvent;
+      double xx = user.getX() + (user.getRandom().nextDouble() - 0.5) * (double) this.diameter;
+      double yy =
+          Mth.clamp(
+              user.getY() + (user.getRandom().nextDouble() - 0.5) * (double) this.diameter,
+              (double) level.getMinY(),
+              (double) (level.getMinY() + ((ServerLevel) level).getLogicalHeight() - 1));
+      double zz = user.getZ() + (user.getRandom().nextDouble() - 0.5) * (double) this.diameter;
+      if (user.isPassenger()) {
+        user.stopRiding();
+      }
+      Vec3 oldPos = user.position();
+      if (!user.randomTeleport(xx, yy, zz, true)) continue;
+      level.gameEvent(GameEvent.TELEPORT, oldPos, GameEvent.Context.of(user));
+      if (user instanceof Fox) {
+        soundEvent = SoundEvents.FOX_TELEPORT;
+        soundSource = SoundSource.NEUTRAL;
+      } else {
+        soundEvent = SoundEvents.CHORUS_FRUIT_TELEPORT;
+        soundSource = SoundSource.PLAYERS;
+      }
+      level.playSound(null, user.getX(), user.getY(), user.getZ(), soundEvent, soundSource);
+      user.resetFallDistance();
+      teleported = true;
+      break;
     }
+    if (teleported) {
+      user.resetCurrentImpulseContext();
+    }
+    return teleported;
+  }
 }
-

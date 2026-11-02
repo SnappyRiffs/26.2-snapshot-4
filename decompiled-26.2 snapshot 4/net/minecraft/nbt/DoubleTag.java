@@ -134,4 +134,3 @@ public record DoubleTag(double value) implements NumericTag
         return visitor.build();
     }
 }
-

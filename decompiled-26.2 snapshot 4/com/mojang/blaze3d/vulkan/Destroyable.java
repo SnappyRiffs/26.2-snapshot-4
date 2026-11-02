@@ -5,6 +5,5 @@ package com.mojang.blaze3d.vulkan;
 
 @FunctionalInterface
 public interface Destroyable {
-    public void destroy();
+  public void destroy();
 }
-

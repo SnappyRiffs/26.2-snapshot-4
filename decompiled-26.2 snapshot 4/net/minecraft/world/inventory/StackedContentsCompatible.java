@@ -7,6 +7,5 @@ import net.minecraft.world.entity.player.StackedItemContents;
 
 @FunctionalInterface
 public interface StackedContentsCompatible {
-    public void fillStackedContents(StackedItemContents var1);
+  public void fillStackedContents(StackedItemContents var1);
 }
-

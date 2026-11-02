@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.logging.LogUtils
  *  org.jspecify.annotations.Nullable
@@ -33,83 +33,116 @@ import net.minecraft.server.MinecraftServer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 
-public final class MinecraftServerStatistics
-implements DynamicMBean {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private final MinecraftServer server;
-    private final MBeanInfo mBeanInfo;
-    private final Map<String, AttributeDescription> attributeDescriptionByName = Stream.of(new AttributeDescription("tickTimes", this::getTickTimes, "Historical tick times (ms)", long[].class), new AttributeDescription("averageTickTime", this::getAverageTickTime, "Current average tick time (ms)", Long.TYPE)).collect(Collectors.toMap(attributeDescription -> attributeDescription.name, Function.identity()));
+public final class MinecraftServerStatistics implements DynamicMBean {
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private final MinecraftServer server;
+  private final MBeanInfo mBeanInfo;
+  private final Map<String, AttributeDescription> attributeDescriptionByName =
+      Stream.of(
+              new AttributeDescription(
+                  "tickTimes", this::getTickTimes, "Historical tick times (ms)", long[].class),
+              new AttributeDescription(
+                  "averageTickTime",
+                  this::getAverageTickTime,
+                  "Current average tick time (ms)",
+                  Long.TYPE))
+          .collect(
+              Collectors.toMap(
+                  attributeDescription -> attributeDescription.name, Function.identity()));
 
-    private MinecraftServerStatistics(MinecraftServer server) {
-        this.server = server;
-        MBeanAttributeInfo[] mBeanAttributeInfos = (MBeanAttributeInfo[])this.attributeDescriptionByName.values().stream().map(AttributeDescription::asMBeanAttributeInfo).toArray(MBeanAttributeInfo[]::new);
-        this.mBeanInfo = new MBeanInfo(MinecraftServerStatistics.class.getSimpleName(), "metrics for dedicated server", mBeanAttributeInfos, null, null, new MBeanNotificationInfo[0]);
+  private MinecraftServerStatistics(MinecraftServer server) {
+    this.server = server;
+    MBeanAttributeInfo[] mBeanAttributeInfos =
+        (MBeanAttributeInfo[])
+            this.attributeDescriptionByName.values().stream()
+                .map(AttributeDescription::asMBeanAttributeInfo)
+                .toArray(MBeanAttributeInfo[]::new);
+    this.mBeanInfo =
+        new MBeanInfo(
+            MinecraftServerStatistics.class.getSimpleName(),
+            "metrics for dedicated server",
+            mBeanAttributeInfos,
+            null,
+            null,
+            new MBeanNotificationInfo[0]);
+  }
+
+  public static void registerJmxMonitoring(MinecraftServer server) {
+    try {
+      ManagementFactory.getPlatformMBeanServer()
+          .registerMBean(
+              new MinecraftServerStatistics(server),
+              new ObjectName("net.minecraft.server:type=Server"));
+    } catch (InstanceAlreadyExistsException
+        | MBeanRegistrationException
+        | MalformedObjectNameException
+        | NotCompliantMBeanException e) {
+      LOGGER.warn("Failed to initialise server as JMX bean", (Throwable) e);
+    }
+  }
+
+  private float getAverageTickTime() {
+    return this.server.getCurrentSmoothedTickTime();
+  }
+
+  private long[] getTickTimes() {
+    return this.server.getTickTimesNanos();
+  }
+
+  @Override
+  public @Nullable Object getAttribute(String attribute) {
+    AttributeDescription attributeDescription = this.attributeDescriptionByName.get(attribute);
+    return attributeDescription == null ? null : attributeDescription.getter.get();
+  }
+
+  @Override
+  public void setAttribute(Attribute attribute) {}
+
+  @Override
+  public AttributeList getAttributes(String[] attributes) {
+    List<Attribute> attributeList =
+        Arrays.stream(attributes)
+            .map(this.attributeDescriptionByName::get)
+            .filter(Objects::nonNull)
+            .map(
+                attributeDescription ->
+                    new Attribute(attributeDescription.name, attributeDescription.getter.get()))
+            .collect(Collectors.toList());
+    return new AttributeList(attributeList);
+  }
+
+  @Override
+  public AttributeList setAttributes(AttributeList attributes) {
+    return new AttributeList();
+  }
+
+  @Override
+  public @Nullable Object invoke(String actionName, Object[] params, String[] signature) {
+    return null;
+  }
+
+  @Override
+  public MBeanInfo getMBeanInfo() {
+    return this.mBeanInfo;
+  }
+
+  private static final class AttributeDescription {
+    private final String name;
+    private final Supplier<Object> getter;
+    private final String description;
+    private final Class<?> type;
+
+    private AttributeDescription(
+        String name, Supplier<Object> getter, String description, Class<?> type) {
+      this.name = name;
+      this.getter = getter;
+      this.description = description;
+      this.type = type;
     }
 
-    public static void registerJmxMonitoring(MinecraftServer server) {
-        try {
-            ManagementFactory.getPlatformMBeanServer().registerMBean(new MinecraftServerStatistics(server), new ObjectName("net.minecraft.server:type=Server"));
-        }
-        catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException e) {
-            LOGGER.warn("Failed to initialise server as JMX bean", (Throwable)e);
-        }
+    private MBeanAttributeInfo asMBeanAttributeInfo() {
+      return new MBeanAttributeInfo(
+          this.name, this.type.getSimpleName(), this.description, true, false, false);
     }
-
-    private float getAverageTickTime() {
-        return this.server.getCurrentSmoothedTickTime();
-    }
-
-    private long[] getTickTimes() {
-        return this.server.getTickTimesNanos();
-    }
-
-    @Override
-    public @Nullable Object getAttribute(String attribute) {
-        AttributeDescription attributeDescription = this.attributeDescriptionByName.get(attribute);
-        return attributeDescription == null ? null : attributeDescription.getter.get();
-    }
-
-    @Override
-    public void setAttribute(Attribute attribute) {
-    }
-
-    @Override
-    public AttributeList getAttributes(String[] attributes) {
-        List<Attribute> attributeList = Arrays.stream(attributes).map(this.attributeDescriptionByName::get).filter(Objects::nonNull).map(attributeDescription -> new Attribute(attributeDescription.name, attributeDescription.getter.get())).collect(Collectors.toList());
-        return new AttributeList(attributeList);
-    }
-
-    @Override
-    public AttributeList setAttributes(AttributeList attributes) {
-        return new AttributeList();
-    }
-
-    @Override
-    public @Nullable Object invoke(String actionName, Object[] params, String[] signature) {
-        return null;
-    }
-
-    @Override
-    public MBeanInfo getMBeanInfo() {
-        return this.mBeanInfo;
-    }
-
-    private static final class AttributeDescription {
-        private final String name;
-        private final Supplier<Object> getter;
-        private final String description;
-        private final Class<?> type;
-
-        private AttributeDescription(String name, Supplier<Object> getter, String description, Class<?> type) {
-            this.name = name;
-            this.getter = getter;
-            this.description = description;
-            this.type = type;
-        }
-
-        private MBeanAttributeInfo asMBeanAttributeInfo() {
-            return new MBeanAttributeInfo(this.name, this.type.getSimpleName(), this.description, true, false, false);
-        }
-    }
+  }
 }
-

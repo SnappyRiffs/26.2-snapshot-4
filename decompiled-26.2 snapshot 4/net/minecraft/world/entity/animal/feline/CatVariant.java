@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.datafixers.kinds.App
  *  com.mojang.datafixers.kinds.Applicative
@@ -26,24 +26,55 @@ import net.minecraft.world.entity.variant.SpawnCondition;
 import net.minecraft.world.entity.variant.SpawnContext;
 import net.minecraft.world.entity.variant.SpawnPrioritySelectors;
 
-public record CatVariant(ClientAsset.ResourceTexture adultAssetInfo, ClientAsset.ResourceTexture babyAssetInfo, SpawnPrioritySelectors spawnConditions) implements PriorityProvider<SpawnContext, SpawnCondition>
-{
-    public static final Codec<CatVariant> DIRECT_CODEC = RecordCodecBuilder.create(i -> i.group((App)ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(CatVariant::adultAssetInfo), (App)ClientAsset.ResourceTexture.CODEC.fieldOf("baby_asset_id").forGetter(CatVariant::babyAssetInfo), (App)SpawnPrioritySelectors.CODEC.fieldOf("spawn_conditions").forGetter(CatVariant::spawnConditions)).apply((Applicative)i, CatVariant::new));
-    public static final Codec<CatVariant> NETWORK_CODEC = RecordCodecBuilder.create(i -> i.group((App)ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(CatVariant::adultAssetInfo), (App)ClientAsset.ResourceTexture.CODEC.fieldOf("baby_asset_id").forGetter(CatVariant::babyAssetInfo)).apply((Applicative)i, CatVariant::new));
-    public static final Codec<Holder<CatVariant>> CODEC = RegistryFixedCodec.create(Registries.CAT_VARIANT);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<CatVariant>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.CAT_VARIANT);
+public record CatVariant(
+    ClientAsset.ResourceTexture adultAssetInfo,
+    ClientAsset.ResourceTexture babyAssetInfo,
+    SpawnPrioritySelectors spawnConditions)
+    implements PriorityProvider<SpawnContext, SpawnCondition> {
+  public static final Codec<CatVariant> DIRECT_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(
+                              CatVariant::adultAssetInfo),
+                      (App)
+                          ClientAsset.ResourceTexture.CODEC
+                              .fieldOf("baby_asset_id")
+                              .forGetter(CatVariant::babyAssetInfo),
+                      (App)
+                          SpawnPrioritySelectors.CODEC
+                              .fieldOf("spawn_conditions")
+                              .forGetter(CatVariant::spawnConditions))
+                  .apply((Applicative) i, CatVariant::new));
+  public static final Codec<CatVariant> NETWORK_CODEC =
+      RecordCodecBuilder.create(
+          i ->
+              i.group(
+                      (App)
+                          ClientAsset.ResourceTexture.DEFAULT_FIELD_CODEC.forGetter(
+                              CatVariant::adultAssetInfo),
+                      (App)
+                          ClientAsset.ResourceTexture.CODEC
+                              .fieldOf("baby_asset_id")
+                              .forGetter(CatVariant::babyAssetInfo))
+                  .apply((Applicative) i, CatVariant::new));
+  public static final Codec<Holder<CatVariant>> CODEC =
+      RegistryFixedCodec.create(Registries.CAT_VARIANT);
+  public static final StreamCodec<RegistryFriendlyByteBuf, Holder<CatVariant>> STREAM_CODEC =
+      ByteBufCodecs.holderRegistry(Registries.CAT_VARIANT);
 
-    private CatVariant(ClientAsset.ResourceTexture adultAssetInfo, ClientAsset.ResourceTexture babyAssetInfo) {
-        this(adultAssetInfo, babyAssetInfo, SpawnPrioritySelectors.EMPTY);
-    }
+  private CatVariant(
+      ClientAsset.ResourceTexture adultAssetInfo, ClientAsset.ResourceTexture babyAssetInfo) {
+    this(adultAssetInfo, babyAssetInfo, SpawnPrioritySelectors.EMPTY);
+  }
 
-    @Override
-    public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
-        return this.spawnConditions.selectors();
-    }
+  @Override
+  public List<PriorityProvider.Selector<SpawnContext, SpawnCondition>> selectors() {
+    return this.spawnConditions.selectors();
+  }
 
-    public ClientAsset.ResourceTexture assetInfo(boolean isBaby) {
-        return isBaby ? this.babyAssetInfo : this.adultAssetInfo;
-    }
+  public ClientAsset.ResourceTexture assetInfo(boolean isBaby) {
+    return isBaby ? this.babyAssetInfo : this.adultAssetInfo;
+  }
 }
-

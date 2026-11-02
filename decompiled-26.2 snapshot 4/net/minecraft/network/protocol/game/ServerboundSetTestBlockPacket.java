@@ -9,22 +9,27 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketType;
-import net.minecraft.network.protocol.game.GamePacketTypes;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.world.level.block.state.properties.TestBlockMode;
 
-public record ServerboundSetTestBlockPacket(BlockPos position, TestBlockMode mode, String message) implements Packet<ServerGamePacketListener>
-{
-    public static final StreamCodec<FriendlyByteBuf, ServerboundSetTestBlockPacket> STREAM_CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC, ServerboundSetTestBlockPacket::position, TestBlockMode.STREAM_CODEC, ServerboundSetTestBlockPacket::mode, ByteBufCodecs.STRING_UTF8, ServerboundSetTestBlockPacket::message, ServerboundSetTestBlockPacket::new);
+public record ServerboundSetTestBlockPacket(BlockPos position, TestBlockMode mode, String message)
+    implements Packet<ServerGamePacketListener> {
+  public static final StreamCodec<FriendlyByteBuf, ServerboundSetTestBlockPacket> STREAM_CODEC =
+      StreamCodec.composite(
+          BlockPos.STREAM_CODEC,
+          ServerboundSetTestBlockPacket::position,
+          TestBlockMode.STREAM_CODEC,
+          ServerboundSetTestBlockPacket::mode,
+          ByteBufCodecs.STRING_UTF8,
+          ServerboundSetTestBlockPacket::message,
+          ServerboundSetTestBlockPacket::new);
 
-    @Override
-    public PacketType<ServerboundSetTestBlockPacket> type() {
-        return GamePacketTypes.SERVERBOUND_SET_TEST_BLOCK;
-    }
+  @Override
+  public PacketType<ServerboundSetTestBlockPacket> type() {
+    return GamePacketTypes.SERVERBOUND_SET_TEST_BLOCK;
+  }
 
-    @Override
-    public void handle(ServerGamePacketListener listener) {
-        listener.handleSetTestBlock(this);
-    }
+  @Override
+  public void handle(ServerGamePacketListener listener) {
+    listener.handleSetTestBlock(this);
+  }
 }
-

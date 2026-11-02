@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -11,20 +11,19 @@ import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 
 public class SingleKeyCache<K, V> {
-    private final Function<K, V> computeValue;
-    private @Nullable K cacheKey = null;
-    private @Nullable V cachedValue;
+  private final Function<K, V> computeValue;
+  private @Nullable K cacheKey = null;
+  private @Nullable V cachedValue;
 
-    public SingleKeyCache(Function<K, V> computeValue) {
-        this.computeValue = computeValue;
-    }
+  public SingleKeyCache(Function<K, V> computeValue) {
+    this.computeValue = computeValue;
+  }
 
-    public V getValue(K cacheKey) {
-        if (this.cachedValue == null || !Objects.equals(this.cacheKey, cacheKey)) {
-            this.cachedValue = this.computeValue.apply(cacheKey);
-            this.cacheKey = cacheKey;
-        }
-        return this.cachedValue;
+  public V getValue(K cacheKey) {
+    if (this.cachedValue == null || !Objects.equals(this.cacheKey, cacheKey)) {
+      this.cachedValue = this.computeValue.apply(cacheKey);
+      this.cacheKey = cacheKey;
     }
+    return this.cachedValue;
+  }
 }
-

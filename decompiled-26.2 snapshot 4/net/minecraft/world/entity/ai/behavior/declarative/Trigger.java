@@ -7,6 +7,5 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
 public interface Trigger<E extends LivingEntity> {
-    public boolean trigger(ServerLevel var1, E var2, long var3);
+  public boolean trigger(ServerLevel var1, E var2, long var3);
 }
-

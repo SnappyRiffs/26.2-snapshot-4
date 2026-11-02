@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  it.unimi.dsi.fastutil.ints.Int2IntArrayMap
  *  it.unimi.dsi.fastutil.ints.Int2IntMap
@@ -25,7 +25,6 @@
 package com.mojang.blaze3d.vulkan;
 
 import com.mojang.blaze3d.systems.DeviceType;
-import com.mojang.blaze3d.vulkan.VulkanUtils;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMaps;
@@ -49,159 +48,209 @@ import org.lwjgl.vulkan.VkPhysicalDeviceProperties;
 import org.lwjgl.vulkan.VkPhysicalDeviceProperties2;
 import org.lwjgl.vulkan.VkQueueFamilyProperties;
 
-public class VulkanPhysicalDevice
-implements AutoCloseable {
-    private final VkPhysicalDevice vkPhysicalDevice;
-    private final VkExtensionProperties.Buffer vkDeviceExtensions;
-    private final VkPhysicalDeviceFeatures2 vkPhysicalDeviceFeatures;
-    private final VkPhysicalDeviceProperties2 vkPhysicalDeviceProperties;
-    private final VkPhysicalDeviceDriverProperties vkPhysicalDeviceDriverProperties;
-    private final Int2IntMap queueFamilyCreateInfoMap;
-    private final @Nullable IntIntPair graphicsQueueFamilyAndIndex;
-    private final @Nullable IntIntPair computeQueueFamilyAndIndex;
-    private final @Nullable IntIntPair transferQueueFamilyAndIndex;
+public class VulkanPhysicalDevice implements AutoCloseable {
+  private final VkPhysicalDevice vkPhysicalDevice;
+  private final VkExtensionProperties.Buffer vkDeviceExtensions;
+  private final VkPhysicalDeviceFeatures2 vkPhysicalDeviceFeatures;
+  private final VkPhysicalDeviceProperties2 vkPhysicalDeviceProperties;
+  private final VkPhysicalDeviceDriverProperties vkPhysicalDeviceDriverProperties;
+  private final Int2IntMap queueFamilyCreateInfoMap;
+  private final @Nullable IntIntPair graphicsQueueFamilyAndIndex;
+  private final @Nullable IntIntPair computeQueueFamilyAndIndex;
+  private final @Nullable IntIntPair transferQueueFamilyAndIndex;
 
-    public VulkanPhysicalDevice(VkPhysicalDevice vkPhysicalDevice) {
-        try (MemoryStack stack = MemoryStack.stackPush();){
-            this.vkPhysicalDevice = vkPhysicalDevice;
-            IntBuffer intBuffer = stack.callocInt(1);
-            this.vkPhysicalDeviceProperties = VkPhysicalDeviceProperties2.calloc().sType$Default();
-            this.vkPhysicalDeviceDriverProperties = VkPhysicalDeviceDriverProperties.calloc().sType$Default();
-            this.vkPhysicalDeviceProperties.pNext(this.vkPhysicalDeviceDriverProperties);
-            VK12.vkGetPhysicalDeviceProperties2((VkPhysicalDevice)vkPhysicalDevice, (VkPhysicalDeviceProperties2)this.vkPhysicalDeviceProperties);
-            VulkanUtils.crashIfFailure(VK12.vkEnumerateDeviceExtensionProperties((VkPhysicalDevice)vkPhysicalDevice, (CharSequence)null, (IntBuffer)intBuffer, null), "Failed to get number of device extension properties");
-            this.vkDeviceExtensions = VkExtensionProperties.calloc((int)intBuffer.get(0));
-            VulkanUtils.crashIfFailure(VK12.vkEnumerateDeviceExtensionProperties((VkPhysicalDevice)vkPhysicalDevice, (CharSequence)null, (IntBuffer)intBuffer, (VkExtensionProperties.Buffer)this.vkDeviceExtensions), "Failed to get extension properties");
-            VK12.vkGetPhysicalDeviceQueueFamilyProperties((VkPhysicalDevice)vkPhysicalDevice, (IntBuffer)intBuffer, null);
-            VkQueueFamilyProperties.Buffer vkQueueFamilyProps = VkQueueFamilyProperties.calloc((int)intBuffer.get(0), (MemoryStack)stack);
-            VK12.vkGetPhysicalDeviceQueueFamilyProperties((VkPhysicalDevice)vkPhysicalDevice, (IntBuffer)intBuffer, (VkQueueFamilyProperties.Buffer)vkQueueFamilyProps);
-            this.vkPhysicalDeviceFeatures = VkPhysicalDeviceFeatures2.calloc().sType$Default();
-            VK12.vkGetPhysicalDeviceFeatures2((VkPhysicalDevice)vkPhysicalDevice, (VkPhysicalDeviceFeatures2)this.vkPhysicalDeviceFeatures);
-            int graphicsQueueFamily = -1;
-            int computeQueueFamily = -1;
-            int transferQueueFamily = -1;
-            int computeQueueFamilyBits = -1;
-            int transferQueueFamilyBits = -1;
-            int numQueueFamilies = vkQueueFamilyProps.capacity();
-            for (int i = 0; i < numQueueFamilies; ++i) {
-                int familyUsedQueues = 0;
-                VkQueueFamilyProperties queueFamilyProperties = (VkQueueFamilyProperties)vkQueueFamilyProps.get(i);
-                if (graphicsQueueFamily == -1 && VulkanUtils.hasAllBits(queueFamilyProperties.queueFlags(), 3) && GLFWVulkan.glfwGetPhysicalDevicePresentationSupport((VkInstance)vkPhysicalDevice.getInstance(), (VkPhysicalDevice)vkPhysicalDevice, (int)i)) {
-                    graphicsQueueFamily = i;
-                    ++familyUsedQueues;
-                }
-                if (queueFamilyProperties.queueCount() <= familyUsedQueues) continue;
-                if (VulkanUtils.hasAllBits(queueFamilyProperties.queueFlags(), 2) && (computeQueueFamily == -1 || Integer.bitCount(queueFamilyProperties.queueFlags()) <= Integer.bitCount(computeQueueFamilyBits))) {
-                    computeQueueFamily = i;
-                    computeQueueFamilyBits = queueFamilyProperties.queueFlags();
-                    ++familyUsedQueues;
-                }
-                if (queueFamilyProperties.queueCount() <= familyUsedQueues || !VulkanUtils.hasAnyBit(queueFamilyProperties.queueFlags(), 7) || transferQueueFamily != -1 && Integer.bitCount(queueFamilyProperties.queueFlags()) > Integer.bitCount(transferQueueFamilyBits)) continue;
-                transferQueueFamily = i;
-                transferQueueFamilyBits = queueFamilyProperties.queueFlags();
-                ++familyUsedQueues;
-            }
-            Int2IntArrayMap familyMap = new Int2IntArrayMap();
-            int graphicsQueueIndex = familyMap.put(graphicsQueueFamily, familyMap.get(graphicsQueueFamily) + 1);
-            int computeQueueIndex = familyMap.put(computeQueueFamily, familyMap.get(computeQueueFamily) + 1);
-            int transferQueueIndex = familyMap.put(transferQueueFamily, familyMap.get(transferQueueFamily) + 1);
-            familyMap.remove(-1);
-            this.queueFamilyCreateInfoMap = Int2IntMaps.unmodifiable((Int2IntMap)familyMap);
-            this.graphicsQueueFamilyAndIndex = graphicsQueueFamily == -1 ? null : new IntIntImmutablePair(graphicsQueueFamily, graphicsQueueIndex);
-            this.computeQueueFamilyAndIndex = computeQueueFamily == -1 ? null : new IntIntImmutablePair(computeQueueFamily, computeQueueIndex);
-            this.transferQueueFamilyAndIndex = transferQueueFamily == -1 ? null : new IntIntImmutablePair(transferQueueFamily, transferQueueIndex);
+  public VulkanPhysicalDevice(VkPhysicalDevice vkPhysicalDevice) {
+    try (MemoryStack stack = MemoryStack.stackPush(); ) {
+      this.vkPhysicalDevice = vkPhysicalDevice;
+      IntBuffer intBuffer = stack.callocInt(1);
+      this.vkPhysicalDeviceProperties = VkPhysicalDeviceProperties2.calloc().sType$Default();
+      this.vkPhysicalDeviceDriverProperties =
+          VkPhysicalDeviceDriverProperties.calloc().sType$Default();
+      this.vkPhysicalDeviceProperties.pNext(this.vkPhysicalDeviceDriverProperties);
+      VK12.vkGetPhysicalDeviceProperties2(
+          (VkPhysicalDevice) vkPhysicalDevice,
+          (VkPhysicalDeviceProperties2) this.vkPhysicalDeviceProperties);
+      VulkanUtils.crashIfFailure(
+          VK12.vkEnumerateDeviceExtensionProperties(
+              (VkPhysicalDevice) vkPhysicalDevice,
+              (CharSequence) null,
+              (IntBuffer) intBuffer,
+              null),
+          "Failed to get number of device extension properties");
+      this.vkDeviceExtensions = VkExtensionProperties.calloc((int) intBuffer.get(0));
+      VulkanUtils.crashIfFailure(
+          VK12.vkEnumerateDeviceExtensionProperties(
+              (VkPhysicalDevice) vkPhysicalDevice,
+              (CharSequence) null,
+              (IntBuffer) intBuffer,
+              (VkExtensionProperties.Buffer) this.vkDeviceExtensions),
+          "Failed to get extension properties");
+      VK12.vkGetPhysicalDeviceQueueFamilyProperties(
+          (VkPhysicalDevice) vkPhysicalDevice, (IntBuffer) intBuffer, null);
+      VkQueueFamilyProperties.Buffer vkQueueFamilyProps =
+          VkQueueFamilyProperties.calloc((int) intBuffer.get(0), (MemoryStack) stack);
+      VK12.vkGetPhysicalDeviceQueueFamilyProperties(
+          (VkPhysicalDevice) vkPhysicalDevice,
+          (IntBuffer) intBuffer,
+          (VkQueueFamilyProperties.Buffer) vkQueueFamilyProps);
+      this.vkPhysicalDeviceFeatures = VkPhysicalDeviceFeatures2.calloc().sType$Default();
+      VK12.vkGetPhysicalDeviceFeatures2(
+          (VkPhysicalDevice) vkPhysicalDevice,
+          (VkPhysicalDeviceFeatures2) this.vkPhysicalDeviceFeatures);
+      int graphicsQueueFamily = -1;
+      int computeQueueFamily = -1;
+      int transferQueueFamily = -1;
+      int computeQueueFamilyBits = -1;
+      int transferQueueFamilyBits = -1;
+      int numQueueFamilies = vkQueueFamilyProps.capacity();
+      for (int i = 0; i < numQueueFamilies; ++i) {
+        int familyUsedQueues = 0;
+        VkQueueFamilyProperties queueFamilyProperties =
+            (VkQueueFamilyProperties) vkQueueFamilyProps.get(i);
+        if (graphicsQueueFamily == -1
+            && VulkanUtils.hasAllBits(queueFamilyProperties.queueFlags(), 3)
+            && GLFWVulkan.glfwGetPhysicalDevicePresentationSupport(
+                (VkInstance) vkPhysicalDevice.getInstance(),
+                (VkPhysicalDevice) vkPhysicalDevice,
+                (int) i)) {
+          graphicsQueueFamily = i;
+          ++familyUsedQueues;
         }
-    }
-
-    @Override
-    public void close() {
-        this.vkPhysicalDeviceFeatures.free();
-        this.vkDeviceExtensions.free();
-        this.vkPhysicalDeviceDriverProperties.free();
-        this.vkPhysicalDeviceProperties.free();
-    }
-
-    public String deviceName() {
-        return this.vkPhysicalDeviceProperties.properties().deviceNameString();
-    }
-
-    public String vendorName() {
-        int vendorId = this.vkPhysicalDeviceProperties.properties().vendorID();
-        return switch (vendorId) {
-            case 4098, 4130 -> "AMD";
-            case 4318, 4818 -> "NVIDIA";
-            case 32902 -> "INTEL";
-            case 5772, 6091, 6505, 20803 -> "QUALCOMM";
-            case 4112 -> "IMGTEC";
-            case 5348 -> "BROADCOM";
-            case 5045 -> "ARM";
-            case 5140 -> "MICROSOFT";
-            case 4203 -> "APPLE";
-            default -> String.format(Locale.ROOT, "0x%x", vendorId);
-        };
-    }
-
-    public VkPhysicalDevice vkPhysicalDevice() {
-        return this.vkPhysicalDevice;
-    }
-
-    public VkPhysicalDeviceProperties vkPhysicalDeviceProperties() {
-        return this.vkPhysicalDeviceProperties.properties();
-    }
-
-    public VkPhysicalDeviceDriverProperties vkPhysicalDeviceDriverProperties() {
-        return this.vkPhysicalDeviceDriverProperties;
-    }
-
-    public boolean hasDeviceExtension(String name) {
-        return this.vkDeviceExtensions.stream().anyMatch(e -> e.extensionNameString().equals(name));
-    }
-
-    public Set<String> getMissingExtensions(Collection<String> required) {
-        HashSet<String> remaining = new HashSet<String>(required);
-        for (VkExtensionProperties extension : this.vkDeviceExtensions) {
-            remaining.remove(extension.extensionNameString());
+        if (queueFamilyProperties.queueCount() <= familyUsedQueues) continue;
+        if (VulkanUtils.hasAllBits(queueFamilyProperties.queueFlags(), 2)
+            && (computeQueueFamily == -1
+                || Integer.bitCount(queueFamilyProperties.queueFlags())
+                    <= Integer.bitCount(computeQueueFamilyBits))) {
+          computeQueueFamily = i;
+          computeQueueFamilyBits = queueFamilyProperties.queueFlags();
+          ++familyUsedQueues;
         }
-        return remaining;
+        if (queueFamilyProperties.queueCount() <= familyUsedQueues
+            || !VulkanUtils.hasAnyBit(queueFamilyProperties.queueFlags(), 7)
+            || transferQueueFamily != -1
+                && Integer.bitCount(queueFamilyProperties.queueFlags())
+                    > Integer.bitCount(transferQueueFamilyBits)) continue;
+        transferQueueFamily = i;
+        transferQueueFamilyBits = queueFamilyProperties.queueFlags();
+        ++familyUsedQueues;
+      }
+      Int2IntArrayMap familyMap = new Int2IntArrayMap();
+      int graphicsQueueIndex =
+          familyMap.put(graphicsQueueFamily, familyMap.get(graphicsQueueFamily) + 1);
+      int computeQueueIndex =
+          familyMap.put(computeQueueFamily, familyMap.get(computeQueueFamily) + 1);
+      int transferQueueIndex =
+          familyMap.put(transferQueueFamily, familyMap.get(transferQueueFamily) + 1);
+      familyMap.remove(-1);
+      this.queueFamilyCreateInfoMap = Int2IntMaps.unmodifiable((Int2IntMap) familyMap);
+      this.graphicsQueueFamilyAndIndex =
+          graphicsQueueFamily == -1
+              ? null
+              : new IntIntImmutablePair(graphicsQueueFamily, graphicsQueueIndex);
+      this.computeQueueFamilyAndIndex =
+          computeQueueFamily == -1
+              ? null
+              : new IntIntImmutablePair(computeQueueFamily, computeQueueIndex);
+      this.transferQueueFamilyAndIndex =
+          transferQueueFamily == -1
+              ? null
+              : new IntIntImmutablePair(transferQueueFamily, transferQueueIndex);
     }
+  }
 
-    public Int2IntMap queueFamilyCreateInfoMap() {
-        return this.queueFamilyCreateInfoMap;
-    }
+  @Override
+  public void close() {
+    this.vkPhysicalDeviceFeatures.free();
+    this.vkDeviceExtensions.free();
+    this.vkPhysicalDeviceDriverProperties.free();
+    this.vkPhysicalDeviceProperties.free();
+  }
 
-    public @Nullable IntIntPair graphicsQueueFamilyAndIndex() {
-        return this.graphicsQueueFamilyAndIndex;
-    }
+  public String deviceName() {
+    return this.vkPhysicalDeviceProperties.properties().deviceNameString();
+  }
 
-    public @Nullable IntIntPair computeQueueFamilyAndIndex() {
-        return this.computeQueueFamilyAndIndex;
-    }
+  public String vendorName() {
+    int vendorId = this.vkPhysicalDeviceProperties.properties().vendorID();
+    return switch (vendorId) {
+      case 4098, 4130 -> "AMD";
+      case 4318, 4818 -> "NVIDIA";
+      case 32902 -> "INTEL";
+      case 5772, 6091, 6505, 20803 -> "QUALCOMM";
+      case 4112 -> "IMGTEC";
+      case 5348 -> "BROADCOM";
+      case 5045 -> "ARM";
+      case 5140 -> "MICROSOFT";
+      case 4203 -> "APPLE";
+      default -> String.format(Locale.ROOT, "0x%x", vendorId);
+    };
+  }
 
-    public @Nullable IntIntPair transferQueueFamilyAndIndex() {
-        return this.transferQueueFamilyAndIndex;
-    }
+  public VkPhysicalDevice vkPhysicalDevice() {
+    return this.vkPhysicalDevice;
+  }
 
-    private static String getStandardEncodingVersion(int version) {
-        int major = version >>> 22 & 0x7F;
-        int minor = version >>> 12 & 0x3FF;
-        int patch = version & 0xFFF;
-        return String.format(Locale.ROOT, "%d.%d.%d", major, minor, patch);
-    }
+  public VkPhysicalDeviceProperties vkPhysicalDeviceProperties() {
+    return this.vkPhysicalDeviceProperties.properties();
+  }
 
-    public String driverInfo() {
-        int apiVersion = this.vkPhysicalDeviceProperties.properties().apiVersion();
-        String versionString = VulkanPhysicalDevice.getStandardEncodingVersion(apiVersion);
-        return String.format(Locale.ROOT, "%s %s %s", versionString, this.vkPhysicalDeviceDriverProperties.driverNameString(), this.vkPhysicalDeviceDriverProperties.driverInfoString());
-    }
+  public VkPhysicalDeviceDriverProperties vkPhysicalDeviceDriverProperties() {
+    return this.vkPhysicalDeviceDriverProperties;
+  }
 
-    public DeviceType deviceType() {
-        return switch (this.vkPhysicalDeviceProperties.properties().deviceType()) {
-            case 1 -> DeviceType.INTEGRATED;
-            case 2 -> DeviceType.DISCRETE;
-            case 3 -> DeviceType.VIRTUAL;
-            case 4 -> DeviceType.CPU;
-            default -> DeviceType.OTHER;
-        };
+  public boolean hasDeviceExtension(String name) {
+    return this.vkDeviceExtensions.stream().anyMatch(e -> e.extensionNameString().equals(name));
+  }
+
+  public Set<String> getMissingExtensions(Collection<String> required) {
+    HashSet<String> remaining = new HashSet<String>(required);
+    for (VkExtensionProperties extension : this.vkDeviceExtensions) {
+      remaining.remove(extension.extensionNameString());
     }
+    return remaining;
+  }
+
+  public Int2IntMap queueFamilyCreateInfoMap() {
+    return this.queueFamilyCreateInfoMap;
+  }
+
+  public @Nullable IntIntPair graphicsQueueFamilyAndIndex() {
+    return this.graphicsQueueFamilyAndIndex;
+  }
+
+  public @Nullable IntIntPair computeQueueFamilyAndIndex() {
+    return this.computeQueueFamilyAndIndex;
+  }
+
+  public @Nullable IntIntPair transferQueueFamilyAndIndex() {
+    return this.transferQueueFamilyAndIndex;
+  }
+
+  private static String getStandardEncodingVersion(int version) {
+    int major = version >>> 22 & 0x7F;
+    int minor = version >>> 12 & 0x3FF;
+    int patch = version & 0xFFF;
+    return String.format(Locale.ROOT, "%d.%d.%d", major, minor, patch);
+  }
+
+  public String driverInfo() {
+    int apiVersion = this.vkPhysicalDeviceProperties.properties().apiVersion();
+    String versionString = VulkanPhysicalDevice.getStandardEncodingVersion(apiVersion);
+    return String.format(
+        Locale.ROOT,
+        "%s %s %s",
+        versionString,
+        this.vkPhysicalDeviceDriverProperties.driverNameString(),
+        this.vkPhysicalDeviceDriverProperties.driverInfoString());
+  }
+
+  public DeviceType deviceType() {
+    return switch (this.vkPhysicalDeviceProperties.properties().deviceType()) {
+      case 1 -> DeviceType.INTEGRATED;
+      case 2 -> DeviceType.DISCRETE;
+      case 3 -> DeviceType.VIRTUAL;
+      case 4 -> DeviceType.CPU;
+      default -> DeviceType.OTHER;
+    };
+  }
 }
-

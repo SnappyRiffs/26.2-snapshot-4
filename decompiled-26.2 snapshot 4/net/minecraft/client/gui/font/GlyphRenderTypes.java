@@ -10,22 +10,33 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 
-public record GlyphRenderTypes(RenderType normal, RenderType seeThrough, RenderType polygonOffset, RenderPipeline guiPipeline) {
-    public static GlyphRenderTypes createForGrayscaleTexture(Identifier name) {
-        return new GlyphRenderTypes(RenderTypes.textGrayscale(name), RenderTypes.textGrayscaleSeeThrough(name), RenderTypes.textGrayscalePolygonOffset(name), RenderPipelines.GUI_TEXT_GRAYSCALE);
-    }
+public record GlyphRenderTypes(
+    RenderType normal,
+    RenderType seeThrough,
+    RenderType polygonOffset,
+    RenderPipeline guiPipeline) {
+  public static GlyphRenderTypes createForGrayscaleTexture(Identifier name) {
+    return new GlyphRenderTypes(
+        RenderTypes.textGrayscale(name),
+        RenderTypes.textGrayscaleSeeThrough(name),
+        RenderTypes.textGrayscalePolygonOffset(name),
+        RenderPipelines.GUI_TEXT_GRAYSCALE);
+  }
 
-    public static GlyphRenderTypes createForColorTexture(Identifier name) {
-        return new GlyphRenderTypes(RenderTypes.text(name), RenderTypes.textSeeThrough(name), RenderTypes.textPolygonOffset(name), RenderPipelines.GUI_TEXT);
-    }
+  public static GlyphRenderTypes createForColorTexture(Identifier name) {
+    return new GlyphRenderTypes(
+        RenderTypes.text(name),
+        RenderTypes.textSeeThrough(name),
+        RenderTypes.textPolygonOffset(name),
+        RenderPipelines.GUI_TEXT);
+  }
 
-    public RenderType select(Font.DisplayMode mode) {
-        return switch (mode) {
-            default -> throw new MatchException(null, null);
-            case Font.DisplayMode.NORMAL -> this.normal;
-            case Font.DisplayMode.SEE_THROUGH -> this.seeThrough;
-            case Font.DisplayMode.POLYGON_OFFSET -> this.polygonOffset;
-        };
-    }
+  public RenderType select(Font.DisplayMode mode) {
+    return switch (mode) {
+      default -> throw new MatchException(null, null);
+      case Font.DisplayMode.NORMAL -> this.normal;
+      case Font.DisplayMode.SEE_THROUGH -> this.seeThrough;
+      case Font.DisplayMode.POLYGON_OFFSET -> this.polygonOffset;
+    };
+  }
 }
-

@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.serialization.MapCodec
  *  org.jspecify.annotations.Nullable
@@ -14,8 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 public interface RangeSelectItemModelProperty {
-    public float get(ItemStack var1, @Nullable ClientLevel var2, @Nullable ItemOwner var3, int var4);
+  public float get(ItemStack var1, @Nullable ClientLevel var2, @Nullable ItemOwner var3, int var4);
 
-    public MapCodec<? extends RangeSelectItemModelProperty> type();
+  public MapCodec<? extends RangeSelectItemModelProperty> type();
 }
-

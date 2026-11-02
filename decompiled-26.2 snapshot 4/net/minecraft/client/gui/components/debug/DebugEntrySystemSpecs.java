@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.jspecify.annotations.Nullable
  */
@@ -13,37 +13,50 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.List;
 import java.util.Locale;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
-import net.minecraft.client.gui.components.debug.DebugScreenEntry;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jspecify.annotations.Nullable;
 
-public class DebugEntrySystemSpecs
-implements DebugScreenEntry {
-    private static final Identifier GROUP = Identifier.withDefaultNamespace("system");
+public class DebugEntrySystemSpecs implements DebugScreenEntry {
+  private static final Identifier GROUP = Identifier.withDefaultNamespace("system");
 
-    @Override
-    public void display(DebugScreenDisplayer displayer, @Nullable Level serverOrClientLevel, @Nullable LevelChunk clientChunk, @Nullable LevelChunk serverChunk) {
-        DeviceInfo deviceInfo = RenderSystem.getDevice().getDeviceInfo();
-        displayer.addToGroup(GROUP, List.of(String.format(Locale.ROOT, "Java: %s", System.getProperty("java.version")), String.format(Locale.ROOT, "CPU: %s", GLX._getCpuInfo()), String.format(Locale.ROOT, "Display: %dx%d (%s)", Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), deviceInfo.vendorName()), String.format(Locale.ROOT, "%s%s", deviceInfo.name(), this.typeName(deviceInfo.type())), String.format(Locale.ROOT, "%s %s", deviceInfo.backendName(), deviceInfo.driverInfo())));
-    }
+  @Override
+  public void display(
+      DebugScreenDisplayer displayer,
+      @Nullable Level serverOrClientLevel,
+      @Nullable LevelChunk clientChunk,
+      @Nullable LevelChunk serverChunk) {
+    DeviceInfo deviceInfo = RenderSystem.getDevice().getDeviceInfo();
+    displayer.addToGroup(
+        GROUP,
+        List.of(
+            String.format(Locale.ROOT, "Java: %s", System.getProperty("java.version")),
+            String.format(Locale.ROOT, "CPU: %s", GLX._getCpuInfo()),
+            String.format(
+                Locale.ROOT,
+                "Display: %dx%d (%s)",
+                Minecraft.getInstance().getWindow().getWidth(),
+                Minecraft.getInstance().getWindow().getHeight(),
+                deviceInfo.vendorName()),
+            String.format(Locale.ROOT, "%s%s", deviceInfo.name(), this.typeName(deviceInfo.type())),
+            String.format(
+                Locale.ROOT, "%s %s", deviceInfo.backendName(), deviceInfo.driverInfo())));
+  }
 
-    private String typeName(DeviceType type) {
-        return switch (type) {
-            default -> throw new MatchException(null, null);
-            case DeviceType.OTHER -> "";
-            case DeviceType.INTEGRATED -> " (iGPU)";
-            case DeviceType.DISCRETE -> " (dGPU)";
-            case DeviceType.VIRTUAL -> " (vGPU)";
-            case DeviceType.CPU -> " (software)";
-        };
-    }
+  private String typeName(DeviceType type) {
+    return switch (type) {
+      default -> throw new MatchException(null, null);
+      case DeviceType.OTHER -> "";
+      case DeviceType.INTEGRATED -> " (iGPU)";
+      case DeviceType.DISCRETE -> " (dGPU)";
+      case DeviceType.VIRTUAL -> " (vGPU)";
+      case DeviceType.CPU -> " (software)";
+    };
+  }
 
-    @Override
-    public boolean isAllowed(boolean reducedDebugInfo) {
-        return true;
-    }
+  @Override
+  public boolean isAllowed(boolean reducedDebugInfo) {
+    return true;
+  }
 }
-

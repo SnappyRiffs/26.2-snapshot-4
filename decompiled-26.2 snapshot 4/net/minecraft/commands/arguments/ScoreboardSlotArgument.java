@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.mojang.brigadier.ImmutableStringReader
  *  com.mojang.brigadier.StringReader
@@ -29,37 +29,39 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.DisplaySlot;
 
-public class ScoreboardSlotArgument
-implements ArgumentType<DisplaySlot> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("sidebar", "foo.bar");
-    public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(value -> Component.translatableEscape("argument.scoreboardDisplaySlot.invalid", value));
+public class ScoreboardSlotArgument implements ArgumentType<DisplaySlot> {
+  private static final Collection<String> EXAMPLES = Arrays.asList("sidebar", "foo.bar");
+  public static final DynamicCommandExceptionType ERROR_INVALID_VALUE =
+      new DynamicCommandExceptionType(
+          value -> Component.translatableEscape("argument.scoreboardDisplaySlot.invalid", value));
 
-    private ScoreboardSlotArgument() {
-    }
+  private ScoreboardSlotArgument() {}
 
-    public static ScoreboardSlotArgument displaySlot() {
-        return new ScoreboardSlotArgument();
-    }
+  public static ScoreboardSlotArgument displaySlot() {
+    return new ScoreboardSlotArgument();
+  }
 
-    public static DisplaySlot getDisplaySlot(CommandContext<CommandSourceStack> context, String name) {
-        return (DisplaySlot)context.getArgument(name, DisplaySlot.class);
-    }
+  public static DisplaySlot getDisplaySlot(
+      CommandContext<CommandSourceStack> context, String name) {
+    return (DisplaySlot) context.getArgument(name, DisplaySlot.class);
+  }
 
-    public DisplaySlot parse(StringReader reader) throws CommandSyntaxException {
-        String name = reader.readUnquotedString();
-        DisplaySlot result = DisplaySlot.CODEC.byName(name);
-        if (result == null) {
-            throw ERROR_INVALID_VALUE.createWithContext((ImmutableStringReader)reader, (Object)name);
-        }
-        return result;
+  public DisplaySlot parse(StringReader reader) throws CommandSyntaxException {
+    String name = reader.readUnquotedString();
+    DisplaySlot result = DisplaySlot.CODEC.byName(name);
+    if (result == null) {
+      throw ERROR_INVALID_VALUE.createWithContext((ImmutableStringReader) reader, (Object) name);
     }
+    return result;
+  }
 
-    public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(Arrays.stream(DisplaySlot.values()).map(DisplaySlot::getSerializedName), builder);
-    }
+  public <S> CompletableFuture<Suggestions> listSuggestions(
+      CommandContext<S> context, SuggestionsBuilder builder) {
+    return SharedSuggestionProvider.suggest(
+        Arrays.stream(DisplaySlot.values()).map(DisplaySlot::getSerializedName), builder);
+  }
 
-    public Collection<String> getExamples() {
-        return EXAMPLES;
-    }
+  public Collection<String> getExamples() {
+    return EXAMPLES;
+  }
 }
-

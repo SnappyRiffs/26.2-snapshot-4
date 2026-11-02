@@ -8,18 +8,17 @@ import net.minecraft.commands.execution.EntryAction;
 import net.minecraft.commands.execution.ExecutionContext;
 import net.minecraft.commands.execution.Frame;
 
-public class FallthroughTask<T extends ExecutionCommandSource<T>>
-implements EntryAction<T> {
-    private static final FallthroughTask<? extends ExecutionCommandSource<?>> INSTANCE = new FallthroughTask();
+public class FallthroughTask<T extends ExecutionCommandSource<T>> implements EntryAction<T> {
+  private static final FallthroughTask<? extends ExecutionCommandSource<?>> INSTANCE =
+      new FallthroughTask();
 
-    public static <T extends ExecutionCommandSource<T>> EntryAction<T> instance() {
-        return INSTANCE;
-    }
+  public static <T extends ExecutionCommandSource<T>> EntryAction<T> instance() {
+    return INSTANCE;
+  }
 
-    @Override
-    public void execute(ExecutionContext<T> context, Frame frame) {
-        frame.returnFailure();
-        frame.discard();
-    }
+  @Override
+  public void execute(ExecutionContext<T> context, Frame frame) {
+    frame.returnFailure();
+    frame.discard();
+  }
 }
-

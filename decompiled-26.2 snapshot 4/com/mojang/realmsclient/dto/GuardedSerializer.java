@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  com.google.gson.ExclusionStrategy
  *  com.google.gson.FieldAttributes
@@ -16,33 +16,36 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.mojang.realmsclient.dto.Exclude;
-import com.mojang.realmsclient.dto.ReflectionBasedSerialization;
 import org.jspecify.annotations.Nullable;
 
 public class GuardedSerializer {
-    private static final ExclusionStrategy STRATEGY = new ExclusionStrategy(){
+  private static final ExclusionStrategy STRATEGY =
+      new ExclusionStrategy() {
 
         public boolean shouldSkipClass(Class<?> clazz) {
-            return false;
+          return false;
         }
 
         public boolean shouldSkipField(FieldAttributes field) {
-            return field.getAnnotation(Exclude.class) != null;
+          return field.getAnnotation(Exclude.class) != null;
         }
-    };
-    private final Gson gson = new GsonBuilder().addSerializationExclusionStrategy(STRATEGY).addDeserializationExclusionStrategy(STRATEGY).create();
+      };
+  private final Gson gson =
+      new GsonBuilder()
+          .addSerializationExclusionStrategy(STRATEGY)
+          .addDeserializationExclusionStrategy(STRATEGY)
+          .create();
 
-    public String toJson(ReflectionBasedSerialization object) {
-        return this.gson.toJson((Object)object);
-    }
+  public String toJson(ReflectionBasedSerialization object) {
+    return this.gson.toJson((Object) object);
+  }
 
-    public String toJson(JsonElement jsonElement) {
-        return this.gson.toJson(jsonElement);
-    }
+  public String toJson(JsonElement jsonElement) {
+    return this.gson.toJson(jsonElement);
+  }
 
-    public <T extends ReflectionBasedSerialization> @Nullable T fromJson(String contents, Class<T> cls) {
-        return (T)((ReflectionBasedSerialization)this.gson.fromJson(contents, cls));
-    }
+  public <T extends ReflectionBasedSerialization> @Nullable T fromJson(
+      String contents, Class<T> cls) {
+    return (T) ((ReflectionBasedSerialization) this.gson.fromJson(contents, cls));
+  }
 }
-

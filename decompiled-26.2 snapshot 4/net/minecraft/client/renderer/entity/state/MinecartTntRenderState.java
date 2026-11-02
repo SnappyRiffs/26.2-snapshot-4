@@ -3,10 +3,6 @@
  */
 package net.minecraft.client.renderer.entity.state;
 
-import net.minecraft.client.renderer.entity.state.MinecartRenderState;
-
-public class MinecartTntRenderState
-extends MinecartRenderState {
-    public float fuseRemainingInTicks = -1.0f;
+public class MinecartTntRenderState extends MinecartRenderState {
+  public float fuseRemainingInTicks = -1.0f;
 }
-

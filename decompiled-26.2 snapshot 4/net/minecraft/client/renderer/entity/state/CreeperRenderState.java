@@ -3,11 +3,7 @@
  */
 package net.minecraft.client.renderer.entity.state;
 
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-
-public class CreeperRenderState
-extends LivingEntityRenderState {
-    public float swelling;
-    public boolean isPowered;
+public class CreeperRenderState extends LivingEntityRenderState {
+  public float swelling;
+  public boolean isPowered;
 }
-
