@@ -35,8 +35,6 @@ import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.multiplayer.LegacyServerPinger;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ResolvedServerAddress;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.multiplayer.resolver.ServerNameResolver;
@@ -61,189 +59,255 @@ import net.minecraft.util.Util;
 import org.slf4j.Logger;
 
 public class ServerStatusPinger {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private static final Component CANT_CONNECT_MESSAGE = Component.translatable("multiplayer.status.cannot_connect").withColor(-65536);
-    private static final ResolutionContext DESCRIPTION_SANITIZE_CONTEXT = ResolutionContext.builder().withObjectInfoValidator(description -> !(description instanceof PlayerSprite)).setDepthLimit(16).setDepthLimitBehavior(ResolutionContext.LimitBehavior.DISCARD_REMAINING).build();
-    private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
+  private static final Logger LOGGER = LogUtils.getLogger();
+  private static final Component CANT_CONNECT_MESSAGE =
+      Component.translatable("multiplayer.status.cannot_connect").withColor(-65536);
+  private static final ResolutionContext DESCRIPTION_SANITIZE_CONTEXT =
+      ResolutionContext.builder()
+          .withObjectInfoValidator(description -> !(description instanceof PlayerSprite))
+          .setDepthLimit(16)
+          .setDepthLimitBehavior(ResolutionContext.LimitBehavior.DISCARD_REMAINING)
+          .build();
+  private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
 
-    public void pingServer(final ServerData data, final Runnable onPersistentDataChange, final Runnable onPongResponse, final EventLoopGroupHolder eventLoopGroupHolder) throws UnknownHostException {
-        final ServerAddress rawAddress = ServerAddress.parseString(data.ip);
-        Optional<InetSocketAddress> resolvedAddress = ServerNameResolver.DEFAULT.resolveAddress(rawAddress).map(ResolvedServerAddress::asInetSocketAddress);
-        if (resolvedAddress.isEmpty()) {
-            this.onPingFailed(ConnectScreen.UNKNOWN_HOST_MESSAGE, data);
-            return;
-        }
-        final InetSocketAddress address = resolvedAddress.get();
-        final Connection connection = Connection.connectToServer(address, eventLoopGroupHolder, null);
-        this.connections.add(connection);
-        data.motd = Component.translatable("multiplayer.status.pinging");
-        data.playerList = Collections.emptyList();
-        ClientStatusPacketListener listener = new ClientStatusPacketListener(){
-            private boolean success;
-            private boolean receivedPing;
-            private long pingStart;
-            final /* synthetic */ ServerStatusPinger this$0;
-            {
-                ServerStatusPinger serverStatusPinger = this$0;
-                Objects.requireNonNull(serverStatusPinger);
-                this.this$0 = serverStatusPinger;
+  public void pingServer(
+      final ServerData data,
+      final Runnable onPersistentDataChange,
+      final Runnable onPongResponse,
+      final EventLoopGroupHolder eventLoopGroupHolder)
+      throws UnknownHostException {
+    final ServerAddress rawAddress = ServerAddress.parseString(data.ip);
+    Optional<InetSocketAddress> resolvedAddress =
+        ServerNameResolver.DEFAULT
+            .resolveAddress(rawAddress)
+            .map(ResolvedServerAddress::asInetSocketAddress);
+    if (resolvedAddress.isEmpty()) {
+      this.onPingFailed(ConnectScreen.UNKNOWN_HOST_MESSAGE, data);
+      return;
+    }
+    final InetSocketAddress address = resolvedAddress.get();
+    final Connection connection = Connection.connectToServer(address, eventLoopGroupHolder, null);
+    this.connections.add(connection);
+    data.motd = Component.translatable("multiplayer.status.pinging");
+    data.playerList = Collections.emptyList();
+    ClientStatusPacketListener listener =
+        new ClientStatusPacketListener() {
+          private boolean success;
+          private boolean receivedPing;
+          private long pingStart;
+          final /* synthetic */ ServerStatusPinger this$0;
+
+          {
+            ServerStatusPinger serverStatusPinger = this$0;
+            Objects.requireNonNull(serverStatusPinger);
+            this.this$0 = serverStatusPinger;
+          }
+
+          @Override
+          public void handleStatusResponse(ClientboundStatusResponsePacket packet) {
+            if (this.receivedPing) {
+              connection.disconnect(Component.translatable("multiplayer.status.unrequested"));
+              return;
             }
-
-            @Override
-            public void handleStatusResponse(ClientboundStatusResponsePacket packet) {
-                if (this.receivedPing) {
-                    connection.disconnect(Component.translatable("multiplayer.status.unrequested"));
-                    return;
-                }
-                this.receivedPing = true;
-                ServerStatus status = packet.status();
-                data.motd = 1.sanitizeDescription(status.description());
-                status.version().ifPresentOrElse(version -> {
-                    data2.version = Component.literal(version.name());
-                    data2.protocol = version.protocol();
-                }, () -> {
-                    data2.version = Component.translatable("multiplayer.status.old");
-                    data2.protocol = 0;
-                });
-                status.players().ifPresentOrElse(players -> {
-                    data2.status = ServerStatusPinger.formatPlayerCount(players.online(), players.max());
-                    data2.players = players;
-                    if (!players.sample().isEmpty()) {
-                        ArrayList<Component> playerNames = new ArrayList<Component>(players.sample().size());
+            this.receivedPing = true;
+            ServerStatus status = packet.status();
+            data.motd = sanitizeDescription(status.description());
+            status
+                .version()
+                .ifPresentOrElse(
+                    version -> {
+                      data2.version = Component.literal(version.name());
+                      data2.protocol = version.protocol();
+                    },
+                    () -> {
+                      data2.version = Component.translatable("multiplayer.status.old");
+                      data2.protocol = 0;
+                    });
+            status
+                .players()
+                .ifPresentOrElse(
+                    players -> {
+                      data2.status =
+                          ServerStatusPinger.formatPlayerCount(players.online(), players.max());
+                      data2.players = players;
+                      if (!players.sample().isEmpty()) {
+                        ArrayList<Component> playerNames =
+                            new ArrayList<Component>(players.sample().size());
                         for (NameAndId profile : players.sample()) {
-                            MutableComponent playerName = profile.equals(MinecraftServer.ANONYMOUS_PLAYER_PROFILE) ? Component.translatable("multiplayer.status.anonymous_player") : Component.literal(profile.name());
-                            playerNames.add(playerName);
+                          MutableComponent playerName =
+                              profile.equals(MinecraftServer.ANONYMOUS_PLAYER_PROFILE)
+                                  ? Component.translatable("multiplayer.status.anonymous_player")
+                                  : Component.literal(profile.name());
+                          playerNames.add(playerName);
                         }
                         if (players.sample().size() < players.online()) {
-                            playerNames.add(Component.translatable("multiplayer.status.and_more", players.online() - players.sample().size()));
+                          playerNames.add(
+                              Component.translatable(
+                                  "multiplayer.status.and_more",
+                                  players.online() - players.sample().size()));
                         }
                         data2.playerList = playerNames;
-                    } else {
+                      } else {
                         data2.playerList = List.of();
-                    }
-                }, () -> {
-                    data2.status = Component.translatable("multiplayer.status.unknown").withStyle(ChatFormatting.DARK_GRAY);
-                });
-                status.favicon().ifPresent(newIcon -> {
-                    if (!Arrays.equals(newIcon.iconBytes(), data.getIconBytes())) {
+                      }
+                    },
+                    () -> {
+                      data2.status =
+                          Component.translatable("multiplayer.status.unknown")
+                              .withStyle(ChatFormatting.DARK_GRAY);
+                    });
+            status
+                .favicon()
+                .ifPresent(
+                    newIcon -> {
+                      if (!Arrays.equals(newIcon.iconBytes(), data.getIconBytes())) {
                         data.setIconBytes(ServerData.validateIcon(newIcon.iconBytes()));
                         onPersistentDataChange.run();
-                    }
-                });
-                this.pingStart = Util.getMillis();
-                connection.send(new ServerboundPingRequestPacket(this.pingStart));
-                this.success = true;
-            }
+                      }
+                    });
+            this.pingStart = Util.getMillis();
+            connection.send(new ServerboundPingRequestPacket(this.pingStart));
+            this.success = true;
+          }
 
-            private static Component sanitizeDescription(Component original) {
-                try {
-                    return ComponentUtils.resolve(DESCRIPTION_SANITIZE_CONTEXT, original);
-                }
-                catch (CommandSyntaxException e) {
-                    LOGGER.warn("Failed to sanitize status {}", (Object)original, (Object)e);
-                    return Component.empty();
-                }
+          private static Component sanitizeDescription(Component original) {
+            try {
+              return ComponentUtils.resolve(DESCRIPTION_SANITIZE_CONTEXT, original);
+            } catch (CommandSyntaxException e) {
+              LOGGER.warn("Failed to sanitize status {}", (Object) original, (Object) e);
+              return Component.empty();
             }
+          }
 
-            @Override
-            public void handlePongResponse(ClientboundPongResponsePacket packet) {
-                long then = this.pingStart;
-                long now = Util.getMillis();
-                data.ping = now - then;
-                connection.disconnect(Component.translatable("multiplayer.status.finished"));
-                onPongResponse.run();
-            }
+          @Override
+          public void handlePongResponse(ClientboundPongResponsePacket packet) {
+            long then = this.pingStart;
+            long now = Util.getMillis();
+            data.ping = now - then;
+            connection.disconnect(Component.translatable("multiplayer.status.finished"));
+            onPongResponse.run();
+          }
 
-            @Override
-            public void onDisconnect(DisconnectionDetails details) {
-                if (!this.success) {
-                    this.this$0.onPingFailed(details.reason(), data);
-                    this.this$0.pingLegacyServer(address, rawAddress, data, eventLoopGroupHolder);
-                }
+          @Override
+          public void onDisconnect(DisconnectionDetails details) {
+            if (!this.success) {
+              this.this$0.onPingFailed(details.reason(), data);
+              this.this$0.pingLegacyServer(address, rawAddress, data, eventLoopGroupHolder);
             }
+          }
 
-            @Override
-            public boolean isAcceptingMessages() {
-                return connection.isConnected();
-            }
+          @Override
+          public boolean isAcceptingMessages() {
+            return connection.isConnected();
+          }
         };
-        try {
-            connection.initiateServerboundStatusConnection(rawAddress.getHost(), rawAddress.getPort(), listener);
-            connection.send(ServerboundStatusRequestPacket.INSTANCE);
+    try {
+      connection.initiateServerboundStatusConnection(
+          rawAddress.getHost(), rawAddress.getPort(), listener);
+      connection.send(ServerboundStatusRequestPacket.INSTANCE);
+    } catch (Throwable t) {
+      LOGGER.error("Failed to ping server {}", (Object) rawAddress, (Object) t);
+    }
+  }
+
+  private void onPingFailed(Component reason, ServerData data) {
+    LOGGER.error("Can't ping {}: {}", (Object) data.ip, (Object) reason.getString());
+    data.motd = CANT_CONNECT_MESSAGE;
+    data.status = CommonComponents.EMPTY;
+  }
+
+  private void pingLegacyServer(
+      InetSocketAddress resolvedAddress,
+      final ServerAddress rawAddress,
+      final ServerData data,
+      EventLoopGroupHolder eventLoopGroupHolder) {
+    ((Bootstrap)
+            ((Bootstrap)
+                    ((Bootstrap) new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup()))
+                        .handler(
+                            (ChannelHandler)
+                                new ChannelInitializer<Channel>(this) {
+                                  {
+                                    Objects.requireNonNull(this$0);
+                                  }
+
+                                  protected void initChannel(Channel channel) {
+                                    try {
+                                      channel
+                                          .config()
+                                          .setOption(ChannelOption.TCP_NODELAY, (Object) true);
+                                    } catch (ChannelException channelException) {
+                                      // empty catch block
+                                    }
+                                    channel
+                                        .pipeline()
+                                        .addLast(
+                                            new ChannelHandler[] {
+                                              new LegacyServerPinger(
+                                                  rawAddress,
+                                                  (protocolVersion,
+                                                      gameVersion,
+                                                      motd,
+                                                      players,
+                                                      maxPlayers) -> {
+                                                    data.setState(ServerData.State.INCOMPATIBLE);
+                                                    data2.version = Component.literal(gameVersion);
+                                                    data2.motd = Component.literal(motd);
+                                                    data2.status =
+                                                        ServerStatusPinger.formatPlayerCount(
+                                                            players, maxPlayers);
+                                                    data2.players =
+                                                        new ServerStatus.Players(
+                                                            maxPlayers, players, List.of());
+                                                  })
+                                            });
+                                  }
+                                }))
+                .channel(eventLoopGroupHolder.channelCls()))
+        .connect(resolvedAddress.getAddress(), resolvedAddress.getPort());
+  }
+
+  public static Component formatPlayerCount(int curPlayers, int maxPlayers) {
+    MutableComponent current =
+        Component.literal(Integer.toString(curPlayers)).withStyle(ChatFormatting.GRAY);
+    MutableComponent max =
+        Component.literal(Integer.toString(maxPlayers)).withStyle(ChatFormatting.GRAY);
+    return Component.translatable("multiplayer.status.player_count", current, max)
+        .withStyle(ChatFormatting.DARK_GRAY);
+  }
+
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public void tick() {
+    List<Connection> list = this.connections;
+    synchronized (list) {
+      Iterator<Connection> iterator = this.connections.iterator();
+      while (iterator.hasNext()) {
+        Connection connection = iterator.next();
+        if (connection.isConnected()) {
+          connection.tick();
+          continue;
         }
-        catch (Throwable t) {
-            LOGGER.error("Failed to ping server {}", (Object)rawAddress, (Object)t);
-        }
+        iterator.remove();
+        connection.handleDisconnection();
+      }
     }
+  }
 
-    private void onPingFailed(Component reason, ServerData data) {
-        LOGGER.error("Can't ping {}: {}", (Object)data.ip, (Object)reason.getString());
-        data.motd = CANT_CONNECT_MESSAGE;
-        data.status = CommonComponents.EMPTY;
+  /*
+   * WARNING - Removed try catching itself - possible behaviour change.
+   */
+  public void removeAll() {
+    List<Connection> list = this.connections;
+    synchronized (list) {
+      Iterator<Connection> iterator = this.connections.iterator();
+      while (iterator.hasNext()) {
+        Connection connection = iterator.next();
+        if (!connection.isConnected()) continue;
+        iterator.remove();
+        connection.disconnect(Component.translatable("multiplayer.status.cancelled"));
+      }
     }
-
-    private void pingLegacyServer(InetSocketAddress resolvedAddress, final ServerAddress rawAddress, final ServerData data, EventLoopGroupHolder eventLoopGroupHolder) {
-        ((Bootstrap)((Bootstrap)((Bootstrap)new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup())).handler((ChannelHandler)new ChannelInitializer<Channel>(this){
-            {
-                Objects.requireNonNull(this$0);
-            }
-
-            protected void initChannel(Channel channel) {
-                try {
-                    channel.config().setOption(ChannelOption.TCP_NODELAY, (Object)true);
-                }
-                catch (ChannelException channelException) {
-                    // empty catch block
-                }
-                channel.pipeline().addLast(new ChannelHandler[]{new LegacyServerPinger(rawAddress, (protocolVersion, gameVersion, motd, players, maxPlayers) -> {
-                    data.setState(ServerData.State.INCOMPATIBLE);
-                    data2.version = Component.literal(gameVersion);
-                    data2.motd = Component.literal(motd);
-                    data2.status = ServerStatusPinger.formatPlayerCount(players, maxPlayers);
-                    data2.players = new ServerStatus.Players(maxPlayers, players, List.of());
-                })});
-            }
-        })).channel(eventLoopGroupHolder.channelCls())).connect(resolvedAddress.getAddress(), resolvedAddress.getPort());
-    }
-
-    public static Component formatPlayerCount(int curPlayers, int maxPlayers) {
-        MutableComponent current = Component.literal(Integer.toString(curPlayers)).withStyle(ChatFormatting.GRAY);
-        MutableComponent max = Component.literal(Integer.toString(maxPlayers)).withStyle(ChatFormatting.GRAY);
-        return Component.translatable("multiplayer.status.player_count", current, max).withStyle(ChatFormatting.DARK_GRAY);
-    }
-
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public void tick() {
-        List<Connection> list = this.connections;
-        synchronized (list) {
-            Iterator<Connection> iterator = this.connections.iterator();
-            while (iterator.hasNext()) {
-                Connection connection = iterator.next();
-                if (connection.isConnected()) {
-                    connection.tick();
-                    continue;
-                }
-                iterator.remove();
-                connection.handleDisconnection();
-            }
-        }
-    }
-
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     */
-    public void removeAll() {
-        List<Connection> list = this.connections;
-        synchronized (list) {
-            Iterator<Connection> iterator = this.connections.iterator();
-            while (iterator.hasNext()) {
-                Connection connection = iterator.next();
-                if (!connection.isConnected()) continue;
-                iterator.remove();
-                connection.disconnect(Component.translatable("multiplayer.status.cancelled"));
-            }
-        }
-    }
+  }
 }
